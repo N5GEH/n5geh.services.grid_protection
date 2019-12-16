@@ -1,0 +1,15 @@
+{
+  "Grid-ID": "xxxx",
+  "POCs":
+    [
+      {
+        "BUS_LV_PH1_I_RES": "Slack, Current Phase1",
+        "BUS_LV_PH2_I_RES": "Slack, Current Phase2",
+        "BUS_LV_PH3_I_RES": "Slack, Current Phase3",
+        "PV1_PH1_I_RES": "PV1, Current Phase1",
+        "PV1_PH2_I_RES": "PV1, Current Phase2",
+        "PV1_PH3_I_RES": "PV1, Current Phase3",
+        "BUS_LV_BREAKER_CTRL": "Slack, Circuit Breaker [0-open, 1-closed]"
+      }
+    ]
+}

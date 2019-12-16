@@ -1,0 +1,9 @@
+#Packages
+venv*/
+misc*/
+
+#Developer
+.idea
+
+#Cache
+*.pyc

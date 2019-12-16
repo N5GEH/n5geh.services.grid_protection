@@ -1,0 +1,10 @@
+#Packages
+venv*/
+misc*/
+
+#Developer
+.idea
+
+#Cache
+*.pyc
+local_simulation_setup/Diff_Protection/RecordedData/

@@ -1,0 +1,11 @@
+DEBUG_MODE_PRINT: True
+DEBUG_MODE_VAR_UPDATER: True
+SERVER_ENDPOINT: opc.tcp://localhost:4840/freeopcua/server/
+NAMESPACE: http://examples.freeopcua.github.io
+#SERVER_ENDPOINT: opc.tcp://ubuntu5g:4840/
+#NAMESPACE: http://opcfoundation.org/UA/
+MAX_ARCHIVES: 20
+MAX_FAULTY_STATES: 5
+TIMESTAMP_PRECISION: 10000
+UPDATE_PERIOD: 500000
+

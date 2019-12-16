@@ -1,0 +1,12 @@
+cryptography>=2.7
+python-dateutil>=2.8.0
+lxml>=4.4.0
+pytz>=2019.2
+pyyaml>=5.1.2
+opcua>=0.98.8
+pandas>=0.25.3
+
+[dev]
+
+[protection]
+pandas>=0.25.3
