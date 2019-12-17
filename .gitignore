@@ -4,6 +4,7 @@ misc*/
 
 #Developer
 .idea
+.egg-info
 
 #Cache
 *.pyc
