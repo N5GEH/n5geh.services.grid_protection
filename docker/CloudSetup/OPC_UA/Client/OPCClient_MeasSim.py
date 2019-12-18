@@ -70,8 +70,12 @@ class VarUpdater(Thread):
                     now_noised = now + datetime.timedelta(0, 0, delta)
 
                     dv = DataValue()
-                    dv.SourceTimestamp = now_noised
-                    dv.Value = ua.Variant(self.count)
+                    dv.SourceTimestamp = now
+                    # dv.SourceTimestamp = now_noised
+                    if "FEEDER2_LOAD_I_PH1_RES" in var.get_browse_name().Name:
+                        dv.Value = ua.Variant(self.count*2)
+                    else:
+                        dv.Value = ua.Variant(self.count)
                     var.set_value(dv)
 
 

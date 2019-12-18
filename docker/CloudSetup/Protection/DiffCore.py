@@ -11,12 +11,14 @@ If there is an deviation greater than an epsilon, that ctrl_nodes gets new value
 import os
 from threading import Thread
 
+from Protection import settings
+
 __version__ = '0.5'
 __author__ = 'Sebastian Krahmer'
 
 
 class DiffCore(Thread):
-    def __init__(self, opc_client, ctrl_nodes, dataframe_ph1, dataframe_ph2, dataframe_ph3,
+    def __init__(self, opc_client, ctrl_nodes, misc_nodes, dataframe_ph1, dataframe_ph2, dataframe_ph3,
                  nominal_current=275, eps=0.05, number_of_faulty_dates_to_failure=5):
         Thread.__init__(self)
         # super().__init__()
@@ -37,6 +39,7 @@ class DiffCore(Thread):
         self.work_status = 'init'
         self.opc_client = opc_client
         self.ctrl_nodes_list = ctrl_nodes
+        self.misc_nodes_list =misc_nodes
         self.df_ph1 = dataframe_ph1
         self.df_ph2 = dataframe_ph2
         self.df_ph3 = dataframe_ph3
@@ -94,30 +97,44 @@ class DiffCore(Thread):
 
     # ## check the recent balances (of current) of selected phase
     def evaluate_historical_balances_of_current(self, faulty_phase):
+        if faulty_phase == 1:
+            # if within the last stored timestamps (size of MAX_ARCHIVES) are at least MAX_FAULTY_STATES
+            if settings.mFaultStates_ph1 >= self.MAX_FAULTY_STATES:
+                self.dissolve_grid_failure()
+            else:
+                settings.mFaultStates_ph1 += 1
+        elif faulty_phase == 2:
+            # if within the last stored timestamps (size of MAX_ARCHIVES) are at least MAX_FAULTY_STATES
+            if settings.mFaultStates_ph2 >= self.MAX_FAULTY_STATES:
+                self.dissolve_grid_failure()
+            else:
+                settings.mFaultStates_ph2 += 1
+        elif faulty_phase == 3:
+            # if within the last stored timestamps (size of MAX_ARCHIVES) are at least MAX_FAULTY_STATES
+            if settings.mFaultStates_ph3 >= self.MAX_FAULTY_STATES:
+                self.dissolve_grid_failure()
+            else:
+                settings.mFaultStates_ph3 += 1
 
-        self.dissolve_grid_failure()
-        ##todo
-        # limit = 0
-        # for i in getattr(self, "sum_ph" + str(faulty_phase)):
-        #     if abs(i) > self.eps_abs:
-        #         limit += 1
-        #
-        # # ## if within the last stored timestamps (size of MAX_ARCHIVES) are at least MAX_FAULTY_STATES
-        # # ## --> dissolve_grid_failure()
-        # if limit >= self.MAX_FAULTY_STATES:
-        #     self.dissolve_grid_failure()
+        # update Status FAULTY_STATES
+        nodes = []
+        values = []
+        for misc in self.misc_nodes_list:
+            if "FAULTY_STATES" in misc.opctag:
+                nodes.append(misc)
+                values.append(max(settings.mFaultStates_ph1, settings.mFaultStates_ph2, settings.mFaultStates_ph3))
+                self.opc_client.set_vars(nodes, values)
 
     def dissolve_grid_failure(self):
-        ctrls = []
-        values = []
-
-        # # ## check the actual state of BREAKER at Slack
+        # check the actual state of CTRLs
         # self.update_ctrl_states()
-
-        # ## update the state of BREAKER at Slack
+        
+        nodes = []
+        values = []
+        # update the state of CTRLs
         for ctrl in self.ctrl_nodes_list:
             if "PRED_CTRL" in ctrl.opctag:
-                ctrls.append(ctrl)
+                nodes.append(ctrl)
                 values.append(0)  # decrease power infeed to 0%
 
             # snippet when using with PowerFactory
@@ -127,8 +144,11 @@ class DiffCore(Thread):
             #     values.append(1)  # only for testing
             #     # values.append(0)    # open breaker 0
 
-        # ## execute set_vars()
-        self.opc_client.set_vars(ctrls, values)
+        # execute set_vars()
+        self.opc_client.set_vars(nodes, values)
+        settings.mFaultStates_ph1 = 0
+        settings.mFaultStates_ph2 = 0
+        settings.mFaultStates_ph3 = 0
         if self.DEBUG_MODE_PRINT:
             print(self.__class__.__name__, "All CTRL devices are set to power feedin = 0.")
 
@@ -148,9 +168,9 @@ class DiffCore(Thread):
     def print_current_result(self, result_code):
         if self.DEBUG_MODE_PRINT:
             print(result_code, ': '
-                  , str(format(self.df_ph1.iloc[-1]['sum'], '.2f')) + ', '
-                  , str(format(self.df_ph2.iloc[-1]['sum'], '.2f')) + ', '
-                  , str(format(self.df_ph3.iloc[-1]['sum'], '.2f')) + ";" + '\n')
+                  , str(format(self.df_ph1.iloc[-1]['sum'], '.2f')) + '(' + str(settings.mFaultStates_ph1) + ')' + ', '
+                  , str(format(self.df_ph2.iloc[-1]['sum'], '.2f')) + '(' + str(settings.mFaultStates_ph2) + ')' + ', '
+                  , str(format(self.df_ph3.iloc[-1]['sum'], '.2f')) + '(' + str(settings.mFaultStates_ph3) + ')' + ";" + '\n')
 
     def print_work_status(self):
         if self.DEBUG_MODE_PRINT:

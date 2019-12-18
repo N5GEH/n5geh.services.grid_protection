@@ -22,6 +22,7 @@ from CloudSetup.OPC_UA.Client.OPCClient import CustomClient
 
 import time
 
+from Protection import settings
 
 __version__ = '0.5'
 __author__ = 'Sebastian Krahmer'
@@ -56,6 +57,8 @@ class DataHandler(object):
         self.df_ph1 = pd.DataFrame()          # dataframe for phase 1 to pass to fault_assessment
         self.df_ph2 = pd.DataFrame()
         self.df_ph3 = pd.DataFrame()
+
+        settings.init()
 
     def start(self):
         # Registration of vars at server
@@ -152,13 +155,16 @@ class DataHandler(object):
 
                 if var.phase == 1:
                     self.df_ph1.loc[ts, var.opctag] = val
-                    print(self.df_ph1)
+                    if self.DEBUG_MODE_PRINT:
+                        print(self.df_ph1)
                 elif var.phase == 2:
                     self.df_ph2.loc[ts, var.opctag] = val
-                    print(self.df_ph2)
+                    if self.DEBUG_MODE_PRINT:
+                        print(self.df_ph2)
                 elif var.phase == 3:
                     self.df_ph3.loc[ts, var.opctag] = val
-                    print(self.df_ph3)
+                    if self.DEBUG_MODE_PRINT:
+                        print(self.df_ph3)
 
                 if self.DEBUG_MODE_PRINT:
                     print(self.__class__.__name__, " successful updated data")
@@ -166,7 +172,7 @@ class DataHandler(object):
 
         start = time.time_ns()                  # in ns
         if self.check_data_queue_for_completeness():
-            dc = DiffCore(self.opc_client, self.ctrl_nodes_list, self.df_ph1, self.df_ph2, self.df_ph3)
+            dc = DiffCore(self.opc_client, self.ctrl_nodes_list, self.misc_nodes_list, self.df_ph1, self.df_ph2, self.df_ph3)
             dc.start()
             self.clear_meas_data()
         end = time.time_ns()                    # in ns
