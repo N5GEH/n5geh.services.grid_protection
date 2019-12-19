@@ -3,6 +3,7 @@ FROM python:3.7-slim-buster
 RUN mkdir /data
 ADD Docker/CloudSetup/Topology          /data/Topology
 ADD Docker/CloudSetup/MeasDeviceConfig  /data/MeasDeviceConfig
+VOLUME /data
 
 
 WORKDIR /usr/src/CloudSetup
