@@ -128,7 +128,7 @@ class DiffCore(Thread):
     def dissolve_grid_failure(self):
         # check the actual state of CTRLs
         # self.update_ctrl_states()
-        
+
         nodes = []
         values = []
         # update the state of CTRLs

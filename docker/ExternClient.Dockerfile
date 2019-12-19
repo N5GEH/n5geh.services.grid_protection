@@ -2,7 +2,7 @@ FROM python:3.7-slim-buster
 
 WORKDIR /usr/src/CloudSetup
 
-ADD UC2_grid_protection/Docker/CloudSetup .
+ADD Docker/CloudSetup .
 # install dependencies and libs via setup.py in CloudSetup
 RUN pip install -e .
 ENV PYTHONPATH /usr/src

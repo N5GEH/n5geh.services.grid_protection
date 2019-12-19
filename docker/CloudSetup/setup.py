@@ -86,7 +86,7 @@ setup(
         'pytz>=2019.2',
         'pyyaml>=5.1.2',
         'opcua>=0.98.8',
-        'pandas>=0.25.3',
+        # 'pandas>=0.25.3',
 
         # 'opcua==0.98.3' # maybe better alternative: load fork from https://github.com/SebastianDD/python-opcua@n5geh
     ],

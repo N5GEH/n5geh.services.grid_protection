@@ -45,7 +45,7 @@ if __name__ == "__main__":
     os.environ.setdefault("NOMINAL_CURRENT", "275")
     os.environ.setdefault("CURRENT_EPS", "0.05")
     os.environ.setdefault("TOPOLOGY_PATH", "/CloudSetup/Topology/TopologyFile_demonstrator.json")
-    os.environ.setdefault("PF_INPUT_PATH", "/CloudSetup/PFInputFiles/demonstrator_setup.txt")
+    os.environ.setdefault("PF_INPUT_PATH", "/CloudSetup/MeasDeviceConfig/demonstrator_setup.txt")
 
     # config.DEBUG_MODE_PRINT = "True"
     # config.DEBUG_MODE_VAR_UPDATER = "True"

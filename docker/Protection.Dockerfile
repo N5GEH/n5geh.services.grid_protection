@@ -1,8 +1,12 @@
 FROM python:3.7-slim-buster
 
-WORKDIR /usr/src/CloudSetup
+RUN mkdir /data
+ADD Docker/CloudSetup/Topology          /data/Topology
+ADD Docker/CloudSetup/MeasDeviceConfig  /data/MeasDeviceConfig
 
-ADD UC2_grid_protection/Docker/CloudSetup .
+
+WORKDIR /usr/src/CloudSetup
+ADD Docker/CloudSetup .
 # install dependencies and libs via setup.py in CloudSetup
 RUN pip install -e .[protection]
 ENV PYTHONPATH /usr/src
@@ -16,7 +20,7 @@ ENV MAX_FAULTY_STATES 5
 ENV NOMINAL_CURRENT 275
 ENV CURRENT_EPS 0.05
 ENV TOPOLOGY_PATH /Topology/TopologyFile_demonstrator.json
-ENV PF_INPUT_PATH /PFInputFiles/demonstrator_setup.txt
+ENV PF_INPUT_PATH /MeasDeviceConfig/demonstrator_setup.txt
 
 EXPOSE 4860
 LABEL type="protection_python" \

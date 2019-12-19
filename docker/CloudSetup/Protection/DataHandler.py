@@ -257,7 +257,7 @@ if __name__ == "__main__":
     # os.environ.setdefault("NOMINAL_CURRENT", "275")
     # os.environ.setdefault("CURRENT_EPS", "0.05")
     # os.environ.setdefault("TOPOLOGY_PATH", "/Topology/TopologyFile_demonstrator.json")
-    # os.environ.setdefault("PF_INPUT_PATH", "/PFInputFiles/demonstrator_setup.txt")
+    # os.environ.setdefault("PF_INPUT_PATH", "/MeasDeviceConfig/demonstrator_setup.txt")
     ##################
 
     topo_path = (os.path.dirname(os.getcwd()) + os.environ.get("TOPOLOGY_PATH"))
