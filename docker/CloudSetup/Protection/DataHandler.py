@@ -10,7 +10,6 @@ After collecting at least one data point from each Meas device, the "FaultAssess
             update_topology(topo_path)
 """
 import os
-from threading import Thread
 
 import pandas as pd
 import datetime
@@ -42,7 +41,7 @@ class DataHandler(object):
 
         self.opc_client = CustomClient(self.SERVER_ENDPOINT)
         self.opc_client.start()
-        self.topo_path = topology_path
+        self.topo_path = os.path.dirname(os.getcwd()) + topology_path
         self.topo_data = None
 
         self.slack_ph1 = None
@@ -65,12 +64,13 @@ class DataHandler(object):
         self.register_devices(os.path.dirname(os.getcwd()) + self.PF_INPUT_PATH)
 
         # Set Topology used for grid protection
-        self.update_topology(os.path.dirname(os.getcwd()) + self.topo_path)
+        self.update_topology(self.topo_path)
 
         # Set start values for controllable nodes
         self.set_start_values_for_ctrls()
 
     def register_devices(self, device_config_path):
+        self.opc_client.create_dirs_on_server()
         self.opc_client.register_variables_to_server(device_config_path)
 
     def update_topology(self, path):
@@ -90,7 +90,7 @@ class DataHandler(object):
                 if var.opctag == topo_opctag:
                     if "_I_" in topo_opctag and "RES" in topo_opctag:
 
-                        # ## separate nodes into groups for each phase
+                        # separate nodes into groups for each phase
                         if "PH1" in topo_opctag:
                             self.Iph1_nodes_list.append(var)
                             if "slack" in topo_browsename.lower():  # find slack node for each phase and
@@ -108,11 +108,25 @@ class DataHandler(object):
                     else:
                         self.misc_nodes_list.append(var)
                     break
-        # ## update OPC-Client and start subscription again
+        # update OPC-Client and start subscription again
         self.update_subscription_opc_client()
+
+        self.reset_flag_update_topology()
 
         if self.DEBUG_MODE_PRINT:
             print(self.__class__.__name__, " successful updated topology")
+
+    def reset_flag_update_topology(self):
+        # reset Flag UPDATE_REQUEST_TOPOLOGY
+        nodes = []
+        values = []
+        for var in self.opc_client.get_server_vars():
+            if "UPDATE_REQUEST_TOPOLOGY" in var.get_browse_name().Name:
+                nodes.append(var)
+                values.append(0)
+                break
+
+        self.opc_client.set_vars(nodes, values)
 
     def get_customized_server_vars(self):
         all_observed_opc_nodes = self.opc_client.get_server_vars()
@@ -144,6 +158,14 @@ class DataHandler(object):
         self.misc_nodes_list = []
 
     def update_data(self, nodeid, datetime_source, val):
+        # check for Update Request Topology
+        for var in self.misc_nodes_list:
+            if var.nodeid == nodeid and "UPDATE_REQUEST_TOPOLOGY" in var.opctag:
+                if val == 1:
+                    self.update_topology(self.topo_path)
+                    return
+
+        # otherwise update data used for DiffCore
         for var in (self.Iph1_nodes_list + self.Iph2_nodes_list + self.Iph3_nodes_list):
             if var.nodeid == nodeid:
                 # print(datetime_source)

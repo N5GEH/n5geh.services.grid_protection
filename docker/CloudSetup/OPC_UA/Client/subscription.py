@@ -14,17 +14,17 @@ class SubHandler(object):
     Do not do expensive, slow or network operation there. Create another
     thread if you need to do such a thing
     """
-    def __init__(self, data_handler, subscriber="client"):
+    def __init__(self, target_for_update, subscriber="client"):
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
-        self.data_handler = data_handler
+        self.mclass = target_for_update
         self.subscriber = subscriber
 
     def datachange_notification(self, node, val, data):
         if self.subscriber == "client":
-            self.data_handler.update_data(node.nodeid, data.monitored_item.Value.SourceTimestamp, val)
-            if self.DEBUG_MODE_PRINT:
+            self.mclass.update_data(node.nodeid, data.monitored_item.Value.SourceTimestamp, val)
+            # if self.DEBUG_MODE_PRINT:
                 # print("New data change event:", node, val, "@", data.monitored_item.Value.SourceTimestamp)
-                pass
+                # pass
 
     def event_notification(self, event):
         if self.DEBUG_MODE_PRINT:

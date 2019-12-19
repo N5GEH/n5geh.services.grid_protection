@@ -12,7 +12,6 @@ This class can set new values for OPC-nodes of a given list.
 """
 import os
 import sys
-from threading import Thread
 
 from opcua import ua, Client
 from distutils.util import strtobool
@@ -84,7 +83,7 @@ class CustomClient(object):
         if self.DEBUG_MODE_PRINT:
             print(self.__class__.__name__, " successful connected")
 
-    def register_variables_to_server(self, file_path, child="PF"):
+    def create_dirs_on_server(self, child="PF"):
         # get object node
         objects_node = self.client.get_objects_node()
 
@@ -94,6 +93,9 @@ class CustomClient(object):
             if "ADD_NEW_OBJECTS_FOLDER" in method.get_browse_name().Name:
                 objects_node.call_method(method, child)
 
+    def register_variables_to_server(self, file_path, child="PF"):
+        # get object node
+        objects_node = self.client.get_objects_node()
         # get tags of variables and register them serverside int folder "child"
         mtagfile = open(file_path, 'r')
         tags_pf_output = format_textfile(mtagfile.readlines())
@@ -125,7 +127,7 @@ class CustomClient(object):
         #     # dv.Value = ua.Variant(1,numbers_to_vartyps(typ))
         #     # mvar.set_value(dv)
 
-    def make_subscription(self, data_handler, list_of_vars_to_observe):
+    def make_subscription(self, target_class, list_of_vars_to_observe, sub_interval=1):
         all_observed_opc_nodes = self.get_server_vars()
 
         self.observed_opc_nodes = []
@@ -134,8 +136,8 @@ class CustomClient(object):
                 if node.nodeid == var.nodeid:
                     self.observed_opc_nodes.append(node)
 
-        sub_handler = SubHandler(data_handler, "client")
-        self.subscription = self.client.create_subscription(1, sub_handler)  # ## subscription interval: 1 ms
+        sub_handler = SubHandler(target_class, "client")
+        self.subscription = self.client.create_subscription(sub_interval, sub_handler)  # subscription interval: 1 ms
         self.unsubscribe()
         self.subscription_handle = self.subscription.subscribe_data_change(self.observed_opc_nodes)
 
@@ -148,7 +150,11 @@ class CustomClient(object):
 
     def unsubscribe(self):
         if self.subscription_handle is not None:
-            self.subscription.unsubscribe(self.subscription_handle)
+            # TODO will raise TimeoutError() - why?
+            self.stop()
+            self.start()
+            # self.subscription.delete()
+            # self.subscription.unsubscribe(self.subscription_handle)
         
     def stop(self):
         self.client.disconnect()
