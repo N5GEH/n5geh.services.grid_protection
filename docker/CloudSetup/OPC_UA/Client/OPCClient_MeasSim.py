@@ -86,8 +86,16 @@ class CustomClient(object):
         self.NAMESPACE = os.environ.get("NAMESPACE")
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
         self.THRESHOLD = int(os.environ.get("START_THRESHOLD", start_threshold)) * 1000   # conversion into ns
+        self.ENABLE_CERTIFICATE = bool(strtobool(os.environ.get("ENABLE_CERTIFICATE")))
+        self.CERTIFICATE_PATH = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH")
 
         self.client = Client(self.SERVER_ENDPOINT)
+        self.client.set_user("n5geh_opcua_client2")
+        self.client.set_password("n5geh2020")
+        if self.ENABLE_CERTIFICATE:
+            self.client.set_security_string("Basic256Sha256,SignAndEncrypt," +
+                                            self.CERTIFICATE_PATH + "n5geh_opcua_server_cert.der," +
+                                            self.CERTIFICATE_PATH + "n5geh_opcua_server_private_key.pem")
         self.meas_device_tag = meas_device_tag
         self.vup = None
 
@@ -136,10 +144,12 @@ if __name__ == "__main__":
     # ### if using local (means not in Docker): uncomment this lines!
     # local = False  # if Server is local or as Docker
     # if local:
-    #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/freeopcua/server/")
+    #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
     # else:
-    #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/freeopcua/server/")
+    #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/OPCUA/python_server/")
     # os.environ.setdefault("NAMESPACE", "https://n5geh.de")
+    # os.environ.setdefault("ENABLE_CERTIFICATE", "True")
+    # os.environ.setdefault("CERTIFICATE_PATH", "/OPC_UA/certificates/")
     # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
     # os.environ.setdefault("DEBUG_MODE_VAR_UPDATER", "True")
     # os.environ.setdefault("UPDATE_PERIOD", "500000")        # in microsec

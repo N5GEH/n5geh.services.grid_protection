@@ -1,0 +1,2 @@
+openssl req -x509 -newkey rsa:2048 -keyout n5geh_opcua_server_private_key.pem -out n5geh_opcua_server_cert.pem -days 355 -nodes
+openssl x509 -outform der -in n5geh_opcua_server_cert.pem -out n5geh_opcua_server_cert.der

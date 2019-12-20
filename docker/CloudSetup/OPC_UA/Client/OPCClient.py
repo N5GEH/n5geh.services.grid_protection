@@ -59,8 +59,16 @@ class CustomClient(object):
         self.SERVER_ENDPOINT = os.environ.get("SERVER_ENDPOINT", server_endpoint)
         self.NAMESPACE = os.environ.get("NAMESPACE")
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
+        self.ENABLE_CERTIFICATE = bool(strtobool(os.environ.get("ENABLE_CERTIFICATE")))
+        self.CERTIFICATE_PATH = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH")
 
         self.client = Client(self.SERVER_ENDPOINT)
+        self.client.set_user("n5geh_opcua_client1")
+        self.client.set_password("n5geh2019")
+        if self.ENABLE_CERTIFICATE:
+            self.client.set_security_string("Basic256Sha256,SignAndEncrypt," +
+                                            self.CERTIFICATE_PATH + "n5geh_opcua_server_cert.der," +
+                                            self.CERTIFICATE_PATH + "n5geh_opcua_server_private_key.pem")
         self.observed_opc_nodes = []
         self.subscription = None
         self.subscription_handle = None
@@ -151,10 +159,10 @@ class CustomClient(object):
     def unsubscribe(self):
         if self.subscription_handle is not None:
             # TODO will raise TimeoutError() - why?
-            self.stop()
-            self.start()
+            # self.stop()
+            # self.start()
             # self.subscription.delete()
-            # self.subscription.unsubscribe(self.subscription_handle)
+            self.subscription.unsubscribe(self.subscription_handle)
         
     def stop(self):
         self.client.disconnect()

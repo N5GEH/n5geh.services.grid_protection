@@ -10,11 +10,28 @@ This class setups a new OPC-Server with:
 
 import sys
 import os
+from distutils.util import strtobool
+
 from opcua import Server, ua, uamethod
+from opcua.server.user_manager import UserManager
+
 sys.path.insert(0, "..")
 
 __version__ = '0.5'
 __author__ = 'Sebastian Krahmer'
+
+# users database
+users_db = {
+    'n5geh_opcua_client1': 'n5geh2019',
+    'n5geh_opcua_client2': 'n5geh2020',
+}
+
+
+# user manager
+def user_manager(isession, username, password):
+    print(isession, username, password)
+    isession.user = UserManager.User
+    return username in users_db and password == users_db[username]
 
 
 def strings_to_vartyps(arg):
@@ -30,10 +47,33 @@ class CustomServer(object):
     def __init__(self):
         self.SERVER_ENDPOINT = os.environ.get("SERVER_ENDPOINT")
         self.NAMESPACE = os.environ.get("NAMESPACE")
+        self.SERVER_NAME = os.environ.get("SERVER_NAME")
+        self.ENABLE_CERTIFICATE = bool(strtobool(os.environ.get("ENABLE_CERTIFICATE")))
+        self.CERTIFICATE_PATH = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH")
 
         # setup our server
         self.server = Server()
         self.server.set_endpoint(self.SERVER_ENDPOINT)
+        self.server.set_server_name(self.SERVER_NAME)
+
+        if self.ENABLE_CERTIFICATE:
+            # load server certificate and private key. This enables endpoints with signing and encryption.
+            self.server.load_certificate(self.CERTIFICATE_PATH + "n5geh_opcua_server_cert.der")
+            self.server.load_private_key(self.CERTIFICATE_PATH + "n5geh_opcua_server_private_key.pem")
+
+            # set all possible endpoint policies for clients to connect through
+            self.server.set_security_policy([
+                # ua.SecurityPolicyType.NoSecurity,
+                ua.SecurityPolicyType.Basic256Sha256_SignAndEncrypt,
+                # ua.SecurityPolicyType.Basic256Sha256_Sign,
+            ])
+
+        # set the security endpoints for identification of clients
+        # self.server.set_security_IDs(["Anonymous", "Basic256Sha256", "Username"])
+        self.server.set_security_IDs(["Username"])
+
+        # set the user_manager function
+        self.server.user_manager.set_user_manager(user_manager)
 
         # setup our own namespace, not really necessary but should as spec
         uri = self.NAMESPACE
@@ -108,9 +148,13 @@ if __name__ == "__main__":
     # if using local (means not in Docker)
     # local = False   # if Server is local or as Docker
     # if local:
-    #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/freeopcua/server/")
+    #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
     # else:
-    #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/freeopcua/server/")
+    #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/OPCUA/python_server/")
     # os.environ.setdefault("NAMESPACE", "https://n5geh.de")
+    # os.environ.setdefault("SERVER_NAME", "ENV SERVER_NAME N5GEH_FreeOpcUa_Python_Server")
+    # os.environ.setdefault("ENABLE_CERTIFICATE", "True")
+    # os.environ.setdefault("CERTIFICATE_PATH", "/OPC_UA/certificates/")
+
     server = CustomServer()
     server.start()
