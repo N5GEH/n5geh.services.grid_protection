@@ -54,13 +54,13 @@ def numbers_to_typestrings(arg):
 
 
 class CustomClient(object):
-    def __init__(self, server_endpoint="opc.tcp://0.0.0.0:4840/freeopcua/server/"):
+    def __init__(self, server_endpoint="opc.tcp://0.0.0.0:4840/OPCUA/python_server/"):
 
         self.SERVER_ENDPOINT = os.environ.get("SERVER_ENDPOINT", server_endpoint)
         self.NAMESPACE = os.environ.get("NAMESPACE")
-        self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
         self.ENABLE_CERTIFICATE = bool(strtobool(os.environ.get("ENABLE_CERTIFICATE")))
         self.CERTIFICATE_PATH = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH")
+        self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
 
         self.client = Client(self.SERVER_ENDPOINT)
         self.client.set_user("n5geh_opcua_client1")

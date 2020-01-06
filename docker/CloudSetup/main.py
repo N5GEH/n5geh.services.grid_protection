@@ -33,10 +33,13 @@ def runInParallel(*fns):
 if __name__ == "__main__":
     local = True
     if local:
-        os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/freeopcua/server/")
+        os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
     else:
-        os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://0.0.0.0:4840/freeopcua/server/")
+        os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://0.0.0.0:4840/OPCUA/python_server/")
     os.environ.setdefault("NAMESPACE", "https://n5geh.de")
+    os.environ.setdefault("SERVER_NAME", "N5GEH_FreeOpcUa_Python_Server")
+    os.environ.setdefault("ENABLE_CERTIFICATE", "True")
+    os.environ.setdefault("CERTIFICATE_PATH", "/CloudSetup/OPC_UA/certificates/")
     os.environ.setdefault("DEBUG_MODE_PRINT", "True")
     os.environ.setdefault("DEBUG_MODE_VAR_UPDATER", "True")
     os.environ.setdefault("UPDATE_PERIOD", "500000")              # in microsec
@@ -46,9 +49,6 @@ if __name__ == "__main__":
     os.environ.setdefault("CURRENT_EPS", "0.05")
     os.environ.setdefault("TOPOLOGY_PATH", "/CloudSetup/Topology/TopologyFile_demonstrator.json")
     os.environ.setdefault("PF_INPUT_PATH", "/CloudSetup/MeasDeviceConfig/demonstrator_setup.txt")
-    os.environ.setdefault("SERVER_NAME", "ENV SERVER_NAME N5GEH_FreeOpcUa_Python_Server")
-    os.environ.setdefault("ENABLE_CERTIFICATE", "True")
-    os.environ.setdefault("CERTIFICATE_PATH", "/CloudSetup/OPC_UA/certificates/")
 
     # config.DEBUG_MODE_PRINT = "True"
     # config.DEBUG_MODE_VAR_UPDATER = "True"
