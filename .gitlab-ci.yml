@@ -13,7 +13,7 @@ opcua_server:
   before_script:
   - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
   script:
-  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/tree/develop/docker/Server.Dockerfile --destination $CI_REGISTRY_IMAGE/develop/server --cache=true --cache-dir=/kanikocache
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/Server.Dockerfile --destination $CI_REGISTRY_IMAGE/server --cache=true --cache-dir=/kanikocache
   only:
     refs:
     - develop
@@ -33,7 +33,7 @@ opcua_extern_client:
   before_script:
   - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
   script:
-  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/tree/develop/docker/ExternClient.Dockerfile --destination $CI_REGISTRY_IMAGE/develop/extern_client --cache=true --cache-dir=/kanikocache
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/ExternClient.Dockerfile --destination $CI_REGISTRY_IMAGE/extern_client --cache=true --cache-dir=/kanikocache
   only:
     refs:
     - develop
@@ -53,7 +53,7 @@ protection:
   before_script:
   - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
   script:
-  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/tree/develop/docker/Protection.Dockerfile --destination $CI_REGISTRY_IMAGE/develop/protection --cache=true --cache-dir=/kanikocache
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/Protection.Dockerfile --destination $CI_REGISTRY_IMAGE/protection --cache=true --cache-dir=/kanikocache
   only:
     refs:
     - develop
