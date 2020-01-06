@@ -1,8 +1,8 @@
 FROM python:3.7-slim-buster
 
 RUN mkdir /data
-ADD Docker/CloudSetup/Topology          /data/Topology
-ADD Docker/CloudSetup/MeasDeviceConfig  /data/MeasDeviceConfig
+ADD docker/CloudSetup/Topology          /data/Topology
+ADD docker/CloudSetup/MeasDeviceConfig  /data/MeasDeviceConfig
 VOLUME /data
 
 
