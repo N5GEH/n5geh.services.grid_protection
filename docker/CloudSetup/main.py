@@ -39,7 +39,7 @@ if __name__ == "__main__":
     os.environ.setdefault("NAMESPACE", "https://n5geh.de")
     os.environ.setdefault("SERVER_NAME", "N5GEH_FreeOpcUa_Python_Server")
     os.environ.setdefault("ENABLE_CERTIFICATE", "True")
-    os.environ.setdefault("CERTIFICATE_PATH", "/CloudSetup/OPC_UA/certificates/")
+    os.environ.setdefault("CERTIFICATE_PATH", "OPC_UA/certificates/")
     os.environ.setdefault("DEBUG_MODE_PRINT", "True")
     os.environ.setdefault("DEBUG_MODE_VAR_UPDATER", "True")
     os.environ.setdefault("UPDATE_PERIOD", "500000")              # in microsec
@@ -47,8 +47,8 @@ if __name__ == "__main__":
     os.environ.setdefault("MAX_FAULTY_STATES", "5")
     os.environ.setdefault("NOMINAL_CURRENT", "275")
     os.environ.setdefault("CURRENT_EPS", "0.05")
-    os.environ.setdefault("TOPOLOGY_PATH", "/CloudSetup/Topology/TopologyFile_demonstrator.json")
-    os.environ.setdefault("PF_INPUT_PATH", "/CloudSetup/MeasDeviceConfig/demonstrator_setup.txt")
+    os.environ.setdefault("TOPOLOGY_PATH", "Topology/TopologyFile_demonstrator.json")
+    os.environ.setdefault("PF_INPUT_PATH", "MeasDeviceConfig/demonstrator_setup.txt")
 
     # config.DEBUG_MODE_PRINT = "True"
     # config.DEBUG_MODE_VAR_UPDATER = "True"

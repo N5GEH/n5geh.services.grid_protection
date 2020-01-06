@@ -14,7 +14,7 @@ ENV PYTHONPATH /usr/src
 ENV SERVER_ENDPOINT opc.tcp://ubuntu5g:4840
 ENV NAMESPACE https://n5geh.de
 ENV ENABLE_CERTIFICATE True
-ENV CERTIFICATE_PATH /CloudSetup/OPC_UA/certificates/
+ENV CERTIFICATE_PATH /OPC_UA/certificates/
 ENV DEBUG_MODE_PRINT True
 ENV DEBUG_MODE_VAR_UPDATER True
 ENV UPDATE_PERIOD 500000
@@ -23,8 +23,8 @@ ENV MAX_FAULTY_STATES 5
 ENV NOMINAL_CURRENT 275
 ENV CURRENT_EPS 0.05
 ENV VOLUME_PATH /data
-ENV TOPOLOGY_PATH /CloudSetup/Topology/TopologyFile_demonstrator.json
-ENV PF_INPUT_PATH /CloudSetup/MeasDeviceConfig/demonstrator_setup.txt
+ENV TOPOLOGY_PATH /Topology/TopologyFile_demonstrator.json
+ENV PF_INPUT_PATH /MeasDeviceConfig/demonstrator_setup.txt
 
 EXPOSE 4860
 LABEL type="protection_python" \

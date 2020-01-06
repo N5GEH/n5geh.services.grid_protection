@@ -58,8 +58,8 @@ class CustomServer(object):
 
         if self.ENABLE_CERTIFICATE:
             # load server certificate and private key. This enables endpoints with signing and encryption.
-            self.server.load_certificate(self.CERTIFICATE_PATH + "n5geh_opcua_server_cert.der")
-            self.server.load_private_key(self.CERTIFICATE_PATH + "n5geh_opcua_server_private_key.pem")
+            self.server.load_certificate((os.path.dirname(os.getcwd()) + self.CERTIFICATE_PATH + "n5geh_opcua_server_cert.der"))
+            self.server.load_private_key((os.path.dirname(os.getcwd()) + self.CERTIFICATE_PATH + "n5geh_opcua_server_private_key.pem"))
 
             # set all possible endpoint policies for clients to connect through
             self.server.set_security_policy([
@@ -122,6 +122,8 @@ class CustomServer(object):
 
     @uamethod
     def add_objects_subfolder(self, parent, dir_name):
+        # TODO check if subfolder exists and delete before create new : delete_nodes(server, nodes, recursive=False, delete_target_references=True):
+        # add? second inarg; delete oldFolder true/false
         folder = self.obj.add_folder(self.idx, dir_name)
         print("Add subfolder: " + dir_name)
 

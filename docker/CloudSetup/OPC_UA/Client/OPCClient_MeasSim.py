@@ -94,8 +94,8 @@ class CustomClient(object):
         self.client.set_password("n5geh2020")
         if self.ENABLE_CERTIFICATE:
             self.client.set_security_string("Basic256Sha256,SignAndEncrypt," +
-                                            self.CERTIFICATE_PATH + "n5geh_opcua_server_cert.der," +
-                                            self.CERTIFICATE_PATH + "n5geh_opcua_server_private_key.pem")
+                                            os.path.dirname(os.getcwd()) + self.CERTIFICATE_PATH + "n5geh_opcua_server_cert.der," +
+                                            os.path.dirname(os.getcwd()) + self.CERTIFICATE_PATH + "n5geh_opcua_server_private_key.pem")
         self.meas_device_tag = meas_device_tag
         self.vup = None
 

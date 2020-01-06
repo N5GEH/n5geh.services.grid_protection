@@ -11,7 +11,7 @@ ENV SERVER_ENDPOINT opc.tcp://0.0.0.0:4840/OPCUA/python_server/
 ENV NAMESPACE https://n5geh.de
 ENV SERVER_NAME N5GEH_FreeOpcUa_Python_Server
 ENV ENABLE_CERTIFICATE True
-ENV CERTIFICATE_PATH /CloudSetup/OPC_UA/certificates/
+ENV CERTIFICATE_PATH /OPC_UA/certificates/
 
 EXPOSE 4840
 LABEL type="opcua_python_server" \

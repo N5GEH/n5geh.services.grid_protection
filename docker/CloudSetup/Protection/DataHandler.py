@@ -72,6 +72,8 @@ class DataHandler(object):
     def register_devices(self, device_config_path):
         self.opc_client.create_dirs_on_server()
         self.opc_client.register_variables_to_server(device_config_path)
+        if self.DEBUG_MODE_PRINT:
+            print(self.__class__.__name__, " successful register devices from file:" + device_config_path)
 
     def update_topology(self, path):
         # stop subscription
@@ -114,7 +116,7 @@ class DataHandler(object):
         self.reset_flag_update_topology()
 
         if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful updated topology")
+            print(self.__class__.__name__, " successful updated topology from file:" + path)
 
     def reset_flag_update_topology(self):
         # reset Flag UPDATE_REQUEST_TOPOLOGY
@@ -260,6 +262,8 @@ class DataHandler(object):
                 ctrls.append(ctrl)
                 values.append(1000)
         self.opc_client.set_vars(ctrls, values)
+        if self.DEBUG_MODE_PRINT:
+            print(self.__class__.__name__, " successful set startValues for ctrl devices")
 
 
 if __name__ == "__main__":
