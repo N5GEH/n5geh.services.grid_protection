@@ -58,8 +58,8 @@ class CustomServer(object):
 
         if self.ENABLE_CERTIFICATE:
             # load server certificate and private key. This enables endpoints with signing and encryption.
-            self.server.load_certificate((os.path.dirname(os.getcwd()) + self.CERTIFICATE_PATH + "n5geh_opcua_server_cert.der"))
-            self.server.load_private_key((os.path.dirname(os.getcwd()) + self.CERTIFICATE_PATH + "n5geh_opcua_server_private_key.pem"))
+            self.server.load_certificate(self.CERTIFICATE_PATH + "n5geh_opcua_server_cert.der")
+            self.server.load_private_key(self.CERTIFICATE_PATH + "n5geh_opcua_server_private_key.pem")
 
             # set all possible endpoint policies for clients to connect through
             self.server.set_security_policy([

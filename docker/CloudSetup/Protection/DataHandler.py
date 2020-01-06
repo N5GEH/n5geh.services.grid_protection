@@ -110,13 +110,13 @@ class DataHandler(object):
                     else:
                         self.misc_nodes_list.append(var)
                     break
+        if self.DEBUG_MODE_PRINT:
+            print(self.__class__.__name__, " successful updated topology from file:" + path)
+
         # update OPC-Client and start subscription again
         self.update_subscription_opc_client()
 
         self.reset_flag_update_topology()
-
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful updated topology from file:" + path)
 
     def reset_flag_update_topology(self):
         # reset Flag UPDATE_REQUEST_TOPOLOGY

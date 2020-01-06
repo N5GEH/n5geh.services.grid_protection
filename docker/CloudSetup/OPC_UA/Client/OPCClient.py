@@ -146,7 +146,7 @@ class CustomClient(object):
 
         sub_handler = SubHandler(target_class, "client")
         self.subscription = self.client.create_subscription(sub_interval, sub_handler)  # subscription interval: 1 ms
-        self.unsubscribe()
+        # self.unsubscribe()
         self.subscription_handle = self.subscription.subscribe_data_change(self.observed_opc_nodes)
 
         if self.DEBUG_MODE_PRINT:
