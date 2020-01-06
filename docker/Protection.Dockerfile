@@ -7,7 +7,7 @@ VOLUME /data
 
 
 WORKDIR /usr/src/CloudSetup
-ADD Docker/CloudSetup .
+ADD docker/CloudSetup .
 # install dependencies and libs via setup.py in CloudSetup
 RUN pip install -e .[protection]
 ENV PYTHONPATH /usr/src
