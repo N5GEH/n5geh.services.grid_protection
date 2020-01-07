@@ -24,6 +24,7 @@ ENV MAX_FAULTY_STATES 5
 ENV NOMINAL_CURRENT 275
 ENV CURRENT_EPS 0.05
 ENV VOLUME_PATH /data
+ENV OPCUA_SERVER_DIR_NAME default_demonstrator
 ENV TOPOLOGY_PATH /CloudSetup/Topology/TopologyFile_demonstrator.json
 ENV PF_INPUT_PATH /CloudSetup/MeasDeviceConfig/demonstrator_setup.txt
 

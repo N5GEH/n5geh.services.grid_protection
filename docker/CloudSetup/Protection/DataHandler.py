@@ -28,7 +28,7 @@ __author__ = 'Sebastian Krahmer'
 
 
 class DataHandler(object):
-    def __init__(self, topology_path):
+    def __init__(self, topology_path, dir_name):
         """
             Args:
                 topology_path (String): path of TopologyFile.json
@@ -43,6 +43,7 @@ class DataHandler(object):
         self.opc_client.start()
         self.topo_path = os.path.dirname(os.getcwd()) + topology_path
         self.topo_data = None
+        self.opcua_dir_name = dir_name
 
         self.slack_ph1 = None
         self.slack_ph2 = None
@@ -61,7 +62,7 @@ class DataHandler(object):
 
     def start(self):
         # Registration of vars at server
-        self.register_devices(os.path.dirname(os.getcwd()) + self.PF_INPUT_PATH)
+        self.register_devices(self.opcua_dir_name, os.path.dirname(os.getcwd()) + self.PF_INPUT_PATH)
 
         # Set Topology used for grid protection
         self.update_topology(self.topo_path)
@@ -69,15 +70,15 @@ class DataHandler(object):
         # Set start values for controllable nodes
         self.set_start_values_for_ctrls()
 
-    def register_devices(self, device_config_path):
-        self.opc_client.create_dirs_on_server()
-        self.opc_client.register_variables_to_server(device_config_path)
+    def register_devices(self, opcua_dir_name, device_config_path):
+        self.opc_client.create_dir_on_server(opcua_dir_name)
+        self.opc_client.register_variables_to_server(opcua_dir_name, device_config_path)
         if self.DEBUG_MODE_PRINT:
             print(self.__class__.__name__, " successful register devices from file:" + device_config_path)
 
     def update_topology(self, path):
         # get at server registered vars allocated as CustomVar
-        server_vars = self.get_customized_server_vars()
+        server_vars = self.get_customized_server_vars(self.opcua_dir_name)
 
         # get new topology
         self.clear_topo_data()
@@ -120,7 +121,7 @@ class DataHandler(object):
         # reset Flag UPDATE_REQUEST_TOPOLOGY
         nodes = []
         values = []
-        for var in self.opc_client.get_server_vars():
+        for var in self.opc_client.get_server_vars(self.opcua_dir_name):
             if "UPDATE_REQUEST_TOPOLOGY" in var.get_browse_name().Name:
                 nodes.append(var)
                 values.append(0)
@@ -128,8 +129,8 @@ class DataHandler(object):
 
         self.opc_client.set_vars(nodes, values)
 
-    def get_customized_server_vars(self):
-        all_observed_opc_nodes = self.opc_client.get_server_vars()
+    def get_customized_server_vars(self, opcua_dir_name):
+        all_observed_opc_nodes = self.opc_client.get_server_vars(opcua_dir_name)
         mvars = []
         for var in all_observed_opc_nodes:
             opctag = var.get_browse_name().Name
@@ -144,7 +145,7 @@ class DataHandler(object):
         return mvars
 
     def update_subscription_opc_client(self):
-        self.opc_client.make_subscription(self, self.Iph1_nodes_list + self.Iph2_nodes_list + self.Iph3_nodes_list +
+        self.opc_client.make_subscription(self, self.opcua_dir_name, self.Iph1_nodes_list + self.Iph2_nodes_list + self.Iph3_nodes_list +
                                           self.ctrl_nodes_list + self.misc_nodes_list)
 
     def clear_topo_data(self):
@@ -283,12 +284,12 @@ if __name__ == "__main__":
     # os.environ.setdefault("MAX_FAULTY_STATES", "5")
     # os.environ.setdefault("NOMINAL_CURRENT", "275")
     # os.environ.setdefault("CURRENT_EPS", "0.05")
+    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "default_demonstrator")
     # os.environ.setdefault("TOPOLOGY_PATH", "/Topology/TopologyFile_demonstrator.json")
     # os.environ.setdefault("PF_INPUT_PATH", "/MeasDeviceConfig/demonstrator_setup.txt")
     ##################
 
     topo_path = os.environ.get("TOPOLOGY_PATH")
-    print(os.path.dirname(os.getcwd()))
-    print(topo_path)
-    mDataHandler = DataHandler(topo_path)
+    opcua_dir_name = os.environ.get("OPCUA_SERVER_DIR_NAME")
+    mDataHandler = DataHandler(topo_path, opcua_dir_name)
     mDataHandler.start()

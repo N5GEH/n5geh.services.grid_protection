@@ -18,6 +18,8 @@ from distutils.util import strtobool
 # from opcua.ua import DataValue
 
 from CloudSetup.OPC_UA.Client.subscription import SubHandler
+from opcua.ua.uaerrors import BadNoMatch
+
 sys.path.insert(0, "..")
 
 __version__ = '0.5'
@@ -91,7 +93,7 @@ class CustomClient(object):
         if self.DEBUG_MODE_PRINT:
             print(self.__class__.__name__, " successful connected")
 
-    def create_dirs_on_server(self, child="PF"):
+    def create_dir_on_server(self, child):
         # get object node
         objects_node = self.client.get_objects_node()
 
@@ -101,7 +103,7 @@ class CustomClient(object):
             if "ADD_NEW_OBJECTS_FOLDER" in method.get_browse_name().Name:
                 objects_node.call_method(method, child)
 
-    def register_variables_to_server(self, file_path, child="PF"):
+    def register_variables_to_server(self, child, file_path):
         # get object node
         objects_node = self.client.get_objects_node()
         # get tags of variables and register them serverside int folder "child"
@@ -135,10 +137,10 @@ class CustomClient(object):
         #     # dv.Value = ua.Variant(1,numbers_to_vartyps(typ))
         #     # mvar.set_value(dv)
 
-    def make_subscription(self, target_class, list_of_vars_to_observe, sub_interval=1):
+    def make_subscription(self, target_class, opcua_dir_name, list_of_vars_to_observe, sub_interval=1):
         if self.subscription is not None:
             self.subscription.delete()
-        all_observed_opc_nodes = self.get_server_vars()
+        all_observed_opc_nodes = self.get_server_vars(opcua_dir_name)
 
         self.observed_opc_nodes = []
         for node in all_observed_opc_nodes:
@@ -153,8 +155,11 @@ class CustomClient(object):
         if self.DEBUG_MODE_PRINT:
             print(self.__class__.__name__, " successful updates subscription")
 
-    def get_server_vars(self, child="PF"):
-        obj = self.root.get_child(["0:Objects", ("{}:" + child).format(self.idx)])
+    def get_server_vars(self, child):
+        try:
+            obj = self.root.get_child(["0:Objects", ("{}:" + child).format(self.idx)])
+        except BadNoMatch:
+            return None
         return obj.get_variables()
 
     # TODO will raise TimeoutError() - why? --> use self.subscription.delete() instead

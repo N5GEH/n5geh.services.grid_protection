@@ -48,6 +48,7 @@ if __name__ == "__main__":
     os.environ.setdefault("MAX_FAULTY_STATES", "5")
     os.environ.setdefault("NOMINAL_CURRENT", "275")
     os.environ.setdefault("CURRENT_EPS", "0.05")
+    os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "default_demonstrator")
     os.environ.setdefault("TOPOLOGY_PATH", "/CloudSetup/Topology/TopologyFile_demonstrator.json")
     os.environ.setdefault("PF_INPUT_PATH", "/CloudSetup/MeasDeviceConfig/demonstrator_setup.txt")
 
@@ -69,7 +70,8 @@ if __name__ == "__main__":
 
     # start DataHandler and pass topo_path of TopologyData
     topo_path = os.environ.get("TOPOLOGY_PATH")
-    mDataHandler = DataHandler(topo_path)
+    opcua_dir_name = os.environ.get("OPCUA_SERVER_DIR_NAME")
+    mDataHandler = DataHandler(topo_path, opcua_dir_name)
     mDataHandler.start()
 
     # setup meas devices as OPC Client

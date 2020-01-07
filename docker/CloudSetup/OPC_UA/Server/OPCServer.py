@@ -14,6 +14,7 @@ from distutils.util import strtobool
 
 from opcua import Server, ua, uamethod
 from opcua.server.user_manager import UserManager
+from opcua.ua.uaerrors import BadNoMatch
 
 sys.path.insert(0, "..")
 
@@ -123,15 +124,28 @@ class CustomServer(object):
 
     @uamethod
     def add_objects_subfolder(self, parent, dir_name):
-        # TODO check if subfolder exists and delete before create new : delete_nodes(server, nodes, recursive=False, delete_target_references=True):
-        # add? second inarg; delete oldFolder true/false
+        try:
+            obj = self.root.get_child(["0:Objects", ("{}:" + dir_name).format(self.idx)])
+            print(obj)
+            # a = self.obj.get_child(dir_name)
+            if obj is not None:
+                if obj.get_browse_name().Name is dir_name:
+                    self.server.delete_nodes([obj])
+                    print("delete subfolder: " + dir_name)
+        except BadNoMatch:
+            print("There is no old folder with the name: " + dir_name)
+
         folder = self.obj.add_folder(self.idx, dir_name)
         print("Add subfolder: " + dir_name)
 
     @uamethod
     def register_opc_tag(self, parent, opctag, variant_type="Float", parent_node=""):
         # Object "parent_node":
-        obj = self.root.get_child(["0:Objects", ("{}:" + parent_node).format(self.idx)])
+        try:
+            obj = self.root.get_child(["0:Objects", ("{}:" + parent_node).format(self.idx)])
+        except BadNoMatch:
+            print("register_opc_tag(): OPCUA_server_dir the variables should be assigned to, doesn't exists.")
+            raise
 
         var = ua.Variant(0, strings_to_vartyps(variant_type))
         mvar = obj.add_variable(self.idx, opctag.strip(), var)

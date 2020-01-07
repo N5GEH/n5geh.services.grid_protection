@@ -15,6 +15,7 @@ import time
 from distutils.util import strtobool
 from opcua import Client, ua
 from opcua.ua import DataValue
+from opcua.ua.uaerrors import BadNoMatch
 
 sys.path.insert(0, "..")
 
@@ -89,6 +90,7 @@ class CustomClient(object):
         self.CERTIFICATE_PATH_SERVER_PRIVATE_KEY = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_SERVER_PRIVATE_KEY")
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
         self.THRESHOLD = int(os.environ.get("START_THRESHOLD", start_threshold)) * 1000   # conversion into ns
+        self.OPCUA_DIR_NAME = os.environ.get("OPCUA_SERVER_DIR_NAME")
 
         self.client = Client(self.SERVER_ENDPOINT)
         self.client.set_user("n5geh_opcua_client2")
@@ -109,13 +111,16 @@ class CustomClient(object):
         self.prepare_auto_updater()
         self.start_auto_updater()
 
-    def get_server_vars(self, child="PF"):
+    def get_server_vars(self, child):
         # ## Now getting a variable node using its browse path
         root = self.client.get_root_node()  # objects = client.get_objects_node()
         uri = self.NAMESPACE
         idx = self.client.get_namespace_index(uri)
 
-        obj = root.get_child(["0:Objects", ("{}:" + child).format(idx)])
+        try:
+            obj = root.get_child(["0:Objects", ("{}:" + child).format(idx)])
+        except BadNoMatch:
+            return None
         return obj.get_variables()
         
     def stop(self):
@@ -127,7 +132,7 @@ class CustomClient(object):
     def prepare_auto_updater(self):
         var_list = []
 
-        for var in self.get_server_vars():
+        for var in self.get_server_vars(self.OPCUA_DIR_NAME):
             if self.meas_device_tag in var.get_browse_name().Name and "CTRL" not in var.get_browse_name().Name:
                 var_list.append(var)
         self.vup = VarUpdater(var_list, self.THRESHOLD)
