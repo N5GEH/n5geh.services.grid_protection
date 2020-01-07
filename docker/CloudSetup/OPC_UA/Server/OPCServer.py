@@ -124,12 +124,13 @@ class CustomServer(object):
 
     @uamethod
     def add_objects_subfolder(self, parent, dir_name):
+        # check if old dir with dir_name exists. if so then delete this dir first
         try:
             obj = self.root.get_child(["0:Objects", ("{}:" + dir_name).format(self.idx)])
             print(obj)
             # a = self.obj.get_child(dir_name)
             if obj is not None:
-                if obj.get_browse_name().Name is dir_name:
+                if obj.get_browse_name().Name == dir_name:
                     self.server.delete_nodes([obj])
                     print("delete subfolder: " + dir_name)
         except BadNoMatch:
