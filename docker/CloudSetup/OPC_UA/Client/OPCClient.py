@@ -67,8 +67,8 @@ class CustomClient(object):
         self.client.set_password("n5geh2019")
         if self.ENABLE_CERTIFICATE:
             self.client.set_security_string("Basic256Sha256,SignAndEncrypt," +
-                                            os.path.dirname(os.getcwd()) + self.CERTIFICATE_PATH + "n5geh_opcua_server_cert.der," +
-                                            os.path.dirname(os.getcwd()) + self.CERTIFICATE_PATH + "n5geh_opcua_server_private_key.pem")
+                                            self.CERTIFICATE_PATH + "n5geh_opcua_server_cert.der," +
+                                            self.CERTIFICATE_PATH + "n5geh_opcua_server_private_key.pem")
         self.observed_opc_nodes = []
         self.subscription = None
         self.subscription_handle = None

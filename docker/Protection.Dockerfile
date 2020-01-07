@@ -29,4 +29,5 @@ ENV PF_INPUT_PATH /CloudSetup/MeasDeviceConfig/demonstrator_setup.txt
 EXPOSE 4860
 LABEL type="protection_python" \
       version="0.5"
+      
 CMD [ "python", "/usr/src/CloudSetup/Protection/DataHandler.py"]
