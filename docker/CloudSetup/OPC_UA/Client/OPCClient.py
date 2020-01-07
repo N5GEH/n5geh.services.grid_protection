@@ -59,16 +59,16 @@ class CustomClient(object):
         self.SERVER_ENDPOINT = os.environ.get("SERVER_ENDPOINT", server_endpoint)
         self.NAMESPACE = os.environ.get("NAMESPACE")
         self.ENABLE_CERTIFICATE = bool(strtobool(os.environ.get("ENABLE_CERTIFICATE")))
-        self.CERTIFICATE_PATH = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH")
+        self.CERTIFICATE_PATH_SERVER_CERT = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_SERVER_CERT")
+        self.CERTIFICATE_PATH_SERVER_PRIVATE_KEY = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_SERVER_PRIVATE_KEY")
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
 
         self.client = Client(self.SERVER_ENDPOINT)
         self.client.set_user("n5geh_opcua_client1")
         self.client.set_password("n5geh2019")
         if self.ENABLE_CERTIFICATE:
-            self.client.set_security_string("Basic256Sha256,SignAndEncrypt," +
-                                            self.CERTIFICATE_PATH + "n5geh_opcua_server_cert.der," +
-                                            self.CERTIFICATE_PATH + "n5geh_opcua_server_private_key.pem")
+            self.client.set_security_string("Basic256Sha256,SignAndEncrypt," + self.CERTIFICATE_PATH_SERVER_CERT + "," +
+                                            self.CERTIFICATE_PATH_SERVER_PRIVATE_KEY)
         self.observed_opc_nodes = []
         self.subscription = None
         self.subscription_handle = None
@@ -136,7 +136,8 @@ class CustomClient(object):
         #     # mvar.set_value(dv)
 
     def make_subscription(self, target_class, list_of_vars_to_observe, sub_interval=1):
-        self.subscription.delete()
+        if self.subscription is not None:
+            self.subscription.delete()
         all_observed_opc_nodes = self.get_server_vars()
 
         self.observed_opc_nodes = []

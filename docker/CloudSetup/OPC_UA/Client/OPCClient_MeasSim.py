@@ -84,18 +84,18 @@ class CustomClient(object):
 
         self.SERVER_ENDPOINT = os.environ.get("SERVER_ENDPOINT", server_endpoint)
         self.NAMESPACE = os.environ.get("NAMESPACE")
+        self.ENABLE_CERTIFICATE = bool(strtobool(os.environ.get("ENABLE_CERTIFICATE")))
+        self.CERTIFICATE_PATH_SERVER_CERT = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_SERVER_CERT")
+        self.CERTIFICATE_PATH_SERVER_PRIVATE_KEY = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_SERVER_PRIVATE_KEY")
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
         self.THRESHOLD = int(os.environ.get("START_THRESHOLD", start_threshold)) * 1000   # conversion into ns
-        self.ENABLE_CERTIFICATE = bool(strtobool(os.environ.get("ENABLE_CERTIFICATE")))
-        self.CERTIFICATE_PATH = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH")
 
         self.client = Client(self.SERVER_ENDPOINT)
         self.client.set_user("n5geh_opcua_client2")
         self.client.set_password("n5geh2020")
         if self.ENABLE_CERTIFICATE:
-            self.client.set_security_string("Basic256Sha256,SignAndEncrypt," +
-                                            self.CERTIFICATE_PATH + "n5geh_opcua_server_cert.der," +
-                                            self.CERTIFICATE_PATH + "n5geh_opcua_server_private_key.pem")
+            self.client.set_security_string("Basic256Sha256,SignAndEncrypt," + self.CERTIFICATE_PATH_SERVER_CERT + "," +
+                                            self.CERTIFICATE_PATH_SERVER_PRIVATE_KEY)
         self.meas_device_tag = meas_device_tag
         self.vup = None
 
