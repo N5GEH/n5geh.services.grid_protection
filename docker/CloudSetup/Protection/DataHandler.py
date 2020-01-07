@@ -76,9 +76,6 @@ class DataHandler(object):
             print(self.__class__.__name__, " successful register devices from file:" + device_config_path)
 
     def update_topology(self, path):
-        # stop subscription
-        self.opc_client.unsubscribe()
-
         # get at server registered vars allocated as CustomVar
         server_vars = self.get_customized_server_vars()
 
@@ -113,7 +110,7 @@ class DataHandler(object):
         if self.DEBUG_MODE_PRINT:
             print(self.__class__.__name__, " successful updated topology from file:" + path)
 
-        # update OPC-Client and start subscription again
+        # update OPC-Client: delete old subscription and start new subscription
         self.update_subscription_opc_client()
 
         self.reset_flag_update_topology()
