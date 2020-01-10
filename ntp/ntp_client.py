@@ -1,7 +1,7 @@
 #  Copyright (c) 2019.
 #  Author: Sebastian Krahmer
 
-"""This is a simple NTP-Client.
+"""This is a simple NTP-client.
 
 This module requests the actual time from a ntp server and format to datetime string.
     Methods:

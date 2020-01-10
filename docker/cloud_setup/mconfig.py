@@ -4,7 +4,7 @@
 # from ruamel.yaml import YAML
 import yaml
 import sys
-current_module = sys.modules["UC2_grid_protection.CloudSetup.mconfig"]
+current_module = sys.modules["UC2_grid_protection.cloud_setup.mconfig"]
 
 
 def init(module):

@@ -14,14 +14,14 @@ import os
 import pandas as pd
 import datetime
 from distutils.util import strtobool
-from CloudSetup.Protection.DataSource import TopologyData
-from CloudSetup.Protection.DataSource import CustomVar
-from CloudSetup.Protection.DiffCore import DiffCore
-from CloudSetup.OPC_UA.Client.OPCClient import CustomClient
+from cloud_setup.protection.DataSource import TopologyData
+from cloud_setup.protection.DataSource import CustomVar
+from cloud_setup.protection.DiffCore import DiffCore
+from cloud_setup.opc_ua.client.OPCClient import CustomClient
 
 import time
 
-from Protection import settings
+from protection import settings
 
 __version__ = '0.5'
 __author__ = 'Sebastian Krahmer'
@@ -64,7 +64,7 @@ class DataHandler(object):
         # Registration of vars at server
         self.register_devices(self.opcua_dir_name, os.path.dirname(os.getcwd()) + self.PF_INPUT_PATH)
 
-        # Set Topology used for grid protection
+        # Set topology used for grid protection
         self.update_topology(self.topo_path)
 
         # Set start values for controllable nodes
@@ -111,7 +111,7 @@ class DataHandler(object):
         if self.DEBUG_MODE_PRINT:
             print(self.__class__.__name__, " successful updated topology from file:" + path)
 
-        # update OPC-Client: delete old subscription and start new subscription
+        # update OPC-client: delete old subscription and start new subscription
         self.update_subscription_opc_client()
 
         # TODO this flag should be handled in other subscription as the measDevice(topology) itself
@@ -159,7 +159,7 @@ class DataHandler(object):
         self.misc_nodes_list = []
 
     def update_data(self, nodeid, datetime_source, val):
-        # check for Update Request Topology
+        # check for Update Request topology
         for var in self.misc_nodes_list:
             if var.nodeid == nodeid and "UPDATE_REQUEST_TOPOLOGY" in var.opctag:
                 if val == 1:
@@ -268,15 +268,15 @@ class DataHandler(object):
 if __name__ == "__main__":
     ##################
     # if using local (means not in Docker)
-    # local = False   # if Server is local or as Docker
+    # local = False   # if server is local or as Docker
     # if local:
     #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
     # else:
     #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/OPCUA/python_server/")
     # os.environ.setdefault("NAMESPACE", "https://n5geh.de")
     # os.environ.setdefault("ENABLE_CERTIFICATE", "True")
-    # os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT", "/OPC_UA/certificates/n5geh_opcua_server_cert.pem")
-    # os.environ.setdefault("CERTIFICATE_PATH_SERVER_PRIVATE_KEY", "/OPC_UA/certificates/n5geh_opcua_server_private_key.pem")
+    # os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT", "/opc_ua/certificates/n5geh_opcua_server_cert.pem")
+    # os.environ.setdefault("CERTIFICATE_PATH_SERVER_PRIVATE_KEY", "/opc_ua/certificates/n5geh_opcua_server_private_key.pem")
     # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
     # os.environ.setdefault("DEBUG_MODE_VAR_UPDATER", "True")
     # os.environ.setdefault("UPDATE_PERIOD", "500000")        # in microsec
@@ -285,8 +285,8 @@ if __name__ == "__main__":
     # os.environ.setdefault("NOMINAL_CURRENT", "275")
     # os.environ.setdefault("CURRENT_EPS", "0.05")
     # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "default_demonstrator")
-    # os.environ.setdefault("TOPOLOGY_PATH", "/Topology/TopologyFile_demonstrator.json")
-    # os.environ.setdefault("PF_INPUT_PATH", "/MeasDeviceConfig/demonstrator_setup.txt")
+    # os.environ.setdefault("TOPOLOGY_PATH", "/topology/TopologyFile_demonstrator.json")
+    # os.environ.setdefault("PF_INPUT_PATH", "/device_config/demonstrator_setup.txt")
     ##################
 
     topo_path = os.environ.get("TOPOLOGY_PATH")

@@ -1,9 +1,9 @@
 #  Copyright (c) 2019.
 #  Author: Sebastian Krahmer
 
-"""This is the OPC-Client class.
+"""This is the OPC-client class.
 
-This class setups a new OPC-Client with for a server with a address specified by os.environ.get("SERVER_ENDPOINT").
+This class setups a new OPC-client with for a server with a address specified by os.environ.get("SERVER_ENDPOINT").
 This class is used as Measurement device equivalent and updates value of vars via VarUpdater.
 """
 import datetime
@@ -147,14 +147,14 @@ class CustomClient(object):
 if __name__ == "__main__":
     ##################
     # ### if using local (means not in Docker): uncomment this lines!
-    # local = False  # if Server is local or as Docker
+    # local = False  # if server is local or as Docker
     # if local:
     #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
     # else:
     #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/OPCUA/python_server/")
     # os.environ.setdefault("NAMESPACE", "https://n5geh.de")
     # os.environ.setdefault("ENABLE_CERTIFICATE", "True")
-    # os.environ.setdefault("CERTIFICATE_PATH", "/OPC_UA/certificates/")
+    # os.environ.setdefault("CERTIFICATE_PATH", "/opc_ua/certificates/")
     # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
     # os.environ.setdefault("DEBUG_MODE_VAR_UPDATER", "True")
     # os.environ.setdefault("UPDATE_PERIOD", "500000")        # in microsec

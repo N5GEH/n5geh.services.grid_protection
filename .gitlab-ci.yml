@@ -13,13 +13,13 @@ opcua_server:
   before_script:
   - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
   script:
-  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/Server.Dockerfile --destination $CI_REGISTRY_IMAGE/server --cache=true --cache-dir=/kanikocache
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/server.Dockerfile --destination $CI_REGISTRY_IMAGE/server --cache=true --cache-dir=/kanikocache
   only:
     refs:
     - develop
     changes:
-    - docker/Server.Dockerfile
-    - docker/CloudSetup/OPC_UA/Server/OPCServer.py
+    - docker/server.Dockerfile
+    - docker/cloud_setup/opc_ua/server/OPCServer.py
 
 opcua_extern_client:
   stage: build
@@ -39,7 +39,7 @@ opcua_extern_client:
     - develop
     changes:
     - docker/ExternClient.Dockerfile
-    - docker/CloudSetup/OPC_UA/Client/OPCClient_MeasSim.py
+    - docker/cloud_setup/opc_ua/client/OPCClient_MeasSim.py
 
 protection:
   stage: build
@@ -53,10 +53,10 @@ protection:
   before_script:
   - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
   script:
-  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/Protection.Dockerfile --destination $CI_REGISTRY_IMAGE/protection --cache=true --cache-dir=/kanikocache
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/protection.Dockerfile --destination $CI_REGISTRY_IMAGE/protection --cache=true --cache-dir=/kanikocache
   only:
     refs:
     - develop
     changes:
-    - docker/Protection.Dockerfile
-    - docker/CloudSetup/Protection/DataHandler.py
+    - docker/protection.Dockerfile
+    - docker/cloud_setup/protection/DataHandler.py

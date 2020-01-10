@@ -21,14 +21,14 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='opcua_powerfactory',
+    name='cloud_setup',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
     version='0.5.0',
 
-    description='Python Powerfactory OPC-UA',
+    description='Python GridProtection via OPC-UA, optionally using PowerFactory as Measurement-OPC-client',
     long_description=long_description,
 
     # The project's main homepage.
@@ -64,7 +64,7 @@ setup(
     ],
 
     # What does your project relate to?
-    keywords='powerfactory simulation opcua grid protection',
+    keywords='cloud opcua grid protection powerfactory',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
@@ -85,8 +85,10 @@ setup(
         'lxml>=4.4.0',
         'pytz>=2019.2',
         'pyyaml>=5.1.2',
-        'opcua==0.98.3',    # maybe better alternative: load fork from https://github.com/SebastianDD/python-opcua@n5geh
-        'pandas>=0.25.3',
+        'opcua>=0.98.9',
+        # 'pandas>=0.25.3',
+
+        # 'opcua==0.98.3' # maybe better alternative: load fork from https://github.com/SebastianDD/python-opcua@n5geh
     ],
 
     # List additional groups of dependencies here (e.g. development
@@ -95,7 +97,9 @@ setup(
     # $ pip install -e .[dev,test]
     extras_require={
         'dev': [],
-        'test': [],
+        'protection': [
+            'pandas>=0.25.3',
+        ],
     },
 
     # If there are data files included in your packages that need to be

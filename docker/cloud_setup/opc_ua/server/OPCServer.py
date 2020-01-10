@@ -1,9 +1,9 @@
 #  Copyright (c) 2019.
 #  Author: Sebastian Krahmer
 
-"""This is the OPC-Server class.
+"""This is the OPC-server class.
 
-This class setups a new OPC-Server with:
+This class setups a new OPC-server with:
  - address specified by Config
  - provides method to create variables remotely
 """
@@ -164,7 +164,7 @@ class CustomServer(object):
 
 if __name__ == "__main__":
     # if using local (means not in Docker)
-    # local = False   # if Server is local or as Docker
+    # local = False   # if server is local or as Docker
     # if local:
     #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
     # else:
@@ -172,7 +172,7 @@ if __name__ == "__main__":
     # os.environ.setdefault("NAMESPACE", "https://n5geh.de")
     # os.environ.setdefault("SERVER_NAME", "ENV SERVER_NAME N5GEH_FreeOpcUa_Python_Server")
     # os.environ.setdefault("ENABLE_CERTIFICATE", "True")
-    # os.environ.setdefault("CERTIFICATE_PATH", "/OPC_UA/certificates/")
+    # os.environ.setdefault("CERTIFICATE_PATH", "/opc_ua/certificates/")
 
     server = CustomServer()
     server.start()

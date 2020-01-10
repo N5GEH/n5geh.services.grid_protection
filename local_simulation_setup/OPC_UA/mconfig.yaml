@@ -1,7 +1,0 @@
-DEBUG_MODE: True
-SERVER_ENDPOINT: opc.tcp://localhost:4840/freeopcua/server/
-NAMESPACE: http://examples.freeopcua.github.io
-MAX_ARCHIVES: 20
-MAX_FAULTY_STATES: 5
-TIMESTAMP_PRECISION: 20000
-

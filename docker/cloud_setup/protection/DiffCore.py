@@ -1,17 +1,17 @@
 #  Copyright (c) 2019.
 #  Author: Sebastian Krahmer
 
-"""This is the Differential Protection Algorithm Core module.
+"""This is the Differential protection Algorithm Core module.
 
 This module checks for a dataframe (which contains for all relevant nodes at least one value)
 if sum of currents within the subgrid is zero.
 
-If there is an deviation greater than an epsilon, that ctrl_nodes gets new values via OPC-Client.
+If there is an deviation greater than an epsilon, that ctrl_nodes gets new values via OPC-client.
 """
 import os
 from threading import Thread
 
-from Protection import settings
+from protection import settings
 
 __version__ = '0.5'
 __author__ = 'Sebastian Krahmer'

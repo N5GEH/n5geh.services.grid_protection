@@ -9,9 +9,9 @@
 """
 from distutils.util import strtobool
 
-from CloudSetup.Protection.DataHandler import DataHandler
-from CloudSetup.OPC_UA.Server.OPCServer import CustomServer
-from CloudSetup.OPC_UA.Client.OPCClient_MeasSim import CustomClient
+from cloud_setup.protection.DataHandler import DataHandler
+from cloud_setup.opc_ua.server.OPCServer import CustomServer
+from cloud_setup.opc_ua.client.OPCClient_MeasSim import CustomClient
 from multiprocessing import Process
 import os
 
@@ -39,8 +39,8 @@ if __name__ == "__main__":
     os.environ.setdefault("NAMESPACE", "https://n5geh.de")
     os.environ.setdefault("SERVER_NAME", "N5GEH_FreeOpcUa_Python_Server")
     os.environ.setdefault("ENABLE_CERTIFICATE", "True")
-    os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT", "/CloudSetup/OPC_UA/certificates/n5geh_opcua_server_cert.pem")
-    os.environ.setdefault("CERTIFICATE_PATH_SERVER_PRIVATE_KEY", "/CloudSetup/OPC_UA/certificates/n5geh_opcua_server_private_key.pem")
+    os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_server_cert.pem")
+    os.environ.setdefault("CERTIFICATE_PATH_SERVER_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_server_private_key.pem")
     os.environ.setdefault("DEBUG_MODE_PRINT", "True")
     os.environ.setdefault("DEBUG_MODE_VAR_UPDATER", "True")
     os.environ.setdefault("UPDATE_PERIOD", "500000")              # in microsec
@@ -49,8 +49,8 @@ if __name__ == "__main__":
     os.environ.setdefault("NOMINAL_CURRENT", "275")
     os.environ.setdefault("CURRENT_EPS", "0.05")
     os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "default_demonstrator")
-    os.environ.setdefault("TOPOLOGY_PATH", "/CloudSetup/Topology/TopologyFile_demonstrator.json")
-    os.environ.setdefault("PF_INPUT_PATH", "/CloudSetup/MeasDeviceConfig/demonstrator_setup.txt")
+    os.environ.setdefault("TOPOLOGY_PATH", "/cloud_setup/topology/TopologyFile_demonstrator.json")
+    os.environ.setdefault("PF_INPUT_PATH", "/cloud_setup/device_config/demonstrator_setup.txt")
 
     # config.DEBUG_MODE_PRINT = "True"
     # config.DEBUG_MODE_VAR_UPDATER = "True"
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     # config.TIMESTAMP_PRECISION = 10000      # in microsec
     # config.UPDATE_PERIOD = 500000           # in microsec
 
-    # setup OPC Server
+    # setup OPC server
     mServer = CustomServer()
     mServer.start()
 
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     mDataHandler = DataHandler(topo_path, opcua_dir_name)
     mDataHandler.start()
 
-    # setup meas devices as OPC Client
+    # setup meas devices as OPC client
     if bool(strtobool(os.environ.get("DEBUG_MODE_VAR_UPDATER"))):
         meas_device_tags = ["RES"]
         for tag in meas_device_tags:

@@ -1,10 +1,10 @@
 #  Copyright (c) 2019.
 #  Author: Sebastian Krahmer
 
-"""This is the OPC-Client class.
+"""This is the OPC-client class.
 
-This class setups a new OPC-Client with for a server with a address specified by os.environ.get("SERVER_ENDPOINT").
-This Client is connected to a DataHandler.
+This class setups a new OPC-client with for a server with a address specified by os.environ.get("SERVER_ENDPOINT").
+This client is connected to a DataHandler.
 This class can register new vars at server by calling server method.
     vars specified by PFInputFiles
 This class makes subscriptions to OPC-nodes of a given list (+ forwards DataHandler as arg to SubHandler)
@@ -17,7 +17,7 @@ from opcua import ua, Client
 from distutils.util import strtobool
 # from opcua.ua import DataValue
 
-from CloudSetup.OPC_UA.Client.subscription import SubHandler
+from cloud_setup.opc_ua.client.subscription import SubHandler
 from opcua.ua.uaerrors import BadNoMatch
 
 sys.path.insert(0, "..")
