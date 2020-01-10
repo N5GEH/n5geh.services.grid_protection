@@ -10,8 +10,8 @@ ENV PYTHONPATH /usr/src
 ENV SERVER_ENDPOINT opc.tcp://ubuntu5g:4840
 ENV NAMESPACE https://n5geh.de
 ENV ENABLE_CERTIFICATE True
-ENV CERTIFICATE_PATH_SERVER_CERT /cloud_setup/opc_ua/certificates/n5geh_opcua_server_cert.pem
-ENV CERTIFICATE_PATH_SERVER_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_opcua_server_private_key.pem
+ENV CERTIFICATE_PATH_CLIENT_CERT /cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem
+ENV CERTIFICATE_PATH_CLIENT_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem
 ENV OPCUA_SERVER_DIR_NAME default_demonstrator
 ENV DEBUG_MODE_PRINT True
 ENV DEBUG_MODE_VAR_UPDATER True

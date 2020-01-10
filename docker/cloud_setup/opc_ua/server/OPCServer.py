@@ -131,6 +131,9 @@ class CustomServer(object):
             # a = self.obj.get_child(dir_name)
             if obj is not None:
                 if obj.get_browse_name().Name == dir_name:
+                    childs = obj.get_variables()
+                    if childs is not None and childs.__sizeof__() >= 1:
+                        self.server.delete_nodes([childs])
                     self.server.delete_nodes([obj])
                     print("delete subfolder: " + dir_name)
         except BadNoMatch:

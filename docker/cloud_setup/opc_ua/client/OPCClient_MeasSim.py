@@ -81,13 +81,13 @@ class VarUpdater(Thread):
 
 
 class CustomClient(object):
-    def __init__(self, meas_device_tag="RES", start_threshold=5000000, server_endpoint="opc.tcp://0.0.0.0:4840/freeopcua/server/"):
+    def __init__(self, meas_device_tag="RES", start_threshold=5000000, server_endpoint="opc.tcp://0.0.0.0:4840/OPCUA/python_server/"):
 
         self.SERVER_ENDPOINT = os.environ.get("SERVER_ENDPOINT", server_endpoint)
         self.NAMESPACE = os.environ.get("NAMESPACE")
         self.ENABLE_CERTIFICATE = bool(strtobool(os.environ.get("ENABLE_CERTIFICATE")))
-        self.CERTIFICATE_PATH_SERVER_CERT = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_SERVER_CERT")
-        self.CERTIFICATE_PATH_SERVER_PRIVATE_KEY = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_SERVER_PRIVATE_KEY")
+        self.CERTIFICATE_PATH_CLIENT_CERT = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_CLIENT_CERT")
+        self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY")
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
         self.THRESHOLD = int(os.environ.get("START_THRESHOLD", start_threshold)) * 1000   # conversion into ns
         self.OPCUA_DIR_NAME = os.environ.get("OPCUA_SERVER_DIR_NAME")
@@ -96,8 +96,8 @@ class CustomClient(object):
         self.client.set_user("n5geh_opcua_client2")
         self.client.set_password("n5geh2020")
         if self.ENABLE_CERTIFICATE:
-            self.client.set_security_string("Basic256Sha256,SignAndEncrypt," + self.CERTIFICATE_PATH_SERVER_CERT + "," +
-                                            self.CERTIFICATE_PATH_SERVER_PRIVATE_KEY)
+            self.client.set_security_string("Basic256Sha256,SignAndEncrypt," + self.CERTIFICATE_PATH_CLIENT_CERT + "," +
+                                            self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY)
         self.meas_device_tag = meas_device_tag
         self.vup = None
 
@@ -154,6 +154,9 @@ if __name__ == "__main__":
     #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/OPCUA/python_server/")
     # os.environ.setdefault("NAMESPACE", "https://n5geh.de")
     # os.environ.setdefault("ENABLE_CERTIFICATE", "True")
+    # os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT", "/opc_ua/certificates/n5geh_opcua_server_cert.pem")
+    # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
+    # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
     # os.environ.setdefault("CERTIFICATE_PATH", "/opc_ua/certificates/")
     # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
     # os.environ.setdefault("DEBUG_MODE_VAR_UPDATER", "True")

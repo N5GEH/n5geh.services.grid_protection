@@ -61,16 +61,16 @@ class CustomClient(object):
         self.SERVER_ENDPOINT = os.environ.get("SERVER_ENDPOINT", server_endpoint)
         self.NAMESPACE = os.environ.get("NAMESPACE")
         self.ENABLE_CERTIFICATE = bool(strtobool(os.environ.get("ENABLE_CERTIFICATE")))
-        self.CERTIFICATE_PATH_SERVER_CERT = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_SERVER_CERT")
-        self.CERTIFICATE_PATH_SERVER_PRIVATE_KEY = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_SERVER_PRIVATE_KEY")
+        self.CERTIFICATE_PATH_CLIENT_CERT = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_CLIENT_CERT")
+        self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY")
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
 
         self.client = Client(self.SERVER_ENDPOINT)
         self.client.set_user("n5geh_opcua_client1")
         self.client.set_password("n5geh2019")
         if self.ENABLE_CERTIFICATE:
-            self.client.set_security_string("Basic256Sha256,SignAndEncrypt," + self.CERTIFICATE_PATH_SERVER_CERT + "," +
-                                            self.CERTIFICATE_PATH_SERVER_PRIVATE_KEY)
+            self.client.set_security_string("Basic256Sha256,SignAndEncrypt," + self.CERTIFICATE_PATH_CLIENT_CERT + "," +
+                                            self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY)
         self.observed_opc_nodes = []
         self.subscription = None
         self.subscription_handle = None
