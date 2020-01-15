@@ -30,8 +30,8 @@ __author__ = 'Sebastian Krahmer'
 class DataHandler(object):
     def __init__(self, topology_path, dir_name):
         """
-            Args:
-                topology_path (String): path of TopologyFile.json
+        :param topology_path (String): path of TopologyFile.json
+        :param dir_name (String): name of subfolder to create; parent of all created nodes
         """
         self.SERVER_ENDPOINT = os.environ.get("SERVER_ENDPOINT")
         self.DEBUG_MODE_VAR_UPDATER = bool(strtobool(os.environ.get("DEBUG_MODE_VAR_UPDATER")))
@@ -40,10 +40,10 @@ class DataHandler(object):
         self.PF_INPUT_PATH = os.environ.get("PF_INPUT_PATH")
 
         self.opc_client = CustomClient(self.SERVER_ENDPOINT)
-        self.opc_client.start()
+
         self.topo_path = os.path.dirname(os.getcwd()) + topology_path
         self.topo_data = None
-        self.opcua_dir_name = dir_name
+        self.server_dir_name = dir_name
 
         self.slack_ph1 = None
         self.slack_ph2 = None
@@ -52,7 +52,8 @@ class DataHandler(object):
         self.Iph2_nodes_list = []
         self.Iph3_nodes_list = []
         self.ctrl_nodes_list = []   # CustomVars related to actuators (will used only for feedback-control); (PF: CTRL-Variable, control only)
-        self.misc_nodes_list = []   # CustomVars not directly related to grid protection (mostly status vars and vars providing additional infos); (PF: RES-Variable which contain not to I-measurement + PF intern simulation vars)
+        self.other_meas_nodes_list = []     # CustomVars that are sensors and NOT related to I-measurement; (PF: RES-Variable which contain not to I-measurement)
+        self.misc_nodes_list = []   # CustomVars not directly related to grid protection (mostly status vars and vars providing additional infos); (PF: PF intern simulation vars)
 
         self.df_ph1 = pd.DataFrame()          # dataframe for phase 1 to pass to fault_assessment
         self.df_ph2 = pd.DataFrame()
@@ -60,28 +61,40 @@ class DataHandler(object):
 
         settings.init()
 
+    def _start_client(self):
+        self.opc_client.start()
+
+    def _stop_client(self):
+        self.opc_client.stop()
+
     def start(self):
+        # start opc client
+        self._start_client()
+
         # Registration of vars at server
-        self.register_devices(self.opcua_dir_name, os.path.dirname(os.getcwd()) + self.PF_INPUT_PATH)
+        self.register_devices(self.server_dir_name, os.path.dirname(os.getcwd()) + self.PF_INPUT_PATH)
 
         # Set topology used for grid protection
-        self.update_topology(self.topo_path)
+        self.set_meas_topology(self.topo_path, [], self.server_dir_name)
 
         # Set start values for controllable nodes
         self.set_start_values_for_ctrls()
 
-    def register_devices(self, opcua_dir_name, device_config_path):
-        self.opc_client.create_dir_on_server(opcua_dir_name)
-        self.opc_client.register_variables_to_server(opcua_dir_name, device_config_path)
+        # Set status nodes used monitoring and topology/device updates
+        self.set_status_flags(self.topo_path, [], self.server_dir_name)
+
+    def register_devices(self, dir_name, device_config_path):
+        self.opc_client.create_dir_on_server(dir_name)
+        self.opc_client.register_variables_to_server(dir_name, device_config_path)
         if self.DEBUG_MODE_PRINT:
             print(self.__class__.__name__, " successful register devices from file:" + device_config_path)
 
-    def update_topology(self, path):
+    def set_meas_topology(self, path, list_of_nodes_to_reset, dir_name):
         # get at server registered vars allocated as CustomVar
-        server_vars = self.get_customized_server_vars(self.opcua_dir_name)
+        server_vars = self.get_customized_server_vars(dir_name)
 
         # get new topology
-        self.clear_topo_data()
+        self.clear_topo_meas()
         self.topo_data = TopologyData(path)
 
         # cluster topology nodes into lists (current, ctrl and misc) and assign the appropriate CustomVar
@@ -103,36 +116,64 @@ class DataHandler(object):
                             self.Iph3_nodes_list.append(var)
                             if "slack" in topo_browsename.lower():
                                 self.slack_ph3 = var
+                    elif "_I_" not in topo_opctag and "RES" in topo_opctag:
+                        self.other_meas_nodes_list.append(var)
                     elif "CTRL" in topo_opctag:
                         self.ctrl_nodes_list.append(var)
-                    else:
+                    break
+        if self.DEBUG_MODE_PRINT:
+            print(self.__class__.__name__, " successful updated meas topology from file:" + path)
+
+        # update OPC-client: delete old subscription and start new subscription
+        self.update_subscription_opc_client(self.Iph1_nodes_list + self.Iph2_nodes_list + self.Iph3_nodes_list +
+                                            self.other_meas_nodes_list + self.ctrl_nodes_list, False)
+
+        self.reset_flags(list_of_nodes_to_reset, dir_name)
+
+    def set_status_flags(self, path, list_of_nodes_to_reset, dir_name):
+        # get at server registered vars allocated as CustomVar
+        server_vars = self.get_customized_server_vars(dir_name)
+
+        # get new topology
+        self.clear_topo_status_flags()
+        self.topo_data = TopologyData(path)
+
+        # cluster topology nodes into lists (current, ctrl and misc) and assign the appropriate CustomVar
+        for topo_opctag, topo_browsename in self.topo_data.get_itempairs():
+            for var in server_vars:
+                if var.opctag == topo_opctag:
+                    if "RES" not in topo_opctag and "CTRL" not in topo_opctag:
                         self.misc_nodes_list.append(var)
                     break
         if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful updated topology from file:" + path)
+            print(self.__class__.__name__, " successful updated status flags from file:" + path)
 
         # update OPC-client: delete old subscription and start new subscription
-        self.update_subscription_opc_client()
+        self.update_subscription_opc_client(self.misc_nodes_list, True, 500)
 
-        # TODO this flag should be handled in other subscription as the measDevice(topology) itself
-        self.reset_flag_update_topology()
+        self.reset_flags(list_of_nodes_to_reset, dir_name)
 
-    def reset_flag_update_topology(self):
-        # reset Flag UPDATE_REQUEST_TOPOLOGY
+    def reset_flags(self, list_of_flags_to_reset, dir_name):
+        """
+        Reset the value of each node in the provided list to 0.
+        :param list_of_flags_to_reset: list of nodes
+        :param dir_name: <String> name of subfolder(node)
+        """
         nodes = []
         values = []
-        for var in self.opc_client.get_server_vars(self.opcua_dir_name):
-            if "UPDATE_REQUEST_TOPOLOGY" in var.get_browse_name().Name:
-                nodes.append(var)
-                values.append(0)
-                break
+        for var in self.opc_client.get_server_vars(dir_name):
+            for node in list_of_flags_to_reset:
+                if var.nodeid == node.nodeid:
+                    nodes.append(var)
+                    values.append(0)
+                    break
 
         self.opc_client.set_vars(nodes, values)
 
-    def get_customized_server_vars(self, opcua_dir_name):
-        all_observed_opc_nodes = self.opc_client.get_server_vars(opcua_dir_name)
+    def get_customized_server_vars(self, dir_name):
+        all_observed_nodes = self.opc_client.get_server_vars(dir_name)
         mvars = []
-        for var in all_observed_opc_nodes:
+        for var in all_observed_nodes:
             opctag = var.get_browse_name().Name
             if 'PH1' in opctag:
                 mvars.append(CustomVar(opctag, var.nodeid, 1))
@@ -144,11 +185,10 @@ class DataHandler(object):
                 mvars.append(CustomVar(opctag, var.nodeid))
         return mvars
 
-    def update_subscription_opc_client(self):
-        self.opc_client.make_subscription(self, self.opcua_dir_name, self.Iph1_nodes_list + self.Iph2_nodes_list + self.Iph3_nodes_list +
-                                          self.ctrl_nodes_list + self.misc_nodes_list)
+    def update_subscription_opc_client(self, list_of_nodes, are_status_nodes=False, sub_interval=1):
+        self.opc_client.make_subscription(self, self.server_dir_name, list_of_nodes, are_status_nodes, sub_interval)
 
-    def clear_topo_data(self):
+    def clear_topo_meas(self):
         self.slack_ph1 = None
         self.slack_ph2 = None
         self.slack_ph3 = None
@@ -156,6 +196,9 @@ class DataHandler(object):
         self.Iph2_nodes_list = []
         self.Iph3_nodes_list = []
         self.ctrl_nodes_list = []
+        self.other_meas_nodes_list = []
+
+    def clear_topo_status_flags(self):
         self.misc_nodes_list = []
 
     def update_data(self, nodeid, datetime_source, val):
@@ -163,7 +206,10 @@ class DataHandler(object):
         for var in self.misc_nodes_list:
             if var.nodeid == nodeid and "UPDATE_REQUEST_TOPOLOGY" in var.opctag:
                 if val == 1:
-                    self.update_topology(self.topo_path)
+                    #TODO could not stop client -->Error
+                    # self._stop_client()
+                    # self._start_client()
+                    self.set_meas_topology(self.topo_path, [var], self.server_dir_name)
                     return
 
         # otherwise update data used for DiffCore

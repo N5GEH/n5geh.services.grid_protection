@@ -58,6 +58,7 @@ class CustomServer(object):
         self.server.set_endpoint(self.SERVER_ENDPOINT)
         self.server.set_server_name(self.SERVER_NAME)
 
+        # set the security endpoints for identification of clients
         if self.ENABLE_CERTIFICATE:
             # load server certificate and private key. This enables endpoints with signing and encryption.
             self.server.load_certificate(self.CERTIFICATE_PATH_SERVER_CERT)
@@ -70,9 +71,10 @@ class CustomServer(object):
                 # ua.SecurityPolicyType.Basic256Sha256_Sign,
             ])
 
-        # set the security endpoints for identification of clients
-        # self.server.set_security_IDs(["Anonymous", "Basic256Sha256", "Username"])
-        self.server.set_security_IDs(["Username"])
+            self.server.set_security_IDs(["Username", "Basic256Sha256"])
+        else:
+            self.server.set_security_policy([ua.SecurityPolicyType.NoSecurity])
+            self.server.set_security_IDs(["Anonymous", "Username"])
 
         # set the user_manager function
         self.server.user_manager.set_user_manager(user_manager)

@@ -7,6 +7,7 @@
     2) starts DataHandler
     3) starts MeasSim OPC Clients
 """
+import logging
 from distutils.util import strtobool
 
 from cloud_setup.protection.DataHandler import DataHandler
@@ -31,6 +32,17 @@ def runInParallel(*fns):
 
 
 if __name__ == "__main__":
+    # optional: setup logging
+    logging.basicConfig(level=logging.WARN)
+    # logger = logging.getLogger("opcua.address_space")
+    # logger.setLevel(logging.DEBUG)
+    # logger = logging.getLogger("opcua.internal_server")
+    # logger.setLevel(logging.DEBUG)
+    # logger = logging.getLogger("opcua.binary_server_asyncio")
+    # logger.setLevel(logging.DEBUG)
+    # logger = logging.getLogger("opcua.uaprocessor")
+    # logger.setLevel(logging.DEBUG)
+
     local = True
     if local:
         os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
@@ -38,7 +50,7 @@ if __name__ == "__main__":
         os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://0.0.0.0:4840/OPCUA/python_server/")
     os.environ.setdefault("NAMESPACE", "https://n5geh.de")
     os.environ.setdefault("SERVER_NAME", "N5GEH_FreeOpcUa_Python_Server")
-    os.environ.setdefault("ENABLE_CERTIFICATE", "True")
+    os.environ.setdefault("ENABLE_CERTIFICATE", "False")
     os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_server_cert.pem")
     os.environ.setdefault("CERTIFICATE_PATH_SERVER_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_server_private_key.pem")
     os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")

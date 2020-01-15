@@ -9,7 +9,7 @@ RUN pip install -e .
 ENV PYTHONPATH /usr/src
 ENV SERVER_ENDPOINT opc.tcp://ubuntu5g:4840
 ENV NAMESPACE https://n5geh.de
-ENV ENABLE_CERTIFICATE True
+ENV ENABLE_CERTIFICATE False
 ENV CERTIFICATE_PATH_CLIENT_CERT /cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem
 ENV CERTIFICATE_PATH_CLIENT_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem
 ENV OPCUA_SERVER_DIR_NAME default_demonstrator
