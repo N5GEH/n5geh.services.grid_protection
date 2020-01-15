@@ -86,7 +86,8 @@ setup(
         'pytz>=2019.2',
         'pyyaml>=5.1.2',
         # 'opcua>=0.98.9',
-        'git+https://github.com/FreeOpcUa/python-opcua.git@0aad4ad67f92bae434eba323c0d92a2efe5792d0',
+        '[-e] git://github.com/FreeOpcUa/python-opcua.git@master#egg=python-opcua',
+        # 'git+https://github.com/FreeOpcUa/python-opcua.git@0aad4ad67f92bae434eba323c0d92a2efe5792d0',
         # 'pandas>=0.25.3',
 
         # 'opcua==0.98.3' # maybe better alternative: load fork from https://github.com/SebastianDD/python-opcua@n5geh
