@@ -3,26 +3,22 @@
 
 """This is the OPC-client class.
 
-This class setups a new OPC-client with for a server with a address specified by os.environ.get("SERVER_ENDPOINT").
-This client is connected to a DataHandler.
+This class setups a new OPC-client for a server with a address specified by server_endpoint.
+
 This class can register new vars at server by calling server method.
-    vars specified by PFInputFiles
-This class makes subscriptions to OPC-nodes of a given list (+ forwards DataHandler as arg to SubHandler)
+This class can make subscriptions to OPC-nodes of a given list
 This class can set new values for OPC-nodes of a given list.
 """
-import os
 import sys
 
 from opcua import ua, Client
-from distutils.util import strtobool
 # from opcua.ua import DataValue
 
-from cloud_setup.opc_ua.client.subscription import SubHandler
 from opcua.ua.uaerrors import BadNoMatch
 
 sys.path.insert(0, "..")
 
-__version__ = '0.5'
+__version__ = '0.6'
 __author__ = 'Sebastian Krahmer'
 
 
@@ -157,4 +153,47 @@ class CustomClient(object):
                     var.set_value(value_list[i], variant_type)
                     break
             i += 1
-# self.observed_nodes
+
+    # region subscription
+    def _subscribe(self, dir_name, sub_handler, subscription, subscription_handle, list_of_nodes_to_subscribe,
+                   already_subscribed_nodes, sub_interval):
+        """
+            Make a subscription for list of nodes and return handle for subscription
+                :param dir_name: subfolder, which contains the requested nodes
+                :param sub_handler: SubHandler which will call the update_data function
+                :param subscription: subscription object
+                :param subscription_handle: handle can used to unsubscribe
+                :param list_of_nodes_to_subscribe: list of nodes/customVars
+                :param already_subscribed_nodes: list of nodes which already within subscription
+                :param sub_interval: time interval the subscribed node is checked (in ms)
+
+                :return subscription:
+                :return subscription_handle
+                :return subscribed_nodes
+        """
+        if subscription is not None:
+            self._unsubscribe(subscription, subscription_handle)
+            already_subscribed_nodes = []
+
+        all_server_nodes = self.get_server_vars(dir_name)
+
+        for node in all_server_nodes:
+            for var in list_of_nodes_to_subscribe:
+                if node.nodeid == var.nodeid:
+                    already_subscribed_nodes.append(node)
+
+        # make subscription
+        subscription = self.client.create_subscription(sub_interval, sub_handler)
+        subscription_handle = subscription.subscribe_data_change(already_subscribed_nodes)
+
+        return subscription, subscription_handle, already_subscribed_nodes
+
+    # will raise TimeoutError() - why? --> use self.subscription.delete() instead
+    @staticmethod
+    def _unsubscribe(self, subscription, subscription_handle):
+        if subscription_handle is not None:
+            # self.stop()
+            # self.start()
+            # self.subscription.delete()
+            subscription.unsubscribe(subscription_handle)
+    # endregion

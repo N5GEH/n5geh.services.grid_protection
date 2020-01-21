@@ -17,7 +17,7 @@ from multiprocessing import Process
 import os
 
 
-__version__ = '0.5'
+__version__ = '0.6'
 __author__ = 'Sebastian Krahmer'
 
 

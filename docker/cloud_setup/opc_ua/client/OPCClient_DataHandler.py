@@ -13,17 +13,16 @@ This class can set new values for OPC-nodes of a given list.
 import os
 import sys
 
-from opcua import ua, Client
+from opcua import ua
 from distutils.util import strtobool
 # from opcua.ua import DataValue
 
 from cloud_setup.opc_ua.client.subscription import SubHandler
 from opc_ua.client.OPCClient import CustomClient
-from opcua.ua.uaerrors import BadNoMatch
 
 sys.path.insert(0, "..")
 
-__version__ = '0.5'
+__version__ = '0.6'
 __author__ = 'Sebastian Krahmer'
 
 
@@ -72,11 +71,11 @@ class OPCClientDataHandler(CustomClient):
         # custom
         self.observed_nodes = []
 
-        self.observed_status_nodes = []
+        self.subscribed_status_nodes = []
         self.subscription_status_nodes = None
         self.subscription_handle_status_nodes = None
 
-        self.observed_meas_nodes = []
+        self.subscribed_meas_nodes = []
         self.subscription_meas_nodes = None
         self.subscription_handle_meas_nodes = None
 
@@ -96,59 +95,31 @@ class OPCClientDataHandler(CustomClient):
             print(self.__class__.__name__, " successful disconnected")
 
     # region subscription
-    def make_subscription(self, target_object, dir_name, list_of_nodes_to_observe, are_status_nodes=False,
+    def make_subscription(self, target_object, dir_name, list_of_nodes_to_subscribe, are_status_nodes=False,
                           sub_interval=1):
         """
         Make a subscription for list of nodes and set some properties.
         :param target_object: object the datachange_notification of subscription is sent to
         :param dir_name: subfolder, which contains the requested nodes
-        :param list_of_nodes_to_observe: list of nodes/customVars
+        :param list_of_nodes_to_subscribe: list of nodes/customVars
         :param are_status_nodes: flag if requested subscription is only for status flags
         :param sub_interval: time interval the subscribed node is checked (in ms)
         """
         self.observed_nodes = []
-        sub_handler = SubHandler(target_object, "client")
+        sub_handler = SubHandler(target_object)
 
         if are_status_nodes is True:
-            self._subscribe(sub_handler, self.subscription_status_nodes, self.subscription_handle_status_nodes,
-                            list_of_nodes_to_observe, dir_name, self.observed_status_nodes, sub_interval)
+            self.subscription_status_nodes, self.subscription_handle_status_nodes, self.subscribed_status_nodes = \
+                self._subscribe(dir_name, sub_handler, self.subscription_status_nodes, self.subscription_handle_status_nodes,
+                                list_of_nodes_to_subscribe, self.subscribed_status_nodes, sub_interval)
         else:
-            self._subscribe(sub_handler, self.subscription_meas_nodes, self.subscription_handle_meas_nodes,
-                            list_of_nodes_to_observe, dir_name, self.observed_meas_nodes, sub_interval)
-
-        self.observed_nodes = self.observed_meas_nodes + self.observed_status_nodes
+            self.subscription_meas_nodes,  self.subscription_handle_meas_nodes, subscribed_meas_nodes = \
+                self._subscribe(dir_name, sub_handler, self.subscription_meas_nodes, self.subscription_handle_meas_nodes,
+                                list_of_nodes_to_subscribe, self.subscribed_meas_nodes, sub_interval)
 
         if self.DEBUG_MODE_PRINT:
             print(self.__class__.__name__, " successful updates subscription")
-
-    def _subscribe(self, sub_handler, subscription, subscription_handle, list_of_nodes_to_observe, dir_name,
-                   new_observed_nodes, sub_interval):
-
-        if subscription is not None:
-            subscription.unsubscribe(subscription_handle)
-            # subscription.delete()
-            new_observed_nodes = []
-        all_server_nodes = self.get_server_vars(dir_name)
-
-        for node in all_server_nodes:
-            for var in list_of_nodes_to_observe:
-                if node.nodeid == var.nodeid:
-                    new_observed_nodes.append(node)
-
-        # make subscription
-        subscription = self.client.create_subscription(sub_interval, sub_handler)
-        subscription_handle = subscription.subscribe_data_change(new_observed_nodes)
-
-    # will raise TimeoutError() - why? --> use self.subscription.delete() instead
-    # def unsubscribe(self):
-    #     if self.subscription_handle is not None:
-    #
-    #         # self.stop()
-    #         # self.start()
-    #         # self.subscription.delete()
-    #         self.subscription.unsubscribe(self.subscription_handle)
-
     # endregion
 
     def set_vars(self, ctrl_list, value_list):
-        super().set_vars(self.observed_nodes, ctrl_list, value_list)
+        super().set_vars(self.subscribed_meas_nodes + self.subscribed_status_nodes, ctrl_list, value_list)

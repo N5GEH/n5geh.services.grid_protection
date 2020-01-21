@@ -21,5 +21,5 @@ ENV START_THRESHOLD 5000000
 
 EXPOSE 4850
 LABEL type="opcua_externClient_python" \
-      version="0.5"
+      version="0.6"
 CMD [ "python", "/usr/src/cloud_setup/opc_ua/client/OPCClient_MeasSim.py"]
