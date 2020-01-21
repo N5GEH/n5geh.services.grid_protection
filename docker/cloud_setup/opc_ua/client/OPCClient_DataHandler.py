@@ -1,14 +1,10 @@
 #  Copyright (c) 2019.
 #  Author: Sebastian Krahmer
 
-"""This is the OPC-client class.
+"""This is the OPC-client class for DataHandler.
 
-This class setups a new OPC-client with for a server with a address specified by os.environ.get("SERVER_ENDPOINT").
-This client is connected to a DataHandler.
-This class can register new vars at server by calling server method.
-    vars specified by PFInputFiles
-This class makes subscriptions to OPC-nodes of a given list (+ forwards DataHandler as arg to SubHandler)
-This class can set new values for OPC-nodes of a given list.
+This class is an child of OPCClient.CustomClient
+This class setups a new OPC-client for a server with a address specified by os.environ.get("SERVER_ENDPOINT").
 """
 import os
 import sys
@@ -69,8 +65,6 @@ class OPCClientDataHandler(CustomClient):
                          self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY, auth_name, auth_password, self.DEBUG_MODE_PRINT)
 
         # custom
-        self.observed_nodes = []
-
         self.subscribed_status_nodes = []
         self.subscription_status_nodes = None
         self.subscription_handle_status_nodes = None
@@ -105,7 +99,6 @@ class OPCClientDataHandler(CustomClient):
         :param are_status_nodes: flag if requested subscription is only for status flags
         :param sub_interval: time interval the subscribed node is checked (in ms)
         """
-        self.observed_nodes = []
         sub_handler = SubHandler(target_object)
 
         if are_status_nodes is True:
@@ -113,7 +106,7 @@ class OPCClientDataHandler(CustomClient):
                 self._subscribe(dir_name, sub_handler, self.subscription_status_nodes, self.subscription_handle_status_nodes,
                                 list_of_nodes_to_subscribe, self.subscribed_status_nodes, sub_interval)
         else:
-            self.subscription_meas_nodes,  self.subscription_handle_meas_nodes, subscribed_meas_nodes = \
+            self.subscription_meas_nodes, self.subscription_handle_meas_nodes, self.subscribed_meas_nodes = \
                 self._subscribe(dir_name, sub_handler, self.subscription_meas_nodes, self.subscription_handle_meas_nodes,
                                 list_of_nodes_to_subscribe, self.subscribed_meas_nodes, sub_interval)
 

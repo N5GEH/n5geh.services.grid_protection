@@ -156,14 +156,12 @@ if __name__ == "__main__":
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
     # os.environ.setdefault("CERTIFICATE_PATH", "/opc_ua/certificates/")
     # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
-    # os.environ.setdefault("DEBUG_MODE_VAR_UPDATER", "True")
     # os.environ.setdefault("UPDATE_PERIOD", "500000")        # in microsec
     # os.environ.setdefault("TIMESTAMP_PRECISION", "10000")   # in microsec
     # os.environ.setdefault("START_THRESHOLD", "5000000")     # in microsec
     ##################
 
-    if bool(strtobool(os.environ.get("DEBUG_MODE_VAR_UPDATER"))):
-        meas_device_tags = ["RES"]
-        for tag in meas_device_tags:
-            mClient_MeasSim = OPCClientSimDevice(tag)
-            mClient_MeasSim.start()
+    meas_device_tags = ["RES"]
+    for tag in meas_device_tags:
+        mClient_SimDevice = OPCClientSimDevice(tag)
+        mClient_SimDevice.start()

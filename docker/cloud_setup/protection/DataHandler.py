@@ -12,7 +12,6 @@ After collecting at least one data point from each Meas device, the "FaultAssess
 import os
 
 import pandas as pd
-import datetime
 import time
 from distutils.util import strtobool
 from cloud_setup.protection.DataSource import TopologyData
@@ -34,7 +33,6 @@ class DataHandler(object):
         :param dir_name (String): name of subfolder to create; parent of all created nodes
         """
         self.SERVER_ENDPOINT = os.environ.get("SERVER_ENDPOINT")
-        self.DEBUG_MODE_VAR_UPDATER = bool(strtobool(os.environ.get("DEBUG_MODE_VAR_UPDATER")))
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
         self.TIMESTAMP_PRECISION = int(os.environ.get("TIMESTAMP_PRECISION"))
         self.PF_INPUT_PATH = os.environ.get("PF_INPUT_PATH")
@@ -201,10 +199,10 @@ class DataHandler(object):
     def clear_topo_status_flags(self):
         self.misc_nodes_list = []
 
-    def update_data(self, nodeid, datetime_source, val):
+    def update_data(self, node, datetime_source, val):
         # check for Update Request topology
         for var in self.misc_nodes_list:
-            if var.nodeid == nodeid and "UPDATE_REQUEST_TOPOLOGY" in var.opctag:
+            if var.nodeid == node.nodeid and "UPDATE_REQUEST_TOPOLOGY" in var.opctag:
                 if val == 1:
                     #TODO could not stop client -->Error
                     # self._stop_client()
@@ -214,10 +212,10 @@ class DataHandler(object):
 
         # otherwise update data used for DiffCore
         for var in (self.Iph1_nodes_list + self.Iph2_nodes_list + self.Iph3_nodes_list):
-            if var.nodeid == nodeid:
+            if var.nodeid == node.nodeid:
 
                 # TODO necessary for real meas devices with fixed timestamp?
-                ts = self.round_time(datetime_source, self.TIMESTAMP_PRECISION)
+                ts = DateHelper.round_time(datetime_source, self.TIMESTAMP_PRECISION)
                 # ts = self.format_datetime(datetime_source)
 
                 if var.opctag == self.slack_ph1.opctag or var.opctag == self.slack_ph2.opctag or var.opctag == self.slack_ph3.opctag:
@@ -249,46 +247,6 @@ class DataHandler(object):
 
         if self.DEBUG_MODE_PRINT:
             print(str((end-start) / (1000 * 1000)) + " ms")  # in ms
-
-    # def format_datetime(self, datetime):
-    #     ts = pd.to_datetime(datetime, format="%Y-%m-%d-%H:%M:%S.%f")
-    #     ts.round('100ms')    # round to 10ms
-    #     return ts
-
-    def round_time(self, dt=None, time_precision=10000, to='average'):
-        """
-        Round a datetime object to a multiple of a timedelta
-        dt : datetime.datetime object, default now.
-        time_precision : precision of time resolution, default 10.000 microseconds (10ms).
-        based partly on:  http://stackoverflow.com/questions/3463930/how-to-round-the-minute-of-a-datetime-object-python
-        """
-        # ## get source timestamp and round to defined precision
-        if dt is None:
-            dt = DateHelper.create_local_utc_datetime()
-
-        microseconds = (dt - dt.min).microseconds
-        rounding_up = (microseconds + time_precision / 2) // time_precision * time_precision
-        rounding_down = (microseconds - time_precision / 2) // time_precision * time_precision
-        if to == 'up':
-            delta = rounding_up - microseconds
-        elif to == 'down':
-            delta = rounding_down - microseconds
-        else:
-            if abs(rounding_up - microseconds) < abs(microseconds - rounding_down):
-                delta = rounding_up - microseconds
-            else:
-                delta = rounding_down - microseconds
-        return dt + datetime.timedelta(0, 0, delta)  # rounding-microseconds
-
-    @staticmethod
-    def create_local_datetime():
-        dt = datetime.datetime.utcnow()
-        # now = datetime.datetime.utcnow()
-        # HERE = tz.tzlocal()
-        # UTC = tz.gettz('UTC')
-        # dt = now.replace(tzinfo=UTC)
-        # dt = dt.astimezone(HERE)
-        return dt
 
     def check_data_queue_for_completeness(self):
         # drops all rows where not all columns filled with values != NaN and check if length is
@@ -336,7 +294,6 @@ if __name__ == "__main__":
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
     # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
-    # os.environ.setdefault("DEBUG_MODE_VAR_UPDATER", "True")
     # os.environ.setdefault("UPDATE_PERIOD", "500000")        # in microsec
     # os.environ.setdefault("TIMESTAMP_PRECISION", "10000")   # in microsec
     # os.environ.setdefault("MAX_FAULTY_STATES", "5")

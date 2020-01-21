@@ -20,7 +20,7 @@ class SubHandler(object):
         self.subscriber = subscriber
 
     def datachange_notification(self, node, val, data):
-        self.mclass.update_data(node.nodeid, data.monitored_item.Value.SourceTimestamp, val)
+        self.mclass.update_data(node, data.monitored_item.Value.SourceTimestamp, val)
 
         # if self.DEBUG_MODE_PRINT:
             # print("New data change event:", node, val, "@", data.monitored_item.Value.SourceTimestamp)

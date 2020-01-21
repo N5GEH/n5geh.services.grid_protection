@@ -56,7 +56,6 @@ if __name__ == "__main__":
     os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
     os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
     os.environ.setdefault("DEBUG_MODE_PRINT", "True")
-    os.environ.setdefault("DEBUG_MODE_VAR_UPDATER", "True")
     os.environ.setdefault("UPDATE_PERIOD", "500000")              # in microsec
     os.environ.setdefault("TIMESTAMP_PRECISION", "10000")         # in microsec
     os.environ.setdefault("MAX_FAULTY_STATES", "5")
@@ -65,6 +64,7 @@ if __name__ == "__main__":
     os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "default_demonstrator")
     os.environ.setdefault("TOPOLOGY_PATH", "/cloud_setup/topology/TopologyFile_demonstrator.json")
     os.environ.setdefault("PF_INPUT_PATH", "/cloud_setup/device_config/demonstrator_setup.txt")
+    os.environ.setdefault("DATABASE_UPDATE_PERIOD", "50000")  # in microsec
 
     # config.DEBUG_MODE_PRINT = "True"
     # config.DEBUG_MODE_VAR_UPDATER = "True"
@@ -89,10 +89,9 @@ if __name__ == "__main__":
     mDataHandler.start()
 
     # setup meas devices as OPC client
-    if bool(strtobool(os.environ.get("DEBUG_MODE_VAR_UPDATER"))):
-        meas_device_tags = ["RES"]
-        for tag in meas_device_tags:
-            mClient_MeasSim = OPCClientSimDevice(tag, "n5geh_opcua_client2", "n5geh2020")
-            mClient_MeasSim.start()
-            # meas_devices.append(mClient_MeasSim)
-        # runInParallel(meas_devices[0].start(), meas_devices[1].start())
+    meas_device_tags = ["RES"]
+    for tag in meas_device_tags:
+        mClient_MeasSim = OPCClientSimDevice(tag, "n5geh_opcua_client2", "n5geh2020")
+        mClient_MeasSim.start()
+        # meas_devices.append(mClient_MeasSim)
+    # runInParallel(meas_devices[0].start(), meas_devices[1].start())
