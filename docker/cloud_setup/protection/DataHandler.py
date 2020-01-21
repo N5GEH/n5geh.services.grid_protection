@@ -13,13 +13,14 @@ import os
 
 import pandas as pd
 import datetime
+from dateutil import tz
+import time
 from distutils.util import strtobool
 from cloud_setup.protection.DataSource import TopologyData
 from cloud_setup.protection.DataSource import CustomVar
 from cloud_setup.protection.DiffCore import DiffCore
 from cloud_setup.opc_ua.client.OPCClient import CustomClient
-
-import time
+from helper.DateHelper import DateHelper
 
 from protection import settings
 
@@ -215,10 +216,11 @@ class DataHandler(object):
         # otherwise update data used for DiffCore
         for var in (self.Iph1_nodes_list + self.Iph2_nodes_list + self.Iph3_nodes_list):
             if var.nodeid == nodeid:
-                # print(datetime_source)
+
+                # TODO necessary for real meas devices with fixed timestamp?
                 ts = self.round_time(datetime_source, self.TIMESTAMP_PRECISION)
-                # print(ts)
                 # ts = self.format_datetime(datetime_source)
+
                 if var.opctag == self.slack_ph1.opctag or var.opctag == self.slack_ph2.opctag or var.opctag == self.slack_ph3.opctag:
                     val = -val  # IMPORTANT: slack counts in negative manner
 
@@ -258,12 +260,12 @@ class DataHandler(object):
         """
         Round a datetime object to a multiple of a timedelta
         dt : datetime.datetime object, default now.
-        time_precision : precision of time resolution, default 20.000 microseconds (20ms).
+        time_precision : precision of time resolution, default 10.000 microseconds (10ms).
         based partly on:  http://stackoverflow.com/questions/3463930/how-to-round-the-minute-of-a-datetime-object-python
         """
         # ## get source timestamp and round to defined precision
         if dt is None:
-            dt = datetime.datetime.now()
+            dt = DateHelper.create_local_utc_datetime()
 
         microseconds = (dt - dt.min).microseconds
         rounding_up = (microseconds + time_precision / 2) // time_precision * time_precision
@@ -278,6 +280,16 @@ class DataHandler(object):
             else:
                 delta = rounding_down - microseconds
         return dt + datetime.timedelta(0, 0, delta)  # rounding-microseconds
+
+    @staticmethod
+    def create_local_datetime():
+        dt = datetime.datetime.utcnow()
+        # now = datetime.datetime.utcnow()
+        # HERE = tz.tzlocal()
+        # UTC = tz.gettz('UTC')
+        # dt = now.replace(tzinfo=UTC)
+        # dt = dt.astimezone(HERE)
+        return dt
 
     def check_data_queue_for_completeness(self):
         # drops all rows where not all columns filled with values != NaN and check if length is

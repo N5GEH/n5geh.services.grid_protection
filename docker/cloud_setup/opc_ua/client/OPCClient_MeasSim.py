@@ -13,6 +13,9 @@ import sys
 from threading import Thread
 import time
 from distutils.util import strtobool
+
+from dateutil import tz
+from helper.DateHelper import DateHelper
 from opcua import Client, ua
 from opcua.ua import DataValue
 from opcua.ua.uaerrors import BadNoMatch
@@ -60,7 +63,8 @@ class VarUpdater(Thread):
                 if self.DEBUG_MODE_PRINT:
                     print(self.__class__.__name__, self.count)
                 # self.vars.set_value(self.count)
-                now = datetime.datetime.now()
+
+                now = DateHelper.create_local_utc_datetime()
                 for var in self.vars:
                     # start = time.process_time_ns()
                     # print(start, var.get_browse_name().Name)
