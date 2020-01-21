@@ -13,13 +13,12 @@ import os
 
 import pandas as pd
 import datetime
-from dateutil import tz
 import time
 from distutils.util import strtobool
 from cloud_setup.protection.DataSource import TopologyData
 from cloud_setup.protection.DataSource import CustomVar
 from cloud_setup.protection.DiffCore import DiffCore
-from cloud_setup.opc_ua.client.OPCClient import CustomClient
+from cloud_setup.opc_ua.client.OPCClient_DataHandler import OPCClientDataHandler
 from helper.DateHelper import DateHelper
 
 from protection import settings
@@ -40,7 +39,7 @@ class DataHandler(object):
         self.TIMESTAMP_PRECISION = int(os.environ.get("TIMESTAMP_PRECISION"))
         self.PF_INPUT_PATH = os.environ.get("PF_INPUT_PATH")
 
-        self.opc_client = CustomClient(self.SERVER_ENDPOINT)
+        self.opc_client = OPCClientDataHandler("n5geh_opcua_client1", "n5geh2019", self.SERVER_ENDPOINT)
 
         self.topo_path = os.path.dirname(os.getcwd()) + topology_path
         self.topo_data = None

@@ -39,7 +39,7 @@ opcua_extern_client:
     - develop
     changes:
     - docker/ExternClient.Dockerfile
-    - docker/cloud_setup/opc_ua/client/OPCClient_MeasSim.py
+    - docker/cloud_setup/opc_ua/client/OPCClient_SimDevice.py
 
 protection:
   stage: build

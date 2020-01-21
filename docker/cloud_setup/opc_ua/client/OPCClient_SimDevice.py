@@ -1,8 +1,9 @@
 #  Copyright (c) 2019.
 #  Author: Sebastian Krahmer
 
-"""This is the OPC-client class.
+"""This is the OPC-client class for SimulationDevices.
 
+This class is an child of OPCClient.CustomClient
 This class setups a new OPC-client with for a server with a address specified by os.environ.get("SERVER_ENDPOINT").
 This class is used as Measurement device equivalent and updates value of vars via VarUpdater.
 """
@@ -14,11 +15,10 @@ from threading import Thread
 import time
 from distutils.util import strtobool
 
-from dateutil import tz
 from helper.DateHelper import DateHelper
-from opcua import Client, ua
+from opc_ua.client.OPCClient import CustomClient
+from opcua import ua
 from opcua.ua import DataValue
-from opcua.ua.uaerrors import BadNoMatch
 
 sys.path.insert(0, "..")
 
@@ -84,55 +84,47 @@ class VarUpdater(Thread):
                     var.set_value(dv)
 
 
-class CustomClient(object):
-    def __init__(self, meas_device_tag="RES", start_threshold=5000000, server_endpoint="opc.tcp://0.0.0.0:4840/OPCUA/python_server/"):
-
+class OPCClientSimDevice(CustomClient):
+    def __init__(self, meas_device_tag="RES", auth_name=None, auth_password=None, start_threshold=5000000,
+                 server_endpoint="opc.tcp://0.0.0.0:4840/OPCUA/python_server/"):
+        # super
         self.SERVER_ENDPOINT = os.environ.get("SERVER_ENDPOINT", server_endpoint)
         self.NAMESPACE = os.environ.get("NAMESPACE")
         self.ENABLE_CERTIFICATE = bool(strtobool(os.environ.get("ENABLE_CERTIFICATE")))
-        self.CERTIFICATE_PATH_CLIENT_CERT = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_CLIENT_CERT")
-        self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY")
+        self.CERTIFICATE_PATH_CLIENT_CERT = os.path.dirname(os.getcwd()) + os.environ.get(
+            "CERTIFICATE_PATH_CLIENT_CERT")
+        self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY = os.path.dirname(os.getcwd()) + os.environ.get(
+            "CERTIFICATE_PATH_CLIENT_PRIVATE_KEY")
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
+
+        super().__init__(self.SERVER_ENDPOINT, self.NAMESPACE, self.ENABLE_CERTIFICATE, self.CERTIFICATE_PATH_CLIENT_CERT,
+                         self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY, auth_name, auth_password, self.DEBUG_MODE_PRINT)
+
+        # custom
         self.THRESHOLD = int(os.environ.get("START_THRESHOLD", start_threshold)) * 1000   # conversion into ns
         self.OPCUA_DIR_NAME = os.environ.get("OPCUA_SERVER_DIR_NAME")
 
-        self.client = Client(self.SERVER_ENDPOINT)
-        self.client.set_user("n5geh_opcua_client2")
-        self.client.set_password("n5geh2020")
-        if self.ENABLE_CERTIFICATE:
-            self.client.set_security_string("Basic256Sha256,SignAndEncrypt," + self.CERTIFICATE_PATH_CLIENT_CERT + "," +
-                                            self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY)
         self.meas_device_tag = meas_device_tag
         self.vup = None
 
         if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, "MeasSim successful init")
+            print(self.__class__.__name__, " successful init")
 
     def start(self):
-        self.client.connect()
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, "MeasSim successful connected")
+        super().start()
         self.prepare_auto_updater()
         self.start_auto_updater()
 
-    def get_server_vars(self, child):
-        # ## Now getting a variable node using its browse path
-        root = self.client.get_root_node()  # objects = client.get_objects_node()
-        uri = self.NAMESPACE
-        idx = self.client.get_namespace_index(uri)
-
-        try:
-            obj = root.get_child(["0:Objects", ("{}:" + child).format(idx)])
-        except BadNoMatch:
-            return None
-        return obj.get_variables()
+        if self.DEBUG_MODE_PRINT:
+            print(self.__class__.__name__, " successful connected")
         
     def stop(self):
-        self.client.disconnect()
+        super().stop()
         self.vup.stop()
         if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, "MeasSim successful disconnected")
+            print(self.__class__.__name__, " successful disconnected")
 
+    # region autoUpdater
     def prepare_auto_updater(self):
         var_list = []
 
@@ -146,6 +138,7 @@ class CustomClient(object):
         self.vup.start()
 
         print(self.__class__.__name__, "MeasSim started Auto-VarUpdater")
+    # endregion
 
 
 if __name__ == "__main__":
@@ -172,5 +165,5 @@ if __name__ == "__main__":
     if bool(strtobool(os.environ.get("DEBUG_MODE_VAR_UPDATER"))):
         meas_device_tags = ["RES"]
         for tag in meas_device_tags:
-            mClient_MeasSim = CustomClient(tag)
+            mClient_MeasSim = OPCClientSimDevice(tag)
             mClient_MeasSim.start()

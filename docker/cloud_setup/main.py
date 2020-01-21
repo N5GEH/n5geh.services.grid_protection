@@ -12,7 +12,7 @@ from distutils.util import strtobool
 
 from cloud_setup.protection.DataHandler import DataHandler
 from cloud_setup.opc_ua.server.OPCServer import CustomServer
-from cloud_setup.opc_ua.client.OPCClient_MeasSim import CustomClient
+from cloud_setup.opc_ua.client.OPCClient_SimDevice import OPCClientSimDevice
 from multiprocessing import Process
 import os
 
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     if bool(strtobool(os.environ.get("DEBUG_MODE_VAR_UPDATER"))):
         meas_device_tags = ["RES"]
         for tag in meas_device_tags:
-            mClient_MeasSim = CustomClient(tag)
+            mClient_MeasSim = OPCClientSimDevice(tag, "n5geh_opcua_client2", "n5geh2020")
             mClient_MeasSim.start()
             # meas_devices.append(mClient_MeasSim)
         # runInParallel(meas_devices[0].start(), meas_devices[1].start())
