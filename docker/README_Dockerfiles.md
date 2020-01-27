@@ -2,8 +2,9 @@
 
 For this project a gitlab runner is established. For now, there are 3 separate images specified:
 - an OPCUA server
-- an external client emulation as instance of a OPCUA client
+- a device group (external client) emulation as instance of a OPCUA client
 - a grid protection framework
+- a database access for influxDB
 
 You could generate docker images following one of this two ways.
 
@@ -25,14 +26,14 @@ You could generate docker images following one of this two ways.
 2. always pull the image: true
 3. restart policy: allways
 
-### Appendum to OPCUA server container
+### Appendum to container OPCUA server
 - publish network ports manually (cf. EXPOSE in xx.Dockerfile): 4840
 - one can show the OPCUA server (variables, methods) via an OPCUA client program e.g. UaExpert 
 
-### Appendum to OPCUA client (external device emulation) container
+### Appendum to container OPCUA client (external simulation device emulation)
 - publish network ports manually (cf. EXPOSE in xx.Dockerfile): 4850
 
-### Appendum to grid protection container
+### Appendum to container grid protection
 When one creates a container out of the image, specify a VOLUME via docker-compose.yml or via the GUI of portainer.
 The volume contains the topologyFile and the measDeviceConfig.
 Either you must create this file manually on the VOLUME or create a container that listens to external commands 
@@ -47,4 +48,9 @@ Either you must create this file manually on the VOLUME or create a container th
 2. add options when create container
     - publish network ports manually (cf. EXPOSE in xx.Dockerfile): 4860
     - assign the preliminary created volume and map it with the container path **/data**
+
+### Appendum to container OPCUA database access
+- before creating this container, setup an influxdb(dockerhub/influxdb) and grafana(dockerhub/grafana/grafana)
+- publish network ports manually (cf. EXPOSE in xx.Dockerfile): 8086
+
 

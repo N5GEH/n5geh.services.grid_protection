@@ -102,6 +102,9 @@ setup(
         'protection': [
             'pandas>=0.25.3',
         ],
+        'sim_device': [
+            'pandas>=0.25.3',
+        ],
         'database_access': [
             'pandas>=0.25.3',
             'influxdb>=5.2.3',
