@@ -20,9 +20,7 @@ from cloud_setup.protection.DiffCore import DiffCore
 from protection.OPCClient_DataHandler import OPCClientDataHandler
 from helper.DateHelper import DateHelper
 
-from protection import settings
-
-__version__ = '0.5'
+__version__ = '0.6'
 __author__ = 'Sebastian Krahmer'
 
 
@@ -56,8 +54,6 @@ class DataHandler(object):
         self.df_ph1 = pd.DataFrame()          # dataframe for phase 1 to pass to fault_assessment
         self.df_ph2 = pd.DataFrame()
         self.df_ph3 = pd.DataFrame()
-
-        settings.init()
 
     def _start_client(self):
         self.opc_client.start()

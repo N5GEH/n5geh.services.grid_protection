@@ -11,7 +11,7 @@ If there is an deviation greater than an epsilon, that ctrl_nodes gets new value
 import os
 from threading import Thread
 
-__version__ = '0.5'
+__version__ = '0.6'
 __author__ = 'Sebastian Krahmer'
 
 
