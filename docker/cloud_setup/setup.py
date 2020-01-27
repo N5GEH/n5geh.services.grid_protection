@@ -26,7 +26,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.5.0',
+    version='0.6.0',
 
     description='Python GridProtection via OPC-UA, optionally using PowerFactory as Measurement-OPC-client',
     long_description=long_description,
@@ -64,7 +64,7 @@ setup(
     ],
 
     # What does your project relate to?
-    keywords='cloud opcua grid protection powerfactory',
+    keywords='cloud opcua grid protection',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
@@ -105,7 +105,6 @@ setup(
         'database_access': [
             'pandas>=0.25.3',
             'influxdb>=5.2.3',
-            'timeloop=1.0.2',
         ],
     },
 

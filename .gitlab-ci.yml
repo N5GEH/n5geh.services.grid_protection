@@ -58,5 +58,25 @@ protection:
     refs:
     - develop
     changes:
-    - docker/protection.Dockerfile
+    - docker/Protection.Dockerfile
     - docker/cloud_setup/protection/DataHandler.py
+
+databse_access:
+  stage: build
+  cache:
+    key: kaniko
+    paths:
+    - /kanikocache
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  before_script:
+  - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+  script:
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/DatabaseAccess.Dockerfile --destination $CI_REGISTRY_IMAGE/database_access --cache=true --cache-dir=/kanikocache
+  only:
+    refs:
+    - develop
+    changes:
+    - docker/DatabaseAccess.Dockerfile
+    - docker/cloud_setup/database_access/InfluxDbWrapper.py
