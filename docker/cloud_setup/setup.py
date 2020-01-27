@@ -104,7 +104,7 @@ setup(
         ],
         'database_access': [
             'pandas>=0.25.3',
-            'influxdb',
+            'influxdb>=5.2.3',
             'timeloop=1.0.2',
         ],
     },
