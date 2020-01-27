@@ -13,6 +13,7 @@ from distutils.util import strtobool
 import pandas as pd
 from helper.DateHelper import DateHelper
 
+
 from opc_ua.client.OPCClient import CustomClient
 from opc_ua.client.subscription import SubHandler
 
@@ -23,8 +24,7 @@ __author__ = 'Sebastian Krahmer'
 
 
 class OPCClientDatabase(CustomClient):
-    def __init__(self, auth_name=None, auth_password=None, update_period=50000,
-                 server_endpoint="opc.tcp://0.0.0.0:4840/OPCUA/python_server/"):
+    def __init__(self, auth_name=None, auth_password=None, server_endpoint="opc.tcp://0.0.0.0:4840/OPCUA/python_server/"):
         # super
         self.SERVER_ENDPOINT = os.environ.get("SERVER_ENDPOINT", server_endpoint)
         self.NAMESPACE = os.environ.get("NAMESPACE")
@@ -39,16 +39,15 @@ class OPCClientDatabase(CustomClient):
                          self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY, auth_name, auth_password, self.DEBUG_MODE_PRINT)
 
         # custom
-        self.OPCUA_DIR_NAME = os.environ.get("OPCUA_SERVER_DIR_NAME")
-        self.UPDATE_PERIOD = os.environ.get("DATABASE_UPDATE_PERIOD", update_period)
+        self.OPCUA_DIR_NAME = os.environ.get("OPCUA_SERVER_DIR_NAME", 'default_demonstrator')
+
+        self.node_dict = dict()
 
         self.subscribed_nodes = []
         self.subscription = None
         self.subscription_handle = None
 
         self.df = pd.DataFrame()
-
-        self.stop_request = False
 
         if self.DEBUG_MODE_PRINT:
             print(self.__class__.__name__, " successful init")
@@ -57,11 +56,15 @@ class OPCClientDatabase(CustomClient):
         # start opc client
         super().start()
 
+        # get_all_observed_nodes have to requested before subscription # TimeoutError()
+        all_observed_nodes = self.get_server_vars(self.OPCUA_DIR_NAME)
+        for var in all_observed_nodes:
+            opctag = var.get_browse_name().Name
+            nodeid_identifier = str(var.nodeid.Identifier)
+            self.node_dict.update({nodeid_identifier: opctag})
+
         # make subscription
         self.make_subscription(self.OPCUA_DIR_NAME, self.get_server_vars(self.OPCUA_DIR_NAME))
-
-        # start Database Update Process
-
 
         if self.DEBUG_MODE_PRINT:
             print(self.__class__.__name__, " successful connected")
@@ -90,39 +93,15 @@ class OPCClientDatabase(CustomClient):
 
     # subscription callback
     def update_data(self, node, datetime_source, val):
-        self.df.loc[datetime_source, node.get_browsw_name().Name] = val
+        browse_name = self.node_dict[str(node.nodeid.Identifier)]
+        self.df.loc[datetime_source, browse_name] = val
     # endregion
 
-    # region Database Update
-    def stop_database_update(self):
-        self.stop_request = True
+    def get_last_dataframe(self):
+        df = self.df
+        self.reset_dataframe()
+        return df
 
-    def start_database_update(self,update_period):
-        while not self.stop_request:
-            pass
-            # TODO make db update every update_period
-    # endregion
+    def reset_dataframe(self):
+        self.df = pd.DataFrame()
 
-
-if __name__ == "__main__":
-    ##################
-    # ### if using local (means not in Docker): uncomment this lines!
-    # local = False  # if server is local or as Docker
-    # if local:
-    #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
-    # else:
-    #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/OPCUA/python_server/")
-    # os.environ.setdefault("NAMESPACE", "https://n5geh.de")
-    # os.environ.setdefault("ENABLE_CERTIFICATE", "True")
-    # os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT", "/opc_ua/certificates/n5geh_opcua_server_cert.pem")
-    # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
-    # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
-    # os.environ.setdefault("CERTIFICATE_PATH", "/opc_ua/certificates/")
-    # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
-    # os.environ.setdefault("DATABASE_UPDATE_PERIOD", "50000")        # in microsec
-    # os.environ.setdefault("TIMESTAMP_PRECISION", "10000")   # in microsec
-    ##################
-
-
-    mClient_Database = OPCClientDatabase()
-    mClient_Database.start()

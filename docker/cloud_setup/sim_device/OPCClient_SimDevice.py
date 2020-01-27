@@ -151,10 +151,8 @@ if __name__ == "__main__":
     #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/OPCUA/python_server/")
     # os.environ.setdefault("NAMESPACE", "https://n5geh.de")
     # os.environ.setdefault("ENABLE_CERTIFICATE", "True")
-    # os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT", "/opc_ua/certificates/n5geh_opcua_server_cert.pem")
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
-    # os.environ.setdefault("CERTIFICATE_PATH", "/opc_ua/certificates/")
     # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
     # os.environ.setdefault("UPDATE_PERIOD", "500000")        # in microsec
     # os.environ.setdefault("TIMESTAMP_PRECISION", "10000")   # in microsec

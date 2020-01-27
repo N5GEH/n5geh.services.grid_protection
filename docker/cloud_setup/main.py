@@ -8,17 +8,18 @@
     3) starts MeasSim OPC Clients
 """
 import logging
-from distutils.util import strtobool
 
 from cloud_setup.protection.DataHandler import DataHandler
 from cloud_setup.opc_ua.server.OPCServer import CustomServer
-from cloud_setup.opc_ua.client.OPCClient_SimDevice import OPCClientSimDevice
+from sim_device.OPCClient_SimDevice import OPCClientSimDevice
 from multiprocessing import Process
 import os
 
 
 __version__ = '0.6'
 __author__ = 'Sebastian Krahmer'
+
+from database_access.InfluxDbWrapper import InfluxDbWrapper
 
 
 def runInParallel(*fns):
@@ -64,7 +65,9 @@ if __name__ == "__main__":
     os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "default_demonstrator")
     os.environ.setdefault("TOPOLOGY_PATH", "/cloud_setup/topology/TopologyFile_demonstrator.json")
     os.environ.setdefault("PF_INPUT_PATH", "/cloud_setup/device_config/demonstrator_setup.txt")
-    os.environ.setdefault("DATABASE_UPDATE_PERIOD", "50000")  # in microsec
+    os.environ.setdefault("INFLUXDB_HOST", "ubuntu5g")
+    os.environ.setdefault("INFLUXDB_PORT", "8086")
+    os.environ.setdefault("DATABASE_UPDATE_PERIOD", "500000")  # in microsec
 
     # config.DEBUG_MODE_PRINT = "True"
     # config.DEBUG_MODE_VAR_UPDATER = "True"
@@ -87,6 +90,10 @@ if __name__ == "__main__":
     opcua_dir_name = os.environ.get("OPCUA_SERVER_DIR_NAME")
     mDataHandler = DataHandler(topo_path, opcua_dir_name)
     mDataHandler.start()
+
+    # setup influxDb wrapper
+    mInfluxDbWrapper = InfluxDbWrapper()
+    mInfluxDbWrapper.start()
 
     # setup meas devices as OPC client
     meas_device_tags = ["RES"]

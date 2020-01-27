@@ -102,6 +102,11 @@ setup(
         'protection': [
             'pandas>=0.25.3',
         ],
+        'database_access': [
+            'pandas>=0.25.3',
+            'influxdb',
+            'timeloop=1.0.2',
+        ],
     },
 
     # If there are data files included in your packages that need to be

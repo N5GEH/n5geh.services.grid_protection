@@ -17,7 +17,7 @@ from distutils.util import strtobool
 from cloud_setup.protection.DataSource import TopologyData
 from cloud_setup.protection.DataSource import CustomVar
 from cloud_setup.protection.DiffCore import DiffCore
-from cloud_setup.opc_ua.client.OPCClient_DataHandler import OPCClientDataHandler
+from protection.OPCClient_DataHandler import OPCClientDataHandler
 from helper.DateHelper import DateHelper
 
 from protection import settings
