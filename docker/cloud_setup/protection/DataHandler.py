@@ -17,6 +17,7 @@ from distutils.util import strtobool
 from cloud_setup.protection.DataSource import TopologyData
 from cloud_setup.protection.DataSource import CustomVar
 from cloud_setup.protection.DiffCore import DiffCore
+from protection import LocalData
 from protection.OPCClient_DataHandler import OPCClientDataHandler
 from helper.DateHelper import DateHelper
 
@@ -302,5 +303,10 @@ if __name__ == "__main__":
 
     topo_path = os.environ.get("TOPOLOGY_PATH")
     opcua_dir_name = os.environ.get("OPCUA_SERVER_DIR_NAME")
+
+    LocalData.mFaultStates_ph1 = 0
+    LocalData.mFaultStates_ph2 = 0
+    LocalData.mFaultStates_ph3 = 0
+
     mDataHandler = DataHandler(topo_path, opcua_dir_name)
     mDataHandler.start()

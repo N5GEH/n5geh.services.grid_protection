@@ -10,6 +10,7 @@ If there is an deviation greater than an epsilon, that ctrl_nodes gets new value
 """
 import os
 from threading import Thread
+from protection import LocalData
 
 __version__ = '0.6'
 __author__ = 'Sebastian Krahmer'
@@ -44,9 +45,6 @@ class DiffCore(Thread):
         self.df_ph3 = dataframe_ph3
 
         self.eps_abs = self.NOMINAL_CURRENT * self.CURRENT_EPS  # 5 %
-        self.mFaultStates_ph1 = 0
-        self.mFaultStates_ph2 = 0
-        self.mFaultStates_ph3 = 0
 
         self.print_work_status()
 
@@ -89,6 +87,9 @@ class DiffCore(Thread):
         if abs(self.df_ph3.iloc[-1]['sum']) >= self.eps_abs and result_code == "VALID":
             result_code = "INVALID"
             self.evaluate_historical_balances_of_current(3)
+            
+        if result_code == "VALID":
+            self.reset_local_data_fault_status()
 
         self.print_current_result(result_code)
 
@@ -96,22 +97,22 @@ class DiffCore(Thread):
     def evaluate_historical_balances_of_current(self, faulty_phase):
         if faulty_phase == 1:
             # if within the last stored timestamps (size of MAX_ARCHIVES) are at least MAX_FAULTY_STATES
-            if self.mFaultStates_ph1 >= self.MAX_FAULTY_STATES:
+            if LocalData.mFaultStates_ph1 >= self.MAX_FAULTY_STATES:
                 self.set_power_infeed_limit(0)
             else:
-                self.mFaultStates_ph1 += 1
+                LocalData.mFaultStates_ph1 += 1
         elif faulty_phase == 2:
             # if within the last stored timestamps (size of MAX_ARCHIVES) are at least MAX_FAULTY_STATES
-            if self.mFaultStates_ph2 >= self.MAX_FAULTY_STATES:
+            if LocalData.mFaultStates_ph2 >= self.MAX_FAULTY_STATES:
                 self.set_power_infeed_limit(0)
             else:
-                self.mFaultStates_ph2 += 1
+                LocalData.mFaultStates_ph2 += 1
         elif faulty_phase == 3:
             # if within the last stored timestamps (size of MAX_ARCHIVES) are at least MAX_FAULTY_STATES
-            if self.mFaultStates_ph3 >= self.MAX_FAULTY_STATES:
+            if LocalData.mFaultStates_ph3 >= self.MAX_FAULTY_STATES:
                 self.set_power_infeed_limit(0)
             else:
-                self.mFaultStates_ph3 += 1
+                LocalData.mFaultStates_ph3 += 1
 
         # update Status FAULTY_STATES
         nodes = []
@@ -119,7 +120,7 @@ class DiffCore(Thread):
         for misc in self.misc_nodes_list:
             if "FAULTY_STATES" in misc.opctag:
                 nodes.append(misc)
-                values.append(max(self.mFaultStates_ph1, self.mFaultStates_ph2, self.mFaultStates_ph3))
+                values.append(max(LocalData.mFaultStates_ph1, LocalData.mFaultStates_ph2, LocalData.mFaultStates_ph3))
                 self.opc_client.set_vars(nodes, values)
 
     def set_power_infeed_limit(self, upper_limit):
@@ -143,11 +144,16 @@ class DiffCore(Thread):
 
         # execute set_vars()
         self.opc_client.set_vars(nodes, values)
-        self.mFaultStates_ph1 = 0
-        self.mFaultStates_ph2 = 0
-        self.mFaultStates_ph3 = 0
+
+        self.reset_local_data_fault_status()
         if self.DEBUG_MODE_PRINT:
             print(self.__class__.__name__, "All CTRL devices are set to power feedin = 0.")
+
+    @staticmethod
+    def reset_local_data_fault_status():
+        LocalData.mFaultStates_ph1 = 0
+        LocalData.mFaultStates_ph2 = 0
+        LocalData.mFaultStates_ph3 = 0
 
     # def update_ctrl_states(self):
     #     ctrls = []
@@ -165,9 +171,9 @@ class DiffCore(Thread):
     def print_current_result(self, result_code):
         if self.DEBUG_MODE_PRINT:
             print(result_code, ': '
-                  , str(format(self.df_ph1.iloc[-1]['sum'], '.2f')) + '(' + str(self.mFaultStates_ph1) + ')' + ', '
-                  , str(format(self.df_ph2.iloc[-1]['sum'], '.2f')) + '(' + str(self.mFaultStates_ph2) + ')' + ', '
-                  , str(format(self.df_ph3.iloc[-1]['sum'], '.2f')) + '(' + str(self.mFaultStates_ph3) + ')' + ";" + '\n')
+                  , str(format(self.df_ph1.iloc[-1]['sum'], '.2f')) + '(' + str(LocalData.mFaultStates_ph1) + ')' + ', '
+                  , str(format(self.df_ph2.iloc[-1]['sum'], '.2f')) + '(' + str(LocalData.mFaultStates_ph2) + ')' + ', '
+                  , str(format(self.df_ph3.iloc[-1]['sum'], '.2f')) + '(' + str(LocalData.mFaultStates_ph3) + ')' + ";" + '\n')
 
     def print_work_status(self):
         if self.DEBUG_MODE_PRINT:
