@@ -11,8 +11,6 @@ If there is an deviation greater than an epsilon, that ctrl_nodes gets new value
 import os
 from threading import Thread
 
-from protection import settings
-
 __version__ = '0.5'
 __author__ = 'Sebastian Krahmer'
 
@@ -39,11 +37,16 @@ class DiffCore(Thread):
         self.work_status = 'init'
         self.opc_client = opc_client
         self.ctrl_nodes_list = ctrl_nodes
-        self.misc_nodes_list =misc_nodes
+        self.misc_nodes_list = misc_nodes
+
         self.df_ph1 = dataframe_ph1
         self.df_ph2 = dataframe_ph2
         self.df_ph3 = dataframe_ph3
+
         self.eps_abs = self.NOMINAL_CURRENT * self.CURRENT_EPS  # 5 %
+        self.mFaultStates_ph1 = 0
+        self.mFaultStates_ph2 = 0
+        self.mFaultStates_ph3 = 0
 
         self.print_work_status()
 
@@ -74,22 +77,16 @@ class DiffCore(Thread):
 
     # ## evaluate the balance (of current) for the closest timestamp
     def evaluate_balance_of_current(self):
-        result_code = "INVALID"
-        if abs(self.df_ph1.iloc[-1]['sum']) < self.eps_abs:  # ## if sum of closest timestamp is smaller than threshold
-            result_code = "VALID"
-        else:
+        result_code = "VALID"
+        if abs(self.df_ph1.iloc[-1]['sum']) >= self.eps_abs:  # ## if sum of closest timestamp is smaller than threshold
             result_code = "INVALID"
             self.evaluate_historical_balances_of_current(1)  # ## otherwise check if in past sum=0 was violated as well
 
-        if abs(self.df_ph2.iloc[-1]['sum']) < self.eps_abs and result_code == "VALID":
-            result_code = "VALID"
-        else:
+        if abs(self.df_ph2.iloc[-1]['sum']) >= self.eps_abs and result_code == "VALID":
             result_code = "INVALID"
             self.evaluate_historical_balances_of_current(2)
 
-        if abs(self.df_ph3.iloc[-1]['sum']) < self.eps_abs and result_code == "VALID":
-            result_code = "VALID"
-        else:
+        if abs(self.df_ph3.iloc[-1]['sum']) >= self.eps_abs and result_code == "VALID":
             result_code = "INVALID"
             self.evaluate_historical_balances_of_current(3)
 
@@ -99,22 +96,22 @@ class DiffCore(Thread):
     def evaluate_historical_balances_of_current(self, faulty_phase):
         if faulty_phase == 1:
             # if within the last stored timestamps (size of MAX_ARCHIVES) are at least MAX_FAULTY_STATES
-            if settings.mFaultStates_ph1 >= self.MAX_FAULTY_STATES:
-                self.dissolve_grid_failure()
+            if self.mFaultStates_ph1 >= self.MAX_FAULTY_STATES:
+                self.set_power_infeed_limit(0)
             else:
-                settings.mFaultStates_ph1 += 1
+                self.mFaultStates_ph1 += 1
         elif faulty_phase == 2:
             # if within the last stored timestamps (size of MAX_ARCHIVES) are at least MAX_FAULTY_STATES
-            if settings.mFaultStates_ph2 >= self.MAX_FAULTY_STATES:
-                self.dissolve_grid_failure()
+            if self.mFaultStates_ph2 >= self.MAX_FAULTY_STATES:
+                self.set_power_infeed_limit(0)
             else:
-                settings.mFaultStates_ph2 += 1
+                self.mFaultStates_ph2 += 1
         elif faulty_phase == 3:
             # if within the last stored timestamps (size of MAX_ARCHIVES) are at least MAX_FAULTY_STATES
-            if settings.mFaultStates_ph3 >= self.MAX_FAULTY_STATES:
-                self.dissolve_grid_failure()
+            if self.mFaultStates_ph3 >= self.MAX_FAULTY_STATES:
+                self.set_power_infeed_limit(0)
             else:
-                settings.mFaultStates_ph3 += 1
+                self.mFaultStates_ph3 += 1
 
         # update Status FAULTY_STATES
         nodes = []
@@ -122,10 +119,10 @@ class DiffCore(Thread):
         for misc in self.misc_nodes_list:
             if "FAULTY_STATES" in misc.opctag:
                 nodes.append(misc)
-                values.append(max(settings.mFaultStates_ph1, settings.mFaultStates_ph2, settings.mFaultStates_ph3))
+                values.append(max(self.mFaultStates_ph1, self.mFaultStates_ph2, self.mFaultStates_ph3))
                 self.opc_client.set_vars(nodes, values)
 
-    def dissolve_grid_failure(self):
+    def set_power_infeed_limit(self, upper_limit):
         # check the actual state of CTRLs
         # self.update_ctrl_states()
 
@@ -135,7 +132,7 @@ class DiffCore(Thread):
         for ctrl in self.ctrl_nodes_list:
             if "PRED_CTRL" in ctrl.opctag:
                 nodes.append(ctrl)
-                values.append(0)  # decrease power infeed to 0%
+                values.append(upper_limit)  # decrease power infeed to 0%
 
             # snippet when using with PowerFactory
             # if "BUS_LV_BREAKER" in ctrl.opctag:
@@ -146,9 +143,9 @@ class DiffCore(Thread):
 
         # execute set_vars()
         self.opc_client.set_vars(nodes, values)
-        settings.mFaultStates_ph1 = 0
-        settings.mFaultStates_ph2 = 0
-        settings.mFaultStates_ph3 = 0
+        self.mFaultStates_ph1 = 0
+        self.mFaultStates_ph2 = 0
+        self.mFaultStates_ph3 = 0
         if self.DEBUG_MODE_PRINT:
             print(self.__class__.__name__, "All CTRL devices are set to power feedin = 0.")
 
@@ -168,9 +165,9 @@ class DiffCore(Thread):
     def print_current_result(self, result_code):
         if self.DEBUG_MODE_PRINT:
             print(result_code, ': '
-                  , str(format(self.df_ph1.iloc[-1]['sum'], '.2f')) + '(' + str(settings.mFaultStates_ph1) + ')' + ', '
-                  , str(format(self.df_ph2.iloc[-1]['sum'], '.2f')) + '(' + str(settings.mFaultStates_ph2) + ')' + ', '
-                  , str(format(self.df_ph3.iloc[-1]['sum'], '.2f')) + '(' + str(settings.mFaultStates_ph3) + ')' + ";" + '\n')
+                  , str(format(self.df_ph1.iloc[-1]['sum'], '.2f')) + '(' + str(self.mFaultStates_ph1) + ')' + ', '
+                  , str(format(self.df_ph2.iloc[-1]['sum'], '.2f')) + '(' + str(self.mFaultStates_ph2) + ')' + ', '
+                  , str(format(self.df_ph3.iloc[-1]['sum'], '.2f')) + '(' + str(self.mFaultStates_ph3) + ')' + ";" + '\n')
 
     def print_work_status(self):
         if self.DEBUG_MODE_PRINT:

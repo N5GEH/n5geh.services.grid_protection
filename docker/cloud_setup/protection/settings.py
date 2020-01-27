@@ -3,16 +3,11 @@
 
 """This is a settings file.
 
-This module stores some gloabl used variables.
+This module stores some global used variables.
 """
 
-def init():
-    global mFaultStates_ph1
-    global mFaultStates_ph2
-    global mFaultStates_ph3
-    global mFaultStates_phn
 
-    mFaultStates_ph1 = 0
-    mFaultStates_ph2 = 0
-    mFaultStates_ph3 = 0
-    mFaultStates_phn = 0
+global mFaultStates_ph1
+global mFaultStates_ph2
+global mFaultStates_ph3
+global mFaultStates_phn
