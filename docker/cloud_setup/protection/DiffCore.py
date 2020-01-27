@@ -87,7 +87,7 @@ class DiffCore(Thread):
         if abs(self.df_ph3.iloc[-1]['sum']) >= self.eps_abs and result_code == "VALID":
             result_code = "INVALID"
             self.evaluate_historical_balances_of_current(3)
-            
+
         if result_code == "VALID":
             self.reset_local_data_fault_status()
 

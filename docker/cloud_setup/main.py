@@ -63,8 +63,8 @@ if __name__ == "__main__":
     os.environ.setdefault("NOMINAL_CURRENT", "275")
     os.environ.setdefault("CURRENT_EPS", "0.05")
     os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "default_demonstrator")
-    os.environ.setdefault("TOPOLOGY_PATH", "/cloud_setup/topology/TopologyFile_demonstrator.json")
-    os.environ.setdefault("PF_INPUT_PATH", "/cloud_setup/device_config/demonstrator_setup.txt")
+    os.environ.setdefault("TOPOLOGY_PATH", "/cloud_setup/data/topology/TopologyFile_demonstrator.json")
+    os.environ.setdefault("PF_INPUT_PATH", "/cloud_setup/data/device_config/demonstrator_setup.txt")
     os.environ.setdefault("INFLUXDB_HOST", "ubuntu5g")
     os.environ.setdefault("INFLUXDB_PORT", "8086")
     os.environ.setdefault("DATABASE_UPDATE_PERIOD", "500000")  # in microsec
@@ -91,10 +91,6 @@ if __name__ == "__main__":
     mDataHandler = DataHandler(topo_path, opcua_dir_name)
     mDataHandler.start()
 
-    # setup influxDb wrapper
-    mInfluxDbWrapper = InfluxDbWrapper()
-    mInfluxDbWrapper.start()
-
     # setup meas devices as OPC client
     meas_device_tags = ["RES"]
     for tag in meas_device_tags:
@@ -102,3 +98,7 @@ if __name__ == "__main__":
         mClient_MeasSim.start()
         # meas_devices.append(mClient_MeasSim)
     # runInParallel(meas_devices[0].start(), meas_devices[1].start())
+
+    # setup influxDb wrapper
+        mInfluxDbWrapper = InfluxDbWrapper()
+        mInfluxDbWrapper.start()
