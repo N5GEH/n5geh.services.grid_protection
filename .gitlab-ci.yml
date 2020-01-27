@@ -33,12 +33,12 @@ opcua_extern_client:
   before_script:
   - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
   script:
-  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/ExternClient.Dockerfile --destination $CI_REGISTRY_IMAGE/extern_client --cache=true --cache-dir=/kanikocache
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/SimDevice.Dockerfile --destination $CI_REGISTRY_IMAGE/sim_device --cache=true --cache-dir=/kanikocache
   only:
     refs:
     - develop
     changes:
-    - docker/ExternClient.Dockerfile
+    - docker/SimDevice.Dockerfile
     - docker/cloud_setup/opc_ua/client/OPCClient_SimDevice.py
 
 protection:
