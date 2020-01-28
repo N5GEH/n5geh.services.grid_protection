@@ -29,5 +29,5 @@ ENV PF_INPUT_PATH /cloud_setup/data/device_config/demonstrator_setup.txt
 EXPOSE 4860
 LABEL type="protection_python" \
       version="0.6"
-      
+HEALTHCHECK --interval=60s --timeout=3s CMD curl --fail http://localhost:4840/pools || exit 1
 CMD [ "python", "/usr/src/cloud_setup/protection/DataHandler.py"]
