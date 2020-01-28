@@ -23,7 +23,7 @@ __author__ = 'Sebastian Krahmer'
 
 class InfluxDbWrapper(object):
     def __init__(self, host='localhost', port=8086, update_period=500):
-        self.UPDATE_PERIOD = os.environ.get("DATABASE_UPDATE_PERIOD", update_period)
+        self.UPDATE_PERIOD = int(os.environ.get("DATABASE_UPDATE_PERIOD", update_period))
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
         self.INFLUXDB_HOST = os.environ.get("INFLUXDB_HOST", host)
         self.INFLUXDB_PORT = os.environ.get("INFLUXDB_PORT", port)

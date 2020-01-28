@@ -44,6 +44,15 @@ def strings_to_vartyps(arg):
         return None     # ua.VariantType.Variant
 
 
+def clamp(n, minn, maxn):
+    if n < minn:
+        return minn
+    elif n > maxn:
+        return maxn
+    else:
+        return n
+
+
 class CustomServer(object):
     def __init__(self):
         self.SERVER_ENDPOINT = os.environ.get("SERVER_ENDPOINT")
@@ -124,6 +133,23 @@ class CustomServer(object):
 
         method_node = self.obj.add_method(self.idx, "ADD_OPC_TAG", self.register_opc_tag, [inarg1, inarg2, inarg3])
 
+        # method: SET_PV_LIMIT
+        inarg1 = ua.Argument()
+        inarg1.Name = "active_power_setpoint"
+        inarg1.DataType = ua.NodeId(ua.ObjectIds.Int32)  # Integer
+        inarg1.ValueRank = -1
+        inarg1.ArrayDimensions = []
+        inarg1.Description = ua.LocalizedText("Type in relative active power setpoint [0 ... 1000]")
+
+        inarg2 = ua.Argument()
+        inarg2.Name = "parent_node"
+        inarg2.DataType = ua.NodeId(ua.ObjectIds.String)  # String
+        inarg2.ValueRank = -1
+        inarg2.ArrayDimensions = []
+        inarg2.Description = ua.LocalizedText("Type in the name of the parent node")
+
+        method_node = self.obj.add_method(self.idx, "SET_PV_LIMIT", self.set_pv_active_power_setpoint, [inarg1, inarg2])
+
     @uamethod
     def add_objects_subfolder(self, parent, dir_name):
         # check if old dir with dir_name exists. if so then delete this dir first
@@ -157,6 +183,20 @@ class CustomServer(object):
         mvar = obj.add_variable(self.idx, opctag.strip(), var)
         mvar.set_writable()
         print("Add variable: " + opctag + " of type " + variant_type + " @node " + parent_node)
+
+    @uamethod
+    def set_pv_active_power_setpoint(self, parent, setpoint, parent_node=""):
+        try:
+            obj = self.root.get_child(["0:Objects", ("{}:" + parent_node).format(self.idx)])
+        except BadNoMatch:
+            print("set_pv_active_power_setpoint(): assign new value to node failed.")
+            raise
+
+        for mvar in obj.get_variables():
+            if "PV" and "CTRL" in mvar.get_browse_name().Name:
+                variant_type = mvar.get_data_value().Value.VariantType
+                mvar.set_value(clamp(setpoint, 0, 1000), variant_type)
+                print("Set Value of node " + mvar.get_browse_name().Name + " to " + str(clamp(setpoint, 0, 1000)))
 
     def start(self):
         self.server.start()
