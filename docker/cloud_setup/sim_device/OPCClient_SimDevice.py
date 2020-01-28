@@ -11,9 +11,11 @@ import datetime
 import os
 import random
 import sys
+import threading
 from threading import Thread
 import time
 from distutils.util import strtobool
+from math import sin, pi
 
 from helper.DateHelper import DateHelper
 from opc_ua.client.OPCClient import CustomClient
@@ -27,65 +29,60 @@ __author__ = 'Sebastian Krahmer'
 
 
 class VarUpdater(Thread):
-    def __init__(self, mvars, start_threshold, period=500000):
+    def __init__(self, mvars, start_threshold, period=500):
         super().__init__()
 
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
         self.TIMESTAMP_PRECISION = int(os.environ.get("TIMESTAMP_PRECISION"))
-        self.PERIOD = int(os.environ.get("UPDATE_PERIOD", period)) * 1000  # conversion into ns
+        self.PERIOD = int(os.environ.get("UPDATE_PERIOD", period))
 
-        self._stopev = False
+        self.ticker = threading.Event()
+        self.stop_request = False
+
         self.vars = mvars
-        self.threshold = start_threshold
-        for var in self.vars:
-            self.count = var.get_value()
-            if self.DEBUG_MODE_PRINT:
-                print(self.__class__.__name__, "MeasSim VarUpdater for: ", var)
+        self.threshold = start_threshold * 1000
         # self.count = self.vars.get_value()
 
     def stop(self):
-        self._stopev = True
+        self.stop_request = True
 
     def run(self):
         start_time = time.time_ns()
-        while not self._stopev or len(self.vars) >= 1:
+        while not self.stop_request or len(self.vars) >= 1:
             if time.time_ns() > (start_time + self.threshold):
                 self.run2()
+                if self.DEBUG_MODE_PRINT:
+                    print(self.__class__.__name__, "SimDevice VarUpdater started")
                 break
 
     def run2(self):
-        next_update_time = time.time_ns() + self.PERIOD
-        while not self._stopev:
-            if (time.time_ns()) > next_update_time:
-                next_update_time = next_update_time + self.PERIOD
-                # time.sleep(self.period)
-                self.count += 0.1
-                if self.DEBUG_MODE_PRINT:
-                    print(self.__class__.__name__, self.count)
-                # self.vars.set_value(self.count)
+        t1 = 0
+        t2 = 0
+        while not self.ticker.wait(self.PERIOD / 1000) and not self.stop_request:
+            # self.vars.set_value(self.count)
 
-                now = DateHelper.create_local_utc_datetime()
-                for var in self.vars:
-                    # start = time.process_time_ns()
-                    # print(start, var.get_browse_name().Name)
-                    # var.set_value(self.count)
+            now = DateHelper.create_local_utc_datetime()
+            for var in self.vars:
+                # add "noise" to dt in the range [0 TIMESTAMP_PRECISION]
+                delta = random.random() * self.TIMESTAMP_PRECISION * 1000
+                now_noised = now + datetime.timedelta(0, 0, delta)
 
-                    # add "noise" to dt in the range [0 TIMESTAMP_PRECISION]
-                    delta = random.random() * self.TIMESTAMP_PRECISION
-                    now_noised = now + datetime.timedelta(0, 0, delta)
+                dv = DataValue()
+                dv.SourceTimestamp = now
+                # dv.SourceTimestamp = now_noised
 
-                    dv = DataValue()
-                    dv.SourceTimestamp = now
-                    # dv.SourceTimestamp = now_noised
-                    if "FEEDER2_LOAD_I_PH1_RES" in var.get_browse_name().Name:
-                        dv.Value = ua.Variant(self.count*2)
-                    else:
-                        dv.Value = ua.Variant(self.count)
-                    var.set_value(dv)
+                if "FEEDER2_LOAD_I_PH1_RES" in var.get_browse_name().Name:
+                    dv.Value = ua.Variant(2*sin(100*pi*(t1+t2)))
+                else:
+                    dv.Value = ua.Variant(2*sin(100*pi*t1))
+                var.set_value(dv)
+
+            t1 += 1 / 1000
+            t2 += 0.5 / 1000
 
 
 class OPCClientSimDevice(CustomClient):
-    def __init__(self, meas_device_tag="RES", auth_name=None, auth_password=None, start_threshold=5000000,
+    def __init__(self, meas_device_tag="RES", auth_name=None, auth_password=None, start_threshold=5000,
                  server_endpoint="opc.tcp://0.0.0.0:4840/OPCUA/python_server/"):
         # super
         self.SERVER_ENDPOINT = os.environ.get("SERVER_ENDPOINT", server_endpoint)
@@ -101,7 +98,7 @@ class OPCClientSimDevice(CustomClient):
                          self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY, auth_name, auth_password, self.DEBUG_MODE_PRINT)
 
         # custom
-        self.THRESHOLD = int(os.environ.get("START_THRESHOLD", start_threshold)) * 1000   # conversion into ns
+        self.THRESHOLD = int(os.environ.get("START_THRESHOLD", start_threshold)) * 1000 * 1000   # conversion into ns
         self.OPCUA_DIR_NAME = os.environ.get("OPCUA_SERVER_DIR_NAME")
 
         self.meas_device_tag = meas_device_tag
@@ -154,9 +151,9 @@ if __name__ == "__main__":
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
     # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
-    # os.environ.setdefault("UPDATE_PERIOD", "500000")        # in microsec
-    # os.environ.setdefault("TIMESTAMP_PRECISION", "10000")   # in microsec
-    # os.environ.setdefault("START_THRESHOLD", "5000000")     # in microsec
+    # os.environ.setdefault("UPDATE_PERIOD", "500")        # in ms
+    # os.environ.setdefault("TIMESTAMP_PRECISION", "10")   # in ms
+    # os.environ.setdefault("START_THRESHOLD", "5000")     # in ms
     ##################
 
     meas_device_tags = ["RES"]

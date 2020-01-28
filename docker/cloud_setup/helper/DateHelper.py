@@ -33,20 +33,21 @@ class DateHelper(object):
         return ts
 
     @staticmethod
-    def round_time(dt=None, time_precision=10000, to='average'):
+    def round_time(dt=None, time_precision=10, to='average'):
         """
         Round a datetime object to a multiple of a timedelta
         dt : datetime.datetime object, default now.
-        time_precision : precision of time resolution, default 10.000 microseconds (10ms).
+        time_precision : precision of time resolution, default 10 ms (10ms).
         based partly on:  http://stackoverflow.com/questions/3463930/how-to-round-the-minute-of-a-datetime-object-python
         """
+        tp = time_precision * 1000  # in microsecs
         # ## get source timestamp and round to defined precision
         if dt is None:
             dt = DateHelper.create_local_utc_datetime()
 
         microseconds = (dt - dt.min).microseconds
-        rounding_up = (microseconds + time_precision / 2) // time_precision * time_precision
-        rounding_down = (microseconds - time_precision / 2) // time_precision * time_precision
+        rounding_up = (microseconds + tp / 2) // tp * tp
+        rounding_down = (microseconds - tp / 2) // tp * tp
         if to == 'up':
             delta = rounding_up - microseconds
         elif to == 'down':

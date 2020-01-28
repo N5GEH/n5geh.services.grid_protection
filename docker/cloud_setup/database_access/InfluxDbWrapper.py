@@ -22,7 +22,7 @@ __author__ = 'Sebastian Krahmer'
 
 
 class InfluxDbWrapper(object):
-    def __init__(self, host='localhost', port=8086, update_period=500000):
+    def __init__(self, host='localhost', port=8086, update_period=500):
         self.UPDATE_PERIOD = os.environ.get("DATABASE_UPDATE_PERIOD", update_period)
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
         self.INFLUXDB_HOST = os.environ.get("INFLUXDB_HOST", host)
@@ -30,7 +30,6 @@ class InfluxDbWrapper(object):
 
         # TimeLoop
         # https://medium.com/greedygame-engineering/an-elegant-way-to-run-periodic-tasks-in-python-61b7c477b679
-        self.WAIT_TIME_MILLISECONDS = 1000
         self.ticker = threading.Event()
         self.stop_request = False
 
@@ -52,12 +51,9 @@ class InfluxDbWrapper(object):
     def start(self):
         self.opc_client.start()
 
-        while not self.ticker.wait(self.WAIT_TIME_MILLISECONDS/1000):
+        while not self.ticker.wait(self.UPDATE_PERIOD/1000):
             df = self.opc_client.get_last_dataframe()
             self.update_database(df)
-
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful started")
 
     # region Database Update
     def stop_database_update(self):
@@ -86,7 +82,7 @@ if __name__ == "__main__":
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
     # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "default_demonstrator")
     # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
-    # os.environ.setdefault("DATABASE_UPDATE_PERIOD", "500000")        # in microsec
+    # os.environ.setdefault("DATABASE_UPDATE_PERIOD", "500")        # in microsec
     ##################
 
     mInfluxDbWrapper = InfluxDbWrapper()

@@ -13,7 +13,7 @@ ENV ENABLE_CERTIFICATE False
 ENV CERTIFICATE_PATH_CLIENT_CERT /cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem
 ENV CERTIFICATE_PATH_CLIENT_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem
 ENV OPCUA_SERVER_DIR_NAME default_demonstrator
-ENV DATABASE_UPDATE_PERIOD 500000
+ENV DATABASE_UPDATE_PERIOD 500
 ENV INFLUXDB_HOST ubuntu5g
 ENV INFLUXDB_PORT 8086
 
@@ -21,5 +21,4 @@ ENV INFLUXDB_PORT 8086
 EXPOSE INFLUXDB_PORT
 LABEL type="database_access_python" \
       version="0.6"
-      
 CMD [ "python", "/usr/src/cloud_setup/database_access/InfluxDbWrapper.py"]

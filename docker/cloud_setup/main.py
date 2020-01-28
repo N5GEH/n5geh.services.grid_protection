@@ -57,8 +57,8 @@ if __name__ == "__main__":
     os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
     os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
     os.environ.setdefault("DEBUG_MODE_PRINT", "True")
-    os.environ.setdefault("UPDATE_PERIOD", "500000")              # in microsec
-    os.environ.setdefault("TIMESTAMP_PRECISION", "10000")         # in microsec
+    os.environ.setdefault("UPDATE_PERIOD", "500")              # in ms
+    os.environ.setdefault("TIMESTAMP_PRECISION", "10")         # in ms
     os.environ.setdefault("MAX_FAULTY_STATES", "5")
     os.environ.setdefault("NOMINAL_CURRENT", "275")
     os.environ.setdefault("CURRENT_EPS", "0.05")
@@ -67,19 +67,7 @@ if __name__ == "__main__":
     os.environ.setdefault("PF_INPUT_PATH", "/cloud_setup/data/device_config/demonstrator_setup.txt")
     os.environ.setdefault("INFLUXDB_HOST", "ubuntu5g")
     os.environ.setdefault("INFLUXDB_PORT", "8086")
-    os.environ.setdefault("DATABASE_UPDATE_PERIOD", "500000")  # in microsec
-
-    # config.DEBUG_MODE_PRINT = "True"
-    # config.DEBUG_MODE_VAR_UPDATER = "True"
-    # config.SERVER_ENDPOINT = "opc.tcp://0.0.0.0:4840/freeopcua/server/"   # admin@hostname # 0.0.0.0 instead of localhost from outside
-    # config.NAMESPACE = "https://n5geh.de"
-    # # config.SERVER_ENDPOINT = "opc.tcp://ubuntu5g:4840/"
-    # # config.NAMESPACE = "http://opcfoundation.org/UA/"
-
-    # config.MAX_ARCHIVES = 20
-    # config.MAX_FAULTY_STATES = 5
-    # config.TIMESTAMP_PRECISION = 10000      # in microsec
-    # config.UPDATE_PERIOD = 500000           # in microsec
+    os.environ.setdefault("DATABASE_UPDATE_PERIOD", "500")  # in ms
 
     # setup OPC server
     mServer = CustomServer()
