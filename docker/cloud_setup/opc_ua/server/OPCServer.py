@@ -155,15 +155,7 @@ class CustomServer(object):
         # check if old dir with dir_name exists. if so then delete this dir first
         try:
             obj = self.root.get_child(["0:Objects", ("{}:" + dir_name).format(self.idx)])
-            print(obj)
-            # a = self.obj.get_child(dir_name)
-            if obj is not None:
-                if obj.get_browse_name().Name == dir_name:
-                    childs = obj.get_variables()
-                    if childs is not None and childs.__sizeof__() >= 1:
-                        self.server.delete_nodes([childs])
-                    self.server.delete_nodes([obj])
-                    print("delete subfolder: " + dir_name)
+            self.server.delete_nodes([obj], True)
         except BadNoMatch:
             print("There is no old folder with the name: " + dir_name)
 
@@ -208,16 +200,20 @@ class CustomServer(object):
 
 
 if __name__ == "__main__":
+    #################################
     # if using local (means not in Docker)
-    # local = False   # if server is local or as Docker
+    # local = True   # if server is local or as Docker
     # if local:
     #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
     # else:
     #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/OPCUA/python_server/")
     # os.environ.setdefault("NAMESPACE", "https://n5geh.de")
-    # os.environ.setdefault("SERVER_NAME", "ENV SERVER_NAME N5GEH_FreeOpcUa_Python_Server")
-    # os.environ.setdefault("ENABLE_CERTIFICATE", "True")
-    # os.environ.setdefault("CERTIFICATE_PATH", "/opc_ua/certificates/")
-
+    # os.environ.setdefault("SERVER_NAME", "N5GEH_FreeOpcUa_Python_Server")
+    # os.environ.setdefault("ENABLE_CERTIFICATE", "False")
+    # os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT",
+    #                       "/cloud_setup/opc_ua/certificates/n5geh_opcua_server_cert.pem")
+    # os.environ.setdefault("CERTIFICATE_PATH_SERVER_PRIVATE_KEY",
+    #                       "/cloud_setup/opc_ua/certificates/n5geh_opcua_server_private_key.pem")
+    #################################
     server = CustomServer()
     server.start()
