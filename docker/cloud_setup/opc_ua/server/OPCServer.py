@@ -18,7 +18,7 @@ from opcua.ua.uaerrors import BadNoMatch
 
 sys.path.insert(0, "..")
 
-__version__ = '0.5'
+__version__ = '0.6'
 __author__ = 'Sebastian Krahmer'
 
 # users database
