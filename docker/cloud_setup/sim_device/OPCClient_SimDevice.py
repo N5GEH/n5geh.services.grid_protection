@@ -40,7 +40,7 @@ class VarUpdater(Thread):
         self.stop_request = False
 
         self.vars = mvars
-        self.threshold = start_threshold * 1000
+        self.threshold = start_threshold
         # self.count = self.vars.get_value()
 
     def stop(self):
@@ -56,6 +56,7 @@ class VarUpdater(Thread):
                 break
 
     def run2(self):
+        count = 0
         t1 = 0
         t2 = 0
         while not self.ticker.wait(self.PERIOD / 1000) and not self.stop_request:
@@ -74,11 +75,23 @@ class VarUpdater(Thread):
                 if "FEEDER2_LOAD_I_PH1_RES" in var.get_browse_name().Name:
                     dv.Value = ua.Variant(2*sin(100*pi*(t1+t2)))
                 else:
-                    dv.Value = ua.Variant(2*sin(100*pi*t1))
+                    if "FEEDER2_BUS_I_PH1_RES" in var.get_browse_name().Name or \
+                        "FEEDER2_BUS_I_PH2_RES" in var.get_browse_name().Name or \
+                        "FEEDER2_BUS_I_PH3_RES" in var.get_browse_name().Name:
+                        dv.Value = ua.Variant(2 * 2 * sin(100 * pi * t1))
+                    else:
+                        dv.Value = ua.Variant(2*sin(100*pi*t1))
                 var.set_value(dv)
 
-            t1 += 1 / 1000
-            t2 += 0.5 / 1000
+            t1 = count / 1000
+            # make deviation after 60 time steps
+            if count > 60:
+                t2 = count * 0.05 / 1000
+            count += 1
+
+            # reset after 120 time steps
+            if count > 120:
+                count = 0
 
 
 class OPCClientSimDevice(CustomClient):
@@ -141,15 +154,16 @@ class OPCClientSimDevice(CustomClient):
 if __name__ == "__main__":
     ##################
     # ### if using local (means not in Docker): uncomment this lines!
-    # local = False  # if server is local or as Docker
+    # local = True  # if server is local or as Docker
     # if local:
     #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
     # else:
     #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/OPCUA/python_server/")
     # os.environ.setdefault("NAMESPACE", "https://n5geh.de")
-    # os.environ.setdefault("ENABLE_CERTIFICATE", "True")
+    # os.environ.setdefault("ENABLE_CERTIFICATE", "False")
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
+    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "default_demonstrator")
     # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
     # os.environ.setdefault("UPDATE_PERIOD", "500")        # in ms
     # os.environ.setdefault("TIMESTAMP_PRECISION", "10")   # in ms
