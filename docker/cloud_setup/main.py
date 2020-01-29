@@ -87,6 +87,6 @@ if __name__ == "__main__":
         # meas_devices.append(mClient_MeasSim)
     # runInParallel(meas_devices[0].start(), meas_devices[1].start())
 
-    # setup influxDb wrapper
-        mInfluxDbWrapper = InfluxDbWrapper()
-        mInfluxDbWrapper.start()
+    # # setup influxDb wrapper
+    #     mInfluxDbWrapper = InfluxDbWrapper()
+    #     mInfluxDbWrapper.start()
