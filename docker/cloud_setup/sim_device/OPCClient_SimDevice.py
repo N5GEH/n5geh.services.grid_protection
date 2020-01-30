@@ -59,6 +59,7 @@ class VarUpdater(Thread):
         count = 0
         t1 = 0
         t2 = 0
+
         while not self.ticker.wait(self.PERIOD / 1000) and not self.stop_request:
             # self.vars.set_value(self.count)
 
@@ -92,6 +93,8 @@ class VarUpdater(Thread):
             # reset after 120 time steps
             if count > 120:
                 count = 0
+                t1 = 0
+                t2 = 0
 
 
 class OPCClientSimDevice(CustomClient):
