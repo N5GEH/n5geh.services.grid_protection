@@ -272,7 +272,7 @@ class DataHandler(object):
         ctrls = []
         values = []
         for ctrl in self.ctrl_nodes_list:
-            if "PRED_CTRL" in ctrl.opctag:
+            if "LIMIT_CTRL" in ctrl.opctag:
                 ctrls.append(ctrl)
                 values.append(1000)
         self.opc_client.set_vars(ctrls, values)

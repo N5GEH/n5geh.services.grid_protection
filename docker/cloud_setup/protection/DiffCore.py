@@ -118,7 +118,7 @@ class DiffCore(Thread):
         nodes = []
         values = []
         for misc in self.misc_nodes_list:
-            if "FAULTY_STATES" in misc.opctag:
+            if "FEHLER_COUNTER" in misc.opctag:
                 nodes.append(misc)
                 values.append(max(LocalData.mFaultStates_ph1, LocalData.mFaultStates_ph2, LocalData.mFaultStates_ph3))
                 self.opc_client.set_vars(nodes, values)
@@ -131,7 +131,7 @@ class DiffCore(Thread):
         values = []
         # update the state of CTRLs
         for ctrl in self.ctrl_nodes_list:
-            if "PRED_CTRL" in ctrl.opctag:
+            if "LIMIT_CTRL" in ctrl.opctag:
                 nodes.append(ctrl)
                 values.append(upper_limit)  # decrease power infeed to 0%
 

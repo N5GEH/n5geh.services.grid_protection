@@ -73,12 +73,10 @@ class VarUpdater(Thread):
                 dv.SourceTimestamp = now
                 # dv.SourceTimestamp = now_noised
 
-                if "FEEDER2_LOAD_I_PH1_RES" in var.get_browse_name().Name:
+                if "LAST_I_PH1_RES" in var.get_browse_name().Name:
                     dv.Value = ua.Variant(2*sin(100*pi*(t1+t2)))
                 else:
-                    if "FEEDER2_BUS_I_PH1_RES" in var.get_browse_name().Name or \
-                        "FEEDER2_BUS_I_PH2_RES" in var.get_browse_name().Name or \
-                        "FEEDER2_BUS_I_PH3_RES" in var.get_browse_name().Name:
+                    if "TRAFO_I_PH1_RES" in var.get_browse_name().Name:
                         dv.Value = ua.Variant(2 * 2 * sin(100 * pi * t1))
                     else:
                         dv.Value = ua.Variant(2*sin(100*pi*t1))
