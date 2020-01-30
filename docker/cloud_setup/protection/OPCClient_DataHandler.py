@@ -73,20 +73,17 @@ class OPCClientDataHandler(CustomClient):
         self.subscription_meas_nodes = None
         self.subscription_handle_meas_nodes = None
 
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful init")
+        print(self.__class__.__name__, " successful init")
 
     def start(self):
         super().start()
 
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful connected")
+        print(self.__class__.__name__, " successful connected")
 
     def stop(self):
         super().stop()
 
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful disconnected")
+        print(self.__class__.__name__, " successful disconnected")
 
     # region subscription
     def make_subscription(self, target_object, dir_name, list_of_nodes_to_subscribe, are_status_nodes=False,
@@ -110,8 +107,7 @@ class OPCClientDataHandler(CustomClient):
                 self._subscribe(dir_name, sub_handler, self.subscription_meas_nodes, self.subscription_handle_meas_nodes,
                                 list_of_nodes_to_subscribe, self.subscribed_meas_nodes, sub_interval)
 
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful updates subscription")
+        print(self.__class__.__name__, " successful updates subscription")
     # endregion
 
     def set_vars(self, ctrl_list, value_list):

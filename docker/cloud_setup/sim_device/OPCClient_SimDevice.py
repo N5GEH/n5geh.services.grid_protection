@@ -51,8 +51,7 @@ class VarUpdater(Thread):
         while not self.stop_request or len(self.vars) >= 1:
             if time.time_ns() > (start_time + self.threshold):
                 self.run2()
-                if self.DEBUG_MODE_PRINT:
-                    print(self.__class__.__name__, "SimDevice VarUpdater started")
+                print(self.__class__.__name__, "SimDevice VarUpdater started")
                 break
 
     def run2(self):
@@ -81,6 +80,8 @@ class VarUpdater(Thread):
                     else:
                         dv.Value = ua.Variant(2*sin(100*pi*t1))
                 var.set_value(dv)
+                if self.DEBUG_MODE_PRINT:
+                    print(self.__class__.__name__, dv.Value)
 
             t1 = count / 1000
             # make deviation after 60 time steps
@@ -118,22 +119,20 @@ class OPCClientSimDevice(CustomClient):
         self.meas_device_tag = meas_device_tag
         self.vup = None
 
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful init")
+        print(self.__class__.__name__, " successful init")
 
     def start(self):
         super().start()
         self.prepare_auto_updater()
         self.start_auto_updater()
 
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful connected")
+        print(self.__class__.__name__, " successful connected")
         
     def stop(self):
         super().stop()
         self.vup.stop()
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful disconnected")
+
+        print(self.__class__.__name__, " successful disconnected")
 
     # region autoUpdater
     def prepare_auto_updater(self):

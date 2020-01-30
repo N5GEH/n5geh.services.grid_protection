@@ -179,5 +179,4 @@ class DiffCore(Thread):
                   , str(format(self.df_ph3.iloc[-1]['sum'], '.2f')) + '(' + str(LocalData.mFaultStates_ph3) + ')' + ";" + '\n')
 
     def print_work_status(self):
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, self.work_status)
+        print(self.__class__.__name__, self.work_status)

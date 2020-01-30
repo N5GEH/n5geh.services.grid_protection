@@ -49,8 +49,7 @@ class OPCClientDatabase(CustomClient):
 
         self.df = pd.DataFrame()
 
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful init")
+        print(self.__class__.__name__, " successful init")
 
     def start(self):
         # start opc client
@@ -66,13 +65,11 @@ class OPCClientDatabase(CustomClient):
         # make subscription
         self.make_subscription(self.OPCUA_DIR_NAME, self.get_server_vars(self.OPCUA_DIR_NAME))
 
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful connected")
+        print(self.__class__.__name__, " successful connected")
         
     def stop(self):
         super().stop()
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful disconnected")
+        print(self.__class__.__name__, " successful disconnected")
 
     # region subscription
     def make_subscription(self, dir_name, list_of_nodes_to_subscribe, sub_interval=1):
@@ -88,8 +85,7 @@ class OPCClientDatabase(CustomClient):
             self._subscribe(dir_name, sub_handler, self.subscription, self.subscription_handle,
                             list_of_nodes_to_subscribe, self.subscribed_nodes, sub_interval)
 
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful updates subscription")
+        print(self.__class__.__name__, " successful updates subscription")
 
     # subscription callback
     def update_data(self, node, datetime_source, val):

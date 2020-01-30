@@ -83,8 +83,8 @@ class DataHandler(object):
     def register_devices(self, dir_name, device_config_path):
         self.opc_client.create_dir_on_server(dir_name)
         self.opc_client.register_variables_to_server(dir_name, device_config_path)
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful register devices from file:" + device_config_path)
+
+        print(self.__class__.__name__, " successful register devices from file:" + device_config_path)
 
     def set_meas_topology(self, path, list_of_nodes_to_reset, dir_name):
         # get at server registered vars allocated as CustomVar
@@ -118,8 +118,7 @@ class DataHandler(object):
                     elif "CTRL" in topo_opctag:
                         self.ctrl_nodes_list.append(var)
                     break
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful updated meas topology from file:" + path)
+        print(self.__class__.__name__, " successful updated meas topology from file:" + path)
 
         # update OPC-client: delete old subscription and start new subscription
         self.update_subscription_opc_client(self.Iph1_nodes_list + self.Iph2_nodes_list + self.Iph3_nodes_list +
@@ -142,8 +141,8 @@ class DataHandler(object):
                     if "RES" not in topo_opctag and "CTRL" not in topo_opctag:
                         self.misc_nodes_list.append(var)
                     break
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful updated status flags from file:" + path)
+
+        print(self.__class__.__name__, " successful updated status flags from file:" + path)
 
         # update OPC-client: delete old subscription and start new subscription
         self.update_subscription_opc_client(self.misc_nodes_list, True, 500)
@@ -276,8 +275,8 @@ class DataHandler(object):
                 ctrls.append(ctrl)
                 values.append(1000)
         self.opc_client.set_vars(ctrls, values)
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful set startValues for ctrl devices")
+
+        print(self.__class__.__name__, " successful set startValues for ctrl devices")
 
 
 if __name__ == "__main__":

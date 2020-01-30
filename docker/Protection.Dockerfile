@@ -16,7 +16,7 @@ ENV NAMESPACE https://n5geh.de
 ENV ENABLE_CERTIFICATE False
 ENV CERTIFICATE_PATH_CLIENT_CERT /cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem
 ENV CERTIFICATE_PATH_CLIENT_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem
-ENV DEBUG_MODE_PRINT True
+ENV DEBUG_MODE_PRINT False
 ENV TIMESTAMP_PRECISION 10
 ENV MAX_FAULTY_STATES 5
 ENV NOMINAL_CURRENT 2
@@ -29,5 +29,5 @@ ENV PF_INPUT_PATH /cloud_setup/data/device_config/Setup_demonstrator.txt
 EXPOSE 4860
 LABEL type="protection_python" \
       version="0.6"
-HEALTHCHECK --interval=60s --timeout=3s CMD curl --fail http://localhost:4860/pools || exit 1
+#HEALTHCHECK --interval=60s --timeout=3s CMD curl --fail http://localhost:4860/pools || exit 1
 CMD [ "python", "/usr/src/cloud_setup/protection/DataHandler.py"]

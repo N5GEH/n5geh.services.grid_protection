@@ -53,7 +53,7 @@ def numbers_to_typestrings(arg):
 
 class CustomClient(object):
     def __init__(self, server_endpoint, namespace, enable_cert, client_cert_path, client_key_path, auth_name=None,
-                 auth_password=None, debug_print=True, client_request_timeout=4):
+                 auth_password=None, debug_print=False, client_request_timeout=4):
 
         self.NAMESPACE = namespace
         self.DEBUG_MODE_PRINT = debug_print

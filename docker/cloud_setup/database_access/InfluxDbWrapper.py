@@ -22,11 +22,12 @@ __author__ = 'Sebastian Krahmer'
 
 
 class InfluxDbWrapper(object):
-    def __init__(self, host='localhost', port=8086, update_period=500):
+    def __init__(self, host='localhost', port=8086, update_period=500, db_name="demonstrator_grid_protection"):
         self.UPDATE_PERIOD = int(os.environ.get("DATABASE_UPDATE_PERIOD", update_period))
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
         self.INFLUXDB_HOST = os.environ.get("INFLUXDB_HOST", host)
         self.INFLUXDB_PORT = os.environ.get("INFLUXDB_PORT", port)
+        self.INFLUXDB_NAME = os.environ.get("INFLUXDB_NAME", db_name)
 
         # TimeLoop
         # https://medium.com/greedygame-engineering/an-elegant-way-to-run-periodic-tasks-in-python-61b7c477b679
@@ -36,17 +37,15 @@ class InfluxDbWrapper(object):
         # DB related stuff
         user = 'root'
         password = 'n5geh2019'
-        self.dbname = 'demonstrator_grid_protection'
         self.protocol = 'line'
 
         self.db_client = DataFrameClient(self.INFLUXDB_HOST, self.INFLUXDB_PORT, user, password, self.dbname)
-        self.db_client.create_database(self.dbname)
+        self.db_client.create_database(self.INFLUXDB_NAME)
 
         # OPC Client
         self.opc_client = OPCClientDatabase()
 
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, " successful init")
+        print(self.__class__.__name__, " successful init")
 
     def start(self):
         self.opc_client.start()
@@ -61,7 +60,8 @@ class InfluxDbWrapper(object):
 
     def update_database(self, dataframe):
         self.db_client.write_points(dataframe, self.dbname, protocol=self.protocol)
-        print(dataframe)
+        if self.DEBUG_MODE_PRINT:
+            print(dataframe)
     # endregion
 
 
@@ -82,7 +82,9 @@ if __name__ == "__main__":
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
     # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "demo")
     # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
-    # os.environ.setdefault("DATABASE_UPDATE_PERIOD", "500")        # in microsec
+    # os.environ.setdefault("DATABASE_UPDATE_PERIOD", "1000")        # in microsec
+    # os.environ.setdefault("INFLUXDB_NAME", "demonstrator_grid_protection")
+
     ##################
 
     mInfluxDbWrapper = InfluxDbWrapper()
