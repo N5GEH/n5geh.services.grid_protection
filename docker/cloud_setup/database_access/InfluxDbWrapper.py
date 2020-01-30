@@ -39,7 +39,7 @@ class InfluxDbWrapper(object):
         password = 'n5geh2019'
         self.protocol = 'line'
 
-        self.db_client = DataFrameClient(self.INFLUXDB_HOST, self.INFLUXDB_PORT, user, password, self.dbname)
+        self.db_client = DataFrameClient(self.INFLUXDB_HOST, self.INFLUXDB_PORT, user, password, self.INFLUXDB_NAME)
         self.db_client.create_database(self.INFLUXDB_NAME)
 
         # OPC Client
@@ -59,7 +59,7 @@ class InfluxDbWrapper(object):
         self.stop_request = True
 
     def update_database(self, dataframe):
-        self.db_client.write_points(dataframe, self.dbname, protocol=self.protocol)
+        self.db_client.write_points(dataframe, self.INFLUXDB_NAME, protocol=self.protocol)
         if self.DEBUG_MODE_PRINT:
             print(dataframe)
     # endregion
