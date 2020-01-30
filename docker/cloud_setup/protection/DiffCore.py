@@ -89,7 +89,7 @@ class DiffCore(Thread):
             self.evaluate_historical_balances_of_current(3)
 
         if result_code == "VALID":
-            self.reset_local_data_fault_status()
+            self.decrease_local_data_fault_status()
 
         self.print_current_result(result_code)
 
@@ -145,15 +145,18 @@ class DiffCore(Thread):
         # execute set_vars()
         self.opc_client.set_vars(nodes, values)
 
-        self.reset_local_data_fault_status()
+        self.decrease_local_data_fault_status()
         if self.DEBUG_MODE_PRINT:
             print(self.__class__.__name__, "All CTRL devices are set to power feedin = 0.")
 
     @staticmethod
-    def reset_local_data_fault_status():
-        LocalData.mFaultStates_ph1 = 0
-        LocalData.mFaultStates_ph2 = 0
-        LocalData.mFaultStates_ph3 = 0
+    def decrease_local_data_fault_status():
+        if LocalData.mFaultStates_ph1 > 0:
+            LocalData.mFaultStates_ph1 -= 1
+        if LocalData.mFaultStates_ph2 > 0:
+            LocalData.mFaultStates_ph2 -= 1
+        if LocalData.mFaultStates_ph3 > 0:
+            LocalData.mFaultStates_ph3 -= 1
 
     # def update_ctrl_states(self):
     #     ctrls = []
