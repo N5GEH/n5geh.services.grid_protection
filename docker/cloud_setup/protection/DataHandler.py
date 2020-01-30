@@ -216,7 +216,9 @@ class DataHandler(object):
                 ts = DateHelper.round_time(datetime_source, self.TIMESTAMP_PRECISION)
                 # ts = self.format_datetime(datetime_source)
 
-                if var.opctag == self.slack_ph1.opctag or var.opctag == self.slack_ph2.opctag or var.opctag == self.slack_ph3.opctag:
+                if self.slack_ph1 is not None and var.opctag == self.slack_ph1.opctag or \
+                        self.slack_ph2 is not None and var.opctag == self.slack_ph2.opctag or \
+                        self.slack_ph3 is not None and var.opctag == self.slack_ph3.opctag:
                     val = -val  # IMPORTANT: slack counts in negative manner
 
                 if var.phase == 1:
