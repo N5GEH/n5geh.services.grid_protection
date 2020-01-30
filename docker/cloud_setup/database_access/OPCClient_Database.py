@@ -39,7 +39,7 @@ class OPCClientDatabase(CustomClient):
                          self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY, auth_name, auth_password, self.DEBUG_MODE_PRINT)
 
         # custom
-        self.OPCUA_DIR_NAME = os.environ.get("OPCUA_SERVER_DIR_NAME", 'default_demonstrator')
+        self.OPCUA_DIR_NAME = os.environ.get("OPCUA_SERVER_DIR_NAME", 'default')
 
         self.node_dict = dict()
 

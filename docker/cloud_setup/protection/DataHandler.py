@@ -34,7 +34,7 @@ class DataHandler(object):
         self.SERVER_ENDPOINT = os.environ.get("SERVER_ENDPOINT")
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
         self.TIMESTAMP_PRECISION = int(os.environ.get("TIMESTAMP_PRECISION"))
-        self.PF_INPUT_PATH = os.environ.get("PF_INPUT_PATH")
+        self.DEVICE_PATH = os.environ.get("DEVICE_PATH")
 
         self.opc_client = OPCClientDataHandler("n5geh_opcua_client1", "n5geh2019", self.SERVER_ENDPOINT)
 
@@ -67,7 +67,7 @@ class DataHandler(object):
         self._start_client()
 
         # Registration of vars at server
-        self.register_devices(self.server_dir_name, os.path.dirname(os.getcwd()) + self.PF_INPUT_PATH)
+        self.register_devices(self.server_dir_name, os.path.dirname(os.getcwd()) + self.DEVICE_PATH)
 
         # Set topology used for grid protection
         self.set_meas_topology(self.topo_path, [], self.server_dir_name)
@@ -239,7 +239,8 @@ class DataHandler(object):
                 break
 
         start = time.time_ns()                  # in ns
-        if self.check_data_queue_for_completeness():
+        # TODO: enable three-phase if necessary
+        if self.check_data_queue_for_completeness(False):
             dc = DiffCore(self.opc_client, self.ctrl_nodes_list, self.misc_nodes_list,
                           self.df_ph1, self.df_ph2, self.df_ph3)
             dc.start()
@@ -249,19 +250,27 @@ class DataHandler(object):
         if self.DEBUG_MODE_PRINT:
             print(str((end-start) / (1000 * 1000)) + " ms")  # in ms
 
-    def check_data_queue_for_completeness(self):
-        # drops all rows where not all columns filled with values != NaN and check if length is
-        df_ph1 = self.df_ph1.dropna()
-        df_ph2 = self.df_ph2.dropna()
-        df_ph3 = self.df_ph3.dropna()
-        if len(df_ph1.columns) == len(self.Iph1_nodes_list) and len(df_ph1.index) >= 1 \
-                and len(df_ph2.columns) == len(self.Iph2_nodes_list) and len(df_ph2.index) >= 1 \
-                and len(df_ph3.columns) == len(self.Iph3_nodes_list) and len(df_ph3.index) >= 1:
-            self.df_ph1.dropna(inplace=True)    # drops all rows where not all columns filled with values != NaN
-            self.df_ph2.dropna(inplace=True)
-            self.df_ph3.dropna(inplace=True)
-            return True
-        return False
+    def check_data_queue_for_completeness(self, three_phase=True):
+        if three_phase:
+            # drops all rows where not all columns filled with values != NaN and check if length is
+            df_ph1 = self.df_ph1.dropna()
+            df_ph2 = self.df_ph2.dropna()
+            df_ph3 = self.df_ph3.dropna()
+            if len(df_ph1.columns) == len(self.Iph1_nodes_list) and len(df_ph1.index) >= 1 \
+                    and len(df_ph2.columns) == len(self.Iph2_nodes_list) and len(df_ph2.index) >= 1 \
+                    and len(df_ph3.columns) == len(self.Iph3_nodes_list) and len(df_ph3.index) >= 1:
+                self.df_ph1.dropna(inplace=True)    # drops all rows where not all columns filled with values != NaN
+                self.df_ph2.dropna(inplace=True)
+                self.df_ph3.dropna(inplace=True)
+                return True
+            return False
+        else:
+            # drops all rows where not all columns filled with values != NaN and check if length is
+            df_ph1 = self.df_ph1.dropna()
+            if len(df_ph1.columns) == len(self.Iph1_nodes_list) and len(df_ph1.index) >= 1:
+                self.df_ph1.dropna(inplace=True)  # drops all rows where not all columns filled with values != NaN
+                return True
+            return False
 
     def clear_meas_data(self):
         self.df_ph1 = pd.DataFrame()
@@ -301,7 +310,7 @@ if __name__ == "__main__":
     # os.environ.setdefault("CURRENT_EPS", "0.05")
     # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "demo")
     # os.environ.setdefault("TOPOLOGY_PATH", "/data/topology/TopologyFile_demonstrator.json")
-    # os.environ.setdefault("PF_INPUT_PATH", "/data/device_config/Setup_demonstrator.txt")
+    # os.environ.setdefault("DEVICE_PATH", "/data/device_config/Setup_demonstrator.txt")
     ##################
 
     topo_path = os.environ.get("TOPOLOGY_PATH")
