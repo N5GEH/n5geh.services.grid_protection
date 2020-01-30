@@ -1,0 +1,22 @@
+{
+  "Grid-ID": "demonstrator",
+  "POCs":
+    [
+      {
+        "FEEDER2_BUS_I_PH1_RES": "Feeder2 Slack, Current Phase1",
+        "FEEDER2_BUS_I_PH2_RES": "Feeder2 Slack, Current Phase2",
+        "FEEDER2_BUS_I_PH3_RES": "Feeder2 Slack, Current Phase3",
+        "FEEDER2_LOAD_I_PH1_RES": "Feeder2 Load, Current Phase1",
+        "FEEDER2_LOAD_I_PH2_RES": "Feeder2 Load, Current Phase2",
+        "FEEDER2_LOAD_I_PH3_RES": "Feeder2 Load, Current Phase3",
+        "FEEDER2_PV_I_PH1_RES": "Feeder2 PV-Infeed, Current Phase1",
+        "FEEDER2_PV_I_PH2_RES": "Feeder2 PV-Infeed, Current Phase2",
+        "FEEDER2_PV_I_PH3_RES": "Feeder2 PV-Infeed, Current Phase3",
+        "FEEDER2_PV_PRED_CTRL": "Feeder2 PV-Infeed, Active power upper limit[0-0%, 1000-100%]",
+        "FEEDER2_PH1_FAULTY_STATES": "Feeder2 Status PH1, Number of detected faulty states since last disconnect of feeder2",
+        "FEEDER2_PH2_FAULTY_STATES": "Feeder2 Status PH2, Number of detected faulty states since last disconnect of feeder2",
+        "FEEDER2_PH3_FAULTY_STATES": "Feeder2 Status PH3, Number of detected faulty states since last disconnect of feeder2",
+        "FEEDER2_UPDATE_REQUEST_TOPOLOGY": "Feeder2 Request, External Request to Update(read in) Topology File"
+      }
+    ]
+}

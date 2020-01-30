@@ -298,9 +298,9 @@ if __name__ == "__main__":
     # os.environ.setdefault("MAX_FAULTY_STATES", "5")
     # os.environ.setdefault("NOMINAL_CURRENT", "2")
     # os.environ.setdefault("CURRENT_EPS", "0.05")
-    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "default_demonstrator")
+    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "demo")
     # os.environ.setdefault("TOPOLOGY_PATH", "/data/topology/TopologyFile_demonstrator.json")
-    # os.environ.setdefault("PF_INPUT_PATH", "/data/device_config/demonstrator_setup.txt")
+    # os.environ.setdefault("PF_INPUT_PATH", "/data/device_config/Setup_demonstrator.txt")
     ##################
 
     topo_path = os.environ.get("TOPOLOGY_PATH")

@@ -60,11 +60,11 @@ if __name__ == "__main__":
     os.environ.setdefault("UPDATE_PERIOD", "500")              # in ms
     os.environ.setdefault("TIMESTAMP_PRECISION", "10")         # in ms
     os.environ.setdefault("MAX_FAULTY_STATES", "5")
-    os.environ.setdefault("NOMINAL_CURRENT", "275")
+    os.environ.setdefault("NOMINAL_CURRENT", "2")
     os.environ.setdefault("CURRENT_EPS", "0.05")
-    os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "default_demonstrator")
+    os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "demo")
     os.environ.setdefault("TOPOLOGY_PATH", "/cloud_setup/data/topology/TopologyFile_demonstrator.json")
-    os.environ.setdefault("PF_INPUT_PATH", "/cloud_setup/data/device_config/demonstrator_setup.txt")
+    os.environ.setdefault("PF_INPUT_PATH", "/cloud_setup/data/device_config/Setup_demonstrator.txt")
     os.environ.setdefault("INFLUXDB_HOST", "ubuntu5g")
     os.environ.setdefault("INFLUXDB_PORT", "8086")
     os.environ.setdefault("DATABASE_UPDATE_PERIOD", "500")  # in ms

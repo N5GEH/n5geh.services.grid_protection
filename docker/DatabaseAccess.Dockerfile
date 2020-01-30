@@ -12,7 +12,7 @@ ENV NAMESPACE https://n5geh.de
 ENV ENABLE_CERTIFICATE False
 ENV CERTIFICATE_PATH_CLIENT_CERT /cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem
 ENV CERTIFICATE_PATH_CLIENT_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem
-ENV OPCUA_SERVER_DIR_NAME default_demonstrator
+ENV OPCUA_SERVER_DIR_NAME demo
 ENV DATABASE_UPDATE_PERIOD 500
 ENV INFLUXDB_HOST ubuntu5g
 ENV INFLUXDB_PORT 8086

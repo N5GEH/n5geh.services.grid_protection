@@ -22,9 +22,9 @@ ENV MAX_FAULTY_STATES 5
 ENV NOMINAL_CURRENT 2
 ENV CURRENT_EPS 0.05
 ENV VOLUME_PATH /data
-ENV OPCUA_SERVER_DIR_NAME default_demonstrator
+ENV OPCUA_SERVER_DIR_NAME demo
 ENV TOPOLOGY_PATH /cloud_setup/data/topology/TopologyFile_demonstrator.json
-ENV PF_INPUT_PATH /cloud_setup/data/device_config/demonstrator_setup.txt
+ENV PF_INPUT_PATH /cloud_setup/data/device_config/Setup_demonstrator.txt
 
 EXPOSE 4860
 LABEL type="protection_python" \

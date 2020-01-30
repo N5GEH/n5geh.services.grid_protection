@@ -12,7 +12,7 @@ ENV NAMESPACE https://n5geh.de
 ENV ENABLE_CERTIFICATE False
 ENV CERTIFICATE_PATH_CLIENT_CERT /cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem
 ENV CERTIFICATE_PATH_CLIENT_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem
-ENV OPCUA_SERVER_DIR_NAME default_demonstrator
+ENV OPCUA_SERVER_DIR_NAME demo
 ENV DEBUG_MODE_PRINT True
 ENV DEBUG_MODE_VAR_UPDATER True
 ENV UPDATE_PERIOD 500
