@@ -35,6 +35,7 @@ class DataHandler(object):
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
         self.TIMESTAMP_PRECISION = int(os.environ.get("TIMESTAMP_PRECISION"))
         self.DEVICE_PATH = os.environ.get("DEVICE_PATH")
+        self.THREE_PHASE_CALCULATION = bool(strtobool(os.environ.get("THREE_PHASE_CALCULATION")))
 
         self.opc_client = OPCClientDataHandler("n5geh_opcua_client1", "n5geh2019", self.SERVER_ENDPOINT)
 
@@ -239,8 +240,7 @@ class DataHandler(object):
                 break
 
         start = time.time_ns()                  # in ns
-        # TODO: enable three-phase if necessary
-        if self.check_data_queue_for_completeness(False):
+        if self.check_data_queue_for_completeness():
             dc = DiffCore(self.opc_client, self.ctrl_nodes_list, self.misc_nodes_list,
                           self.df_ph1, self.df_ph2, self.df_ph3)
             dc.start()
@@ -250,8 +250,8 @@ class DataHandler(object):
         if self.DEBUG_MODE_PRINT:
             print(str((end-start) / (1000 * 1000)) + " ms")  # in ms
 
-    def check_data_queue_for_completeness(self, three_phase=True):
-        if three_phase:
+    def check_data_queue_for_completeness(self):
+        if self.THREE_PHASE_CALCULATION:
             # drops all rows where not all columns filled with values != NaN and check if length is
             df_ph1 = self.df_ph1.dropna()
             df_ph2 = self.df_ph2.dropna()
@@ -304,6 +304,7 @@ if __name__ == "__main__":
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
     # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
+    # os.environ.setdefault("THREE_PHASE_CALCULATION", "False")
     # os.environ.setdefault("TIMESTAMP_PRECISION", "10")   # in ms
     # os.environ.setdefault("MAX_FAULTY_STATES", "5")
     # os.environ.setdefault("NOMINAL_CURRENT", "2")
@@ -316,9 +317,9 @@ if __name__ == "__main__":
     topo_path = os.environ.get("TOPOLOGY_PATH")
     opcua_dir_name = os.environ.get("OPCUA_SERVER_DIR_NAME")
 
-    LocalData.mFaultStates_ph1 = 0
-    LocalData.mFaultStates_ph2 = 0
-    LocalData.mFaultStates_ph3 = 0
+    LocalData.mFaultStateCounter_ph1 = 0
+    LocalData.mFaultStateCounter_ph2 = 0
+    LocalData.mFaultStateCounter_ph3 = 0
 
     mDataHandler = DataHandler(topo_path, opcua_dir_name)
     mDataHandler.start()

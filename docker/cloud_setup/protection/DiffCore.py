@@ -9,7 +9,9 @@ if sum of currents within the subgrid is zero.
 If there is an deviation greater than an epsilon, that ctrl_nodes gets new values via OPC-client.
 """
 import os
+from distutils.util import strtobool
 from threading import Thread
+
 from protection import LocalData
 
 __version__ = '0.6'
@@ -34,6 +36,8 @@ class DiffCore(Thread):
         self.NOMINAL_CURRENT = int(os.environ.get("NOMINAL_CURRENT", nominal_current))
         self.CURRENT_EPS = float(os.environ.get("CURRENT_EPS", eps))
         self.MAX_FAULTY_STATES = int(os.environ.get("MAX_FAULTY_STATES", number_of_faulty_dates_to_failure))
+        # three_phase_mode: True if calculation should be for all three phases, False if only single phase
+        self.THREE_PHASE_CALCULATION = bool(strtobool(os.environ.get("THREE_PHASE_CALCULATION")))
 
         self.work_status = 'init'
         self.opc_client = opc_client
@@ -68,60 +72,75 @@ class DiffCore(Thread):
     # ## I_sum for each phase of subgrid
     def compute_balance_of_current(self):
         self.df_ph1.loc[:, 'sum'] = self.df_ph1.sum(axis=1)
-        self.df_ph2.loc[:, 'sum'] = self.df_ph2.sum(axis=1)
-        self.df_ph3.loc[:, 'sum'] = self.df_ph3.sum(axis=1)
+
+        if self.THREE_PHASE_CALCULATION:
+            self.df_ph2.loc[:, 'sum'] = self.df_ph2.sum(axis=1)
+            self.df_ph3.loc[:, 'sum'] = self.df_ph3.sum(axis=1)
 
         self.evaluate_balance_of_current()
 
     # ## evaluate the balance (of current) for the closest timestamp
     def evaluate_balance_of_current(self):
         result_code = "VALID"
-        if abs(self.df_ph1.iloc[-1]['sum']) >= self.eps_abs:  # ## if sum of closest timestamp is smaller than threshold
+
+        if abs(self.df_ph1.iloc[-1]['sum']) >= self.eps_abs:  # ## if sum of closest timestamp is bigger than threshold
             result_code = "INVALID"
             self.evaluate_historical_balances_of_current(1)  # ## otherwise check if in past sum=0 was violated as well
+        else:
+            self.decrease_fault_state_counter(1)
 
-        if abs(self.df_ph2.iloc[-1]['sum']) >= self.eps_abs and result_code == "VALID":
-            result_code = "INVALID"
-            self.evaluate_historical_balances_of_current(2)
+        if self.THREE_PHASE_CALCULATION:
+            if abs(self.df_ph2.iloc[-1]['sum']) >= self.eps_abs and result_code == "VALID":
+                result_code = "INVALID"
+                self.evaluate_historical_balances_of_current(2)
+            else:
+                self.decrease_fault_state_counter(2)
 
-        if abs(self.df_ph3.iloc[-1]['sum']) >= self.eps_abs and result_code == "VALID":
-            result_code = "INVALID"
-            self.evaluate_historical_balances_of_current(3)
+            if abs(self.df_ph3.iloc[-1]['sum']) >= self.eps_abs and result_code == "VALID":
+                result_code = "INVALID"
+                self.evaluate_historical_balances_of_current(3)
+            else:
+                self.decrease_fault_state_counter(3)
 
-        if result_code == "VALID":
-            self.decrease_local_data_fault_status()
+        self.send_fault_state_counter_to_server()
 
         self.print_current_result(result_code)
 
     # ## check the recent balances (of current) of selected phase
     def evaluate_historical_balances_of_current(self, faulty_phase):
         if faulty_phase == 1:
+            self.increase_fault_state_counter(faulty_phase)
             # if within the last stored timestamps (size of MAX_ARCHIVES) are at least MAX_FAULTY_STATES
-            if LocalData.mFaultStates_ph1 >= self.MAX_FAULTY_STATES:
+            if LocalData.mFaultStateCounter_ph1 >= self.MAX_FAULTY_STATES:
                 self.set_power_infeed_limit(0)
-            else:
-                LocalData.mFaultStates_ph1 += 1
-        elif faulty_phase == 2:
-            # if within the last stored timestamps (size of MAX_ARCHIVES) are at least MAX_FAULTY_STATES
-            if LocalData.mFaultStates_ph2 >= self.MAX_FAULTY_STATES:
-                self.set_power_infeed_limit(0)
-            else:
-                LocalData.mFaultStates_ph2 += 1
-        elif faulty_phase == 3:
-            # if within the last stored timestamps (size of MAX_ARCHIVES) are at least MAX_FAULTY_STATES
-            if LocalData.mFaultStates_ph3 >= self.MAX_FAULTY_STATES:
-                self.set_power_infeed_limit(0)
-            else:
-                LocalData.mFaultStates_ph3 += 1
 
-        # update Status FAULTY_STATES
+        elif faulty_phase == 2:
+            self.increase_fault_state_counter(faulty_phase)
+            # if within the last stored timestamps (size of MAX_ARCHIVES) are at least MAX_FAULTY_STATES
+            if LocalData.mFaultStateCounter_ph2 >= self.MAX_FAULTY_STATES:
+                self.set_power_infeed_limit(0)
+
+        elif faulty_phase == 3:
+            self.increase_fault_state_counter(faulty_phase)
+            # if within the last stored timestamps (size of MAX_ARCHIVES) are at least MAX_FAULTY_STATES
+            if LocalData.mFaultStateCounter_ph3 >= self.MAX_FAULTY_STATES:
+                self.set_power_infeed_limit(0)
+
+    def send_fault_state_counter_to_server(self):
         nodes = []
         values = []
         for misc in self.misc_nodes_list:
-            if "FEHLER_COUNTER" in misc.opctag:
+            if "FEHLER_COUNTER" and "PH1" in misc.opctag:
                 nodes.append(misc)
-                values.append(max(LocalData.mFaultStates_ph1, LocalData.mFaultStates_ph2, LocalData.mFaultStates_ph3))
-                self.opc_client.set_vars(nodes, values)
+                values.append(LocalData.mFaultStateCounter_ph1)
+            elif "FEHLER_COUNTER" and "PH2" in misc.opctag:
+                nodes.append(misc)
+                values.append(LocalData.mFaultStateCounter_ph2)
+            elif "FEHLER_COUNTER" and "PH3" in misc.opctag:
+                nodes.append(misc)
+                values.append(LocalData.mFaultStateCounter_ph3)
+
+        self.opc_client.set_vars(nodes, values)
 
     def set_power_infeed_limit(self, upper_limit):
         # check the actual state of CTRLs
@@ -145,18 +164,25 @@ class DiffCore(Thread):
         # execute set_vars()
         self.opc_client.set_vars(nodes, values)
 
-        self.decrease_local_data_fault_status()
         if self.DEBUG_MODE_PRINT:
             print(self.__class__.__name__, "All CTRL devices are set to power feedin = 0.")
 
     @staticmethod
-    def decrease_local_data_fault_status():
-        if LocalData.mFaultStates_ph1 > 0:
-            LocalData.mFaultStates_ph1 -= 1
-        if LocalData.mFaultStates_ph2 > 0:
-            LocalData.mFaultStates_ph2 -= 1
-        if LocalData.mFaultStates_ph3 > 0:
-            LocalData.mFaultStates_ph3 -= 1
+    def decrease_fault_state_counter(faulty_phase):
+        if faulty_phase == 1 and LocalData.mFaultStateCounter_ph1 > 0:
+            LocalData.mFaultStateCounter_ph1 -= 1
+        elif faulty_phase == 2 and LocalData.mFaultStateCounter_ph2 > 0:
+            LocalData.mFaultStateCounter_ph2 -= 1
+        elif faulty_phase == 3 and LocalData.mFaultStateCounter_ph3 > 0:
+            LocalData.mFaultStateCounter_ph3 -= 1
+
+    def increase_fault_state_counter(self, faulty_phase):
+        if faulty_phase == 1 and LocalData.mFaultStateCounter_ph1 < self.MAX_FAULTY_STATES:
+            LocalData.mFaultStateCounter_ph1 += 1
+        elif faulty_phase == 2 and LocalData.mFaultStateCounter_ph2 < self.MAX_FAULTY_STATES:
+            LocalData.mFaultStateCounter_ph2 += 1
+        elif faulty_phase == 3 and LocalData.mFaultStateCounter_ph3 < self.MAX_FAULTY_STATES:
+            LocalData.mFaultStateCounter_ph3 += 1
 
     # def update_ctrl_states(self):
     #     ctrls = []
@@ -173,10 +199,14 @@ class DiffCore(Thread):
 
     def print_current_result(self, result_code):
         if self.DEBUG_MODE_PRINT:
-            print(result_code, ': '
-                  , str(format(self.df_ph1.iloc[-1]['sum'], '.2f')) + '(' + str(LocalData.mFaultStates_ph1) + ')' + ', '
-                  , str(format(self.df_ph2.iloc[-1]['sum'], '.2f')) + '(' + str(LocalData.mFaultStates_ph2) + ')' + ', '
-                  , str(format(self.df_ph3.iloc[-1]['sum'], '.2f')) + '(' + str(LocalData.mFaultStates_ph3) + ')' + ";" + '\n')
+            if self.THREE_PHASE_CALCULATION:
+                print(result_code, ': '
+                      , str(format(self.df_ph1.iloc[-1]['sum'], '.2f')) + '(' + str(LocalData.mFaultStateCounter_ph1) + ')' + ', '
+                      , str(format(self.df_ph2.iloc[-1]['sum'], '.2f')) + '(' + str(LocalData.mFaultStateCounter_ph2) + ')' + ', '
+                      , str(format(self.df_ph3.iloc[-1]['sum'], '.2f')) + '(' + str(LocalData.mFaultStateCounter_ph3) + ')' + ";" + '\n')
+            else:
+                print(result_code, ': '
+                      , str(format(self.df_ph1.iloc[-1]['sum'], '.2f')) + '(' + str(LocalData.mFaultStateCounter_ph1) + ')' + ";" + '\n')
 
     def print_work_status(self):
         print(self.__class__.__name__, self.work_status)

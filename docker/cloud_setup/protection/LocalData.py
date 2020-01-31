@@ -7,7 +7,7 @@ This module stores some global used variables.
 """
 
 
-global mFaultStates_ph1
-global mFaultStates_ph2
-global mFaultStates_ph3
-global mFaultStates_phn
+mFaultStateCounter_ph1 = 0
+mFaultStateCounter_ph2 = 0
+mFaultStateCounter_ph3 = 0
+mFaultStateCounter_phn = 0

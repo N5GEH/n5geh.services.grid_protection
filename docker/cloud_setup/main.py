@@ -57,6 +57,7 @@ if __name__ == "__main__":
     os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
     os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
     os.environ.setdefault("DEBUG_MODE_PRINT", "True")
+    os.environ.setdefault("THREE_PHASE_CALCULATION", "False")
     os.environ.setdefault("UPDATE_PERIOD", "500")              # in ms
     os.environ.setdefault("TIMESTAMP_PRECISION", "10")         # in ms
     os.environ.setdefault("MAX_FAULTY_STATES", "5")
@@ -64,10 +65,10 @@ if __name__ == "__main__":
     os.environ.setdefault("CURRENT_EPS", "0.05")
     os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "demo")
     os.environ.setdefault("TOPOLOGY_PATH", "/cloud_setup/data/topology/TopologyFile_demonstrator.json")
-    os.environ.setdefault("PF_INPUT_PATH", "/cloud_setup/data/device_config/Setup_demonstrator.txt")
+    os.environ.setdefault("DEVICE_PATH", "/cloud_setup/data/device_config/Setup_demonstrator.txt")
     os.environ.setdefault("INFLUXDB_HOST", "ubuntu5g")
     os.environ.setdefault("INFLUXDB_PORT", "8086")
-    os.environ.setdefault("DATABASE_UPDATE_PERIOD", "500")  # in ms
+    os.environ.setdefault("DATABASE_UPDATE_PERIOD", "1000")  # in ms
 
     # setup OPC server
     mServer = CustomServer()
