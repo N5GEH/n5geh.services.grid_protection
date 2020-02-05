@@ -85,6 +85,7 @@ setup(
         'lxml>=4.4.0',
         'pytz>=2019.2',
         'pyyaml>=5.1.2',
+        'pandas>=1.0.0',
         'opcua',
         # 'opcua==0.98.3' # maybe better alternative: load fork from https://github.com/SebastianDD/python-opcua@n5geh
     ],
@@ -99,13 +100,10 @@ setup(
     extras_require={
         'dev': [],
         'protection': [
-            'pandas>=1.0.0',
         ],
         'sim_device': [
-            'pandas>=1.0.0',
         ],
         'database_access': [
-            'pandas>=1.0.0',
             'influxdb>=5.2.3',
         ],
     },
