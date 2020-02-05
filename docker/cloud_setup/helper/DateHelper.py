@@ -27,6 +27,11 @@ class DateHelper(object):
         return dt
 
     @staticmethod
+    def get_local_datetime():
+        dt = DateHelper.create_local_utc_datetime()
+        return DateHelper.transform_timezone_to_local(dt)
+
+    @staticmethod
     def format_datetime(dt):
         ts = pd.to_datetime(dt, format="%Y-%m-%d-%H:%M:%S.%f")
         # ts.round('10ms')    # round to 10ms

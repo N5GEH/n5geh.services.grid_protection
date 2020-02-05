@@ -12,6 +12,7 @@ import sys
 import os
 from distutils.util import strtobool
 
+from helper.DateHelper import DateHelper
 from opcua import Server, ua, uamethod
 from opcua.server.user_manager import UserManager
 from opcua.ua.uaerrors import BadNoMatch
@@ -157,10 +158,10 @@ class CustomServer(object):
             obj = self.root.get_child(["0:Objects", ("{}:" + dir_name).format(self.idx)])
             self.server.delete_nodes([obj], True)
         except BadNoMatch:
-            print("There is no old folder with the name: " + dir_name)
+            print(DateHelper.get_local_datetime(), "There is no old folder with the name: " + dir_name)
 
         folder = self.obj.add_folder(self.idx, dir_name)
-        print("Add subfolder: " + dir_name)
+        print(DateHelper.get_local_datetime(), "Add subfolder: " + dir_name)
 
     @uamethod
     def register_opc_tag(self, parent, opctag, variant_type="Float", parent_node=""):
@@ -168,35 +169,38 @@ class CustomServer(object):
         try:
             obj = self.root.get_child(["0:Objects", ("{}:" + parent_node).format(self.idx)])
         except BadNoMatch:
-            print("register_opc_tag(): OPCUA_server_dir the variables should be assigned to, doesn't exists.")
+            print(DateHelper.get_local_datetime(),
+                  "register_opc_tag(): OPCUA_server_dir the variables should be assigned to, doesn't exists.")
             raise
 
         var = ua.Variant(0, strings_to_vartyps(variant_type))
         mvar = obj.add_variable(self.idx, opctag.strip(), var)
         mvar.set_writable()
-        print("Add variable: " + opctag + " of type " + variant_type + " @node " + parent_node)
+        print(DateHelper.get_local_datetime(),
+              "Add variable: " + opctag + " of type " + variant_type + " @node " + parent_node)
 
     @uamethod
     def set_pv_active_power_setpoint(self, parent, setpoint, parent_node=""):
         try:
             obj = self.root.get_child(["0:Objects", ("{}:" + parent_node).format(self.idx)])
         except BadNoMatch:
-            print("set_pv_active_power_setpoint(): assign new value to node failed.")
+            print(DateHelper.get_local_datetime(), "set_pv_active_power_setpoint(): assign new value to node failed.")
             raise
 
         for mvar in obj.get_variables():
             if "PV" and "CTRL" in mvar.get_browse_name().Name:
                 variant_type = mvar.get_data_value().Value.VariantType
                 mvar.set_value(clamp(setpoint, 0, 1000), variant_type)
-                print("Set Value of node " + mvar.get_browse_name().Name + " to " + str(clamp(setpoint, 0, 1000)))
+                print(DateHelper.get_local_datetime(),
+                      "Set Value of node " + mvar.get_browse_name().Name + " to " + str(clamp(setpoint, 0, 1000)))
 
     def start(self):
         self.server.start()
-        print(self.__class__.__name__, " successful started")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful started")
 
     def stop(self):
         self.server.stop()
-        print(self.__class__.__name__, " successful stopped")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful stopped")
 
 
 if __name__ == "__main__":
