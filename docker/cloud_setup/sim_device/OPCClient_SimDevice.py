@@ -32,9 +32,11 @@ class VarUpdater(Thread):
     def __init__(self, mvars, start_threshold, period=500):
         super().__init__()
 
-        self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
-        self.TIMESTAMP_PRECISION = int(os.environ.get("TIMESTAMP_PRECISION"))
-        self.PERIOD = int(os.environ.get("UPDATE_PERIOD", period))
+        self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT", "False")))
+        self.TIMESTAMP_PRECISION = int(os.environ.get("AUTO_VAR_UPDATER_TIMESTAMP_PRECISION"))
+        self.PERIOD = int(os.environ.get("AUTO_VAR_UPDATER_UPDATE_PERIOD", period))
+        self.TIME_STEPS_NO_ERROR = int(os.environ.get("AUTO_VAR_UPDATER_TIME_STEPS_NO_ERROR", "60"))
+        self.TIME_STEPS_ERROR = int(os.environ.get("AUTO_VAR_UPDATER_TIME_STEPS_ERROR", "60"))
 
         self.ticker = threading.Event()
         self.stop_request = False
@@ -51,7 +53,7 @@ class VarUpdater(Thread):
         while not self.stop_request or len(self.vars) >= 1:
             if time.time_ns() > (start_time + self.threshold):
                 self.run2()
-                print(self.__class__.__name__, "SimDevice VarUpdater started")
+                print(self.__class__.__name__, "@SimDevice started")
                 break
 
     def run2(self):
@@ -85,15 +87,17 @@ class VarUpdater(Thread):
 
             t1 = count / 1000
             # make deviation after 60 time steps
-            if count > 60:
+            if count > self.TIME_STEPS_NO_ERROR:
                 t2 = count * 0.05 / 1000
             count += 1
 
             # reset after 120 time steps
-            if count > 120:
+            if count > self.TIME_STEPS_NO_ERROR + self.TIME_STEPS_ERROR:
                 count = 0
                 t1 = 0
                 t2 = 0
+
+        print(self.__class__.__name__, "@SimDevice stopped")
 
 
 class OPCClientSimDevice(CustomClient):
@@ -107,32 +111,32 @@ class OPCClientSimDevice(CustomClient):
             "CERTIFICATE_PATH_CLIENT_CERT")
         self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY = os.path.dirname(os.getcwd()) + os.environ.get(
             "CERTIFICATE_PATH_CLIENT_PRIVATE_KEY")
-        self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
+        self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT", "False")))
 
         super().__init__(self.SERVER_ENDPOINT, self.NAMESPACE, self.ENABLE_CERTIFICATE, self.CERTIFICATE_PATH_CLIENT_CERT,
                          self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY, auth_name, auth_password, self.DEBUG_MODE_PRINT)
 
         # custom
-        self.THRESHOLD = int(os.environ.get("START_THRESHOLD", start_threshold)) * 1000 * 1000   # conversion into ns
+        self.THRESHOLD = int(os.environ.get("AUTO_VAR_UPDATER_START_THRESHOLD", start_threshold)) * 1000 * 1000   # conversion into ns
         self.OPCUA_DIR_NAME = os.environ.get("OPCUA_SERVER_DIR_NAME")
 
         self.meas_device_tag = meas_device_tag
         self.vup = None
 
-        print(self.__class__.__name__, " successful init")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful init")
 
     def start(self):
         super().start()
         self.prepare_auto_updater()
         self.start_auto_updater()
 
-        print(self.__class__.__name__, " successful connected")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful connected")
         
     def stop(self):
         super().stop()
         self.vup.stop()
 
-        print(self.__class__.__name__, " successful disconnected")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful disconnected")
 
     # region autoUpdater
     def prepare_auto_updater(self):
@@ -147,14 +151,14 @@ class OPCClientSimDevice(CustomClient):
         print(self.__class__.__name__, type(self.vup))
         self.vup.start()
 
-        print(self.__class__.__name__, "MeasSim started Auto-VarUpdater")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, "MeasSim started Auto-VarUpdater")
     # endregion
 
 
 if __name__ == "__main__":
     ##################
     # ### if using local (means not in Docker): uncomment this lines!
-    # local = True  # if server is local or as Docker
+    # local = False  # if server is local or as Docker
     # if local:
     #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
     # else:
@@ -163,11 +167,13 @@ if __name__ == "__main__":
     # os.environ.setdefault("ENABLE_CERTIFICATE", "False")
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
-    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "demo")
+    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "simulation")
     # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
-    # os.environ.setdefault("UPDATE_PERIOD", "100")        # in ms
-    # os.environ.setdefault("TIMESTAMP_PRECISION", "10")   # in ms
-    # os.environ.setdefault("START_THRESHOLD", "5000")     # in ms
+    # os.environ.setdefault("AUTO_VAR_UPDATER_UPDATE_PERIOD", "100")        # in ms
+    # os.environ.setdefault("AUTO_VAR_UPDATER_TIMESTAMP_PRECISION", "10")   # in ms
+    # os.environ.setdefault("AUTO_VAR_UPDATER_START_THRESHOLD", "5000")     # in ms
+    # os.environ.setdefault("AUTO_VAR_UPDATER_TIME_STEPS_NO_ERROR", "60")
+    # os.environ.setdefault("AUTO_VAR_UPDATER_TIME_STEPS_ERROR", "60")
     ##################
 
     meas_device_tags = ["RES"]

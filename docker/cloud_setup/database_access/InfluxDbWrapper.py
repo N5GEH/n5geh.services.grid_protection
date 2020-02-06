@@ -3,7 +3,7 @@
 
 """This is the Database Wrapper for a InfluxDB.
 
-This class can write and read from a inlfuxDB instance
+This class can write and read from a InfluxDB instance
 """
 
 import os
@@ -12,6 +12,7 @@ import threading
 
 from distutils.util import strtobool
 
+from helper.DateHelper import DateHelper
 from influxdb import DataFrameClient
 from database_access.OPCClient_Database import OPCClientDatabase
 
@@ -24,7 +25,7 @@ __author__ = 'Sebastian Krahmer'
 class InfluxDbWrapper(object):
     def __init__(self, host='localhost', port=8086, update_period=500, db_name="demonstrator_grid_protection"):
         self.UPDATE_PERIOD = int(os.environ.get("DATABASE_UPDATE_PERIOD", update_period))
-        self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
+        self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT", "False")))
         self.INFLUXDB_HOST = os.environ.get("INFLUXDB_HOST", host)
         self.INFLUXDB_PORT = os.environ.get("INFLUXDB_PORT", port)
         self.INFLUXDB_NAME = os.environ.get("INFLUXDB_NAME", db_name)
@@ -45,7 +46,7 @@ class InfluxDbWrapper(object):
         # OPC Client
         self.opc_client = OPCClientDatabase()
 
-        print(self.__class__.__name__, " successful init")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful init")
 
     def start(self):
         self.opc_client.start()
@@ -80,11 +81,10 @@ if __name__ == "__main__":
     # os.environ.setdefault("ENABLE_CERTIFICATE", "False")
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
-    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "demo")
+    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "simulation")
     # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
     # os.environ.setdefault("DATABASE_UPDATE_PERIOD", "1000")        # in microsec
-    # os.environ.setdefault("INFLUXDB_NAME", "demonstrator_grid_protection")
-
+    # os.environ.setdefault("INFLUXDB_NAME", "simulation_grid_protection")
     ##################
 
     mInfluxDbWrapper = InfluxDbWrapper()

@@ -33,7 +33,7 @@ class OPCClientDatabase(CustomClient):
             "CERTIFICATE_PATH_CLIENT_CERT")
         self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY = os.path.dirname(os.getcwd()) + os.environ.get(
             "CERTIFICATE_PATH_CLIENT_PRIVATE_KEY")
-        self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
+        self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT", "False")))
 
         super().__init__(self.SERVER_ENDPOINT, self.NAMESPACE, self.ENABLE_CERTIFICATE, self.CERTIFICATE_PATH_CLIENT_CERT,
                          self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY, auth_name, auth_password, self.DEBUG_MODE_PRINT)
@@ -49,7 +49,7 @@ class OPCClientDatabase(CustomClient):
 
         self.df = pd.DataFrame()
 
-        print(self.__class__.__name__, " successful init")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful init")
 
     def start(self):
         # start opc client
@@ -65,11 +65,11 @@ class OPCClientDatabase(CustomClient):
         # make subscription
         self.make_subscription(self.OPCUA_DIR_NAME, self.get_server_vars(self.OPCUA_DIR_NAME))
 
-        print(self.__class__.__name__, " successful connected")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful connected")
         
     def stop(self):
         super().stop()
-        print(self.__class__.__name__, " successful disconnected")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful disconnected")
 
     # region subscription
     def make_subscription(self, dir_name, list_of_nodes_to_subscribe, sub_interval=1):
@@ -85,7 +85,7 @@ class OPCClientDatabase(CustomClient):
             self._subscribe(dir_name, sub_handler, self.subscription, self.subscription_handle,
                             list_of_nodes_to_subscribe, self.subscribed_nodes, sub_interval)
 
-        print(self.__class__.__name__, " successful updates subscription")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful updates subscription")
 
     # subscription callback
     def update_data(self, node, datetime_source, val):

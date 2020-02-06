@@ -32,7 +32,7 @@ class DataHandler(object):
         :param dir_name (String): name of subfolder to create; parent of all created nodes
         """
         self.SERVER_ENDPOINT = os.environ.get("SERVER_ENDPOINT")
-        self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
+        self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT", "False")))
         self.TIMESTAMP_PRECISION = int(os.environ.get("TIMESTAMP_PRECISION"))
         self.DEVICE_PATH = os.environ.get("DEVICE_PATH")
         self.THREE_PHASE_CALCULATION = bool(strtobool(os.environ.get("THREE_PHASE_CALCULATION")))
@@ -79,13 +79,14 @@ class DataHandler(object):
         # Set status nodes used monitoring and topology/device updates
         self.set_status_flags(self.topo_path, [], self.server_dir_name)
 
-        print(self.__class__.__name__, " finished Start-Routine")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " finished Start-Routine")
 
     def register_devices(self, dir_name, device_config_path):
         self.opc_client.create_dir_on_server(dir_name)
         self.opc_client.register_variables_to_server(dir_name, device_config_path)
 
-        print(self.__class__.__name__, " successful register devices from file:" + device_config_path)
+        print(DateHelper.get_local_datetime(), self.__class__.__name__,
+              " successful register devices from file:" + device_config_path)
 
     def set_meas_topology(self, path, list_of_nodes_to_reset, dir_name):
         # get at server registered vars allocated as CustomVar
@@ -119,7 +120,8 @@ class DataHandler(object):
                     elif "CTRL" in topo_opctag:
                         self.ctrl_nodes_list.append(var)
                     break
-        print(self.__class__.__name__, " successful updated meas topology from file:" + path)
+        print(DateHelper.get_local_datetime(), self.__class__.__name__,
+              " successful updated meas topology from file:" + path)
 
         # update OPC-client: delete old subscription and start new subscription
         self.update_subscription_opc_client(self.Iph1_nodes_list + self.Iph2_nodes_list + self.Iph3_nodes_list +
@@ -143,7 +145,8 @@ class DataHandler(object):
                         self.misc_nodes_list.append(var)
                     break
 
-        print(self.__class__.__name__, " successful updated status flags from file:" + path)
+        print(DateHelper.get_local_datetime(), self.__class__.__name__,
+              " successful updated status flags from file:" + path)
 
         # update OPC-client: delete old subscription and start new subscription
         self.update_subscription_opc_client(self.misc_nodes_list, True, 500)
@@ -248,7 +251,7 @@ class DataHandler(object):
         end = time.time_ns()                    # in ns
 
         if self.DEBUG_MODE_PRINT:
-            print(str((end-start) / (1000 * 1000)) + " ms")  # in ms
+            print(DateHelper.get_local_datetime(), str((end-start) / (1000 * 1000)) + " ms")  # in ms
 
     def check_data_queue_for_completeness(self):
         if self.THREE_PHASE_CALCULATION:
@@ -287,13 +290,13 @@ class DataHandler(object):
                 values.append(1000)
         self.opc_client.set_vars(ctrls, values)
 
-        print(self.__class__.__name__, " successful set startValues for ctrl devices")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful set startValues for ctrl devices")
 
 
 if __name__ == "__main__":
     ##################
     # if using local (means not in Docker)
-    # local = True   # if server is local or as Docker
+    # local = False   # if server is local or as Docker
     # if local:
     #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
     # else:
@@ -309,7 +312,7 @@ if __name__ == "__main__":
     # os.environ.setdefault("MAX_FAULTY_STATES", "5")
     # os.environ.setdefault("NOMINAL_CURRENT", "2")
     # os.environ.setdefault("CURRENT_EPS", "0.05")
-    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "demo")
+    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "simulation")
     # os.environ.setdefault("TOPOLOGY_PATH", "/data/topology/TopologyFile_demonstrator.json")
     # os.environ.setdefault("DEVICE_PATH", "/data/device_config/Setup_demonstrator.txt")
     ##################

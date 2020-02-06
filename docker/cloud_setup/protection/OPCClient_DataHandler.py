@@ -9,6 +9,7 @@ This class setups a new OPC-client for a server with a address specified by os.e
 import os
 import sys
 
+from helper.DateHelper import DateHelper
 from opcua import ua
 from distutils.util import strtobool
 # from opcua.ua import DataValue
@@ -59,7 +60,7 @@ class OPCClientDataHandler(CustomClient):
         self.ENABLE_CERTIFICATE = bool(strtobool(os.environ.get("ENABLE_CERTIFICATE")))
         self.CERTIFICATE_PATH_CLIENT_CERT = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_CLIENT_CERT")
         self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY = os.path.dirname(os.getcwd()) + os.environ.get("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY")
-        self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT")))
+        self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT", "False")))
 
         super().__init__(server_endpoint, self.NAMESPACE, self.ENABLE_CERTIFICATE, self.CERTIFICATE_PATH_CLIENT_CERT,
                          self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY, auth_name, auth_password, self.DEBUG_MODE_PRINT)
@@ -73,17 +74,17 @@ class OPCClientDataHandler(CustomClient):
         self.subscription_meas_nodes = None
         self.subscription_handle_meas_nodes = None
 
-        print(self.__class__.__name__, " successful init")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful init")
 
     def start(self):
         super().start()
 
-        print(self.__class__.__name__, " successful connected")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful connected")
 
     def stop(self):
         super().stop()
 
-        print(self.__class__.__name__, " successful disconnected")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful disconnected")
 
     # region subscription
     def make_subscription(self, target_object, dir_name, list_of_nodes_to_subscribe, are_status_nodes=False,
@@ -107,7 +108,7 @@ class OPCClientDataHandler(CustomClient):
                 self._subscribe(dir_name, sub_handler, self.subscription_meas_nodes, self.subscription_handle_meas_nodes,
                                 list_of_nodes_to_subscribe, self.subscribed_meas_nodes, sub_interval)
 
-        print(self.__class__.__name__, " successful updates subscription")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful updates subscription")
     # endregion
 
     def set_vars(self, ctrl_list, value_list):

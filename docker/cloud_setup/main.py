@@ -56,19 +56,28 @@ if __name__ == "__main__":
     os.environ.setdefault("CERTIFICATE_PATH_SERVER_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_server_private_key.pem")
     os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
     os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
-    os.environ.setdefault("DEBUG_MODE_PRINT", "True")
+    os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "demo")
+    os.environ.setdefault("TOPOLOGY_PATH", "/cloud_setup/data/topology/TopologyFile_demonstrator.json")
+    os.environ.setdefault("DEVICE_PATH", "/cloud_setup/data/device_config/Setup_demonstrator.txt")
+
     os.environ.setdefault("THREE_PHASE_CALCULATION", "False")
-    os.environ.setdefault("UPDATE_PERIOD", "500")              # in ms
+    os.environ.setdefault("UPDATE_PERIOD", "50")              # in ms
     os.environ.setdefault("TIMESTAMP_PRECISION", "10")         # in ms
     os.environ.setdefault("MAX_FAULTY_STATES", "5")
     os.environ.setdefault("NOMINAL_CURRENT", "2")
     os.environ.setdefault("CURRENT_EPS", "0.05")
-    os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "demo")
-    os.environ.setdefault("TOPOLOGY_PATH", "/cloud_setup/data/topology/TopologyFile_demonstrator.json")
-    os.environ.setdefault("DEVICE_PATH", "/cloud_setup/data/device_config/Setup_demonstrator.txt")
+
+    os.environ.setdefault("AUTO_VAR_UPDATER_UPDATE_PERIOD", "100")        # in ms
+    os.environ.setdefault("AUTO_VAR_UPDATER_TIMESTAMP_PRECISION", "10")   # in ms
+    os.environ.setdefault("AUTO_VAR_UPDATER_START_THRESHOLD", "5000")     # in ms
+    os.environ.setdefault("AUTO_VAR_UPDATER_TIME_STEPS_NO_ERROR", "60")
+    os.environ.setdefault("AUTO_VAR_UPDATER_TIME_STEPS_ERROR", "60")
+
     os.environ.setdefault("INFLUXDB_HOST", "ubuntu5g")
     os.environ.setdefault("INFLUXDB_PORT", "8086")
     os.environ.setdefault("DATABASE_UPDATE_PERIOD", "1000")  # in ms
+
+    os.environ.setdefault("DEBUG_MODE_PRINT", "True")
 
     # setup OPC server
     mServer = CustomServer()
@@ -85,8 +94,6 @@ if __name__ == "__main__":
     for tag in meas_device_tags:
         mClient_MeasSim = OPCClientSimDevice(tag, "n5geh_opcua_client2", "n5geh2020")
         mClient_MeasSim.start()
-        # meas_devices.append(mClient_MeasSim)
-    # runInParallel(meas_devices[0].start(), meas_devices[1].start())
 
     # # setup influxDb wrapper
     #     mInfluxDbWrapper = InfluxDbWrapper()

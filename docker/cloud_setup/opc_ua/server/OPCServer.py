@@ -10,6 +10,7 @@ This class setups a new OPC-server with:
 
 import sys
 import os
+import logging
 from distutils.util import strtobool
 
 from helper.DateHelper import DateHelper
@@ -204,6 +205,11 @@ class CustomServer(object):
 
 
 if __name__ == "__main__":
+    # optional: setup logging
+    logging.basicConfig(level=logging.WARN)
+    logger = logging.getLogger("opcua.uaprocessor")
+    logger.setLevel(logging.DEBUG)
+
     #################################
     # if using local (means not in Docker)
     # local = True   # if server is local or as Docker

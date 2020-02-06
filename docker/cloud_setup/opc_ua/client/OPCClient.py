@@ -11,6 +11,7 @@ This class can set new values for OPC-nodes of a given list.
 """
 import sys
 
+from helper.DateHelper import DateHelper
 from opcua import ua, Client
 # from opcua.ua import DataValue
 
@@ -74,14 +75,25 @@ class CustomClient(object):
         self.idx = None
 
     def start(self):
-        self.client.connect()
+        try:
+            self.client.connect()
+        except Exception as ex:
+            print(DateHelper.get_local_datetime(), ex)
+            sys.exit(1)
+        except ConnectionError as er:
+            print(DateHelper.get_local_datetime(), er)
+            sys.exit(1)
+
         # Now getting root variable node using its browse path
         self.root = self.client.get_root_node()
         uri = self.NAMESPACE
         self.idx = self.client.get_namespace_index(uri)
 
     def stop(self):
-        self.client.disconnect()
+        try:
+            self.client.disconnect()
+        except Exception as ex:
+            print("Couldn't stop OPC Client because of: ", ex)
 
     def get_server_vars(self, child):
         # TODO raise TimeOutError when called after subscription was set up, (cf. ua_client.py: send_request)

@@ -20,7 +20,6 @@ ENV DEBUG_MODE_PRINT False
 ENV INFLUXDB_NAME demonstrator_grid_protection
 
 
-EXPOSE INFLUXDB_PORT
 LABEL type="database_access_python" \
       version="0.6"
 CMD [ "python", "/usr/src/cloud_setup/database_access/InfluxDbWrapper.py"]
