@@ -86,11 +86,12 @@ setup(
         'pytz>=2019.2',
         'pyyaml>=5.1.2',
         'pandas>=1.0.0',
-        'opcua',
+        # 'opcua',
         # 'opcua==0.98.3' # maybe better alternative: load fork from https://github.com/SebastianDD/python-opcua@n5geh
     ],
     dependency_links=[
-        'git+https://github.com/FreeOpcUa/python-opcua.git@master#egg=opcua-0.98.9.1',
+        # 'git+https://github.com/FreeOpcUa/python-opcua.git@master#egg=opcua-0.98.9.1',
+        'git+https://github.com/SebastianDD/python-opcua.git'
     ],
 
     # List additional groups of dependencies here (e.g. development
