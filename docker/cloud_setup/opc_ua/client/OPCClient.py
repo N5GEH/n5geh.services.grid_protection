@@ -77,11 +77,11 @@ class CustomClient(object):
     def start(self):
         try:
             self.client.connect()
-        except Exception as ex:
-            print(DateHelper.get_local_datetime(), ex)
-            sys.exit(1)
         except ConnectionError as er:
             print(DateHelper.get_local_datetime(), er)
+            sys.exit(1)
+        except Exception as ex:
+            print(DateHelper.get_local_datetime(), ex)
             sys.exit(1)
 
         # Now getting root variable node using its browse path

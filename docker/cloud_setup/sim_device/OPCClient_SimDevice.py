@@ -52,8 +52,8 @@ class VarUpdater(Thread):
         start_time = time.time_ns()
         while not self.stop_request or len(self.vars) >= 1:
             if time.time_ns() > (start_time + self.threshold):
+                print(DateHelper.get_local_datetime(), self.__class__.__name__, " started")
                 self.run2()
-                print(self.__class__.__name__, "@SimDevice started")
                 break
 
     def run2(self):
@@ -65,25 +65,31 @@ class VarUpdater(Thread):
             # self.vars.set_value(self.count)
 
             now = DateHelper.create_local_utc_datetime()
-            for var in self.vars:
-                # add "noise" to dt in the range [0 TIMESTAMP_PRECISION]
-                delta = random.random() * self.TIMESTAMP_PRECISION * 1000
-                now_noised = now + datetime.timedelta(0, 0, delta)
 
-                dv = DataValue()
-                dv.SourceTimestamp = now
-                # dv.SourceTimestamp = now_noised
+            try:
+                for var in self.vars:
+                    # add "noise" to dt in the range [0 TIMESTAMP_PRECISION]
+                    delta = random.random() * self.TIMESTAMP_PRECISION * 1000
+                    now_noised = now + datetime.timedelta(0, 0, delta)
 
-                if "LAST_I_PH1_RES" in var.get_browse_name().Name:
-                    dv.Value = ua.Variant(2*sin(100*pi*(t1+t2)))
-                else:
-                    if "TRAFO_I_PH1_RES" in var.get_browse_name().Name:
-                        dv.Value = ua.Variant(2 * 2 * sin(100 * pi * t1))
+                    dv = DataValue()
+                    dv.SourceTimestamp = now
+                    # dv.SourceTimestamp = now_noised
+
+                    if "LAST_I_PH1_RES" in var.get_browse_name().Name:
+                        dv.Value = ua.Variant(2*sin(100*pi*(t1+t2)))
                     else:
-                        dv.Value = ua.Variant(2*sin(100*pi*t1))
-                var.set_value(dv)
-                if self.DEBUG_MODE_PRINT:
-                    print(self.__class__.__name__, dv.Value)
+                        if "TRAFO_I_PH1_RES" in var.get_browse_name().Name:
+                            dv.Value = ua.Variant(2 * 2 * sin(100 * pi * t1))
+                        else:
+                            dv.Value = ua.Variant(2*sin(100*pi*t1))
+                    var.set_value(dv)
+                    if self.DEBUG_MODE_PRINT:
+                        print(self.__class__.__name__, dv.Value)
+
+            except Exception as ex:
+                print(DateHelper.get_local_datetime(), ex)
+                sys.exit(1)
 
             t1 = count / 1000
             # make deviation after 60 time steps
@@ -97,7 +103,7 @@ class VarUpdater(Thread):
                 t1 = 0
                 t2 = 0
 
-        print(self.__class__.__name__, "@SimDevice stopped")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " stopped")
 
 
 class OPCClientSimDevice(CustomClient):
@@ -151,7 +157,7 @@ class OPCClientSimDevice(CustomClient):
         print(self.__class__.__name__, type(self.vup))
         self.vup.start()
 
-        print(DateHelper.get_local_datetime(), self.__class__.__name__, "MeasSim started Auto-VarUpdater")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, "started Auto-VarUpdater")
     # endregion
 
 
