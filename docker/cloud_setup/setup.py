@@ -79,6 +79,10 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     python_requires='>=3.7.0',
+    dependency_links=[
+        # 'git+https://github.com/FreeOpcUa/python-opcua.git@master#egg=opcua-0.98.9.1',
+        'git+https://github.com/SebastianDD/python-opcua.git@master#egg=opcua-0.98.9.latest.fork'
+    ],
     install_requires=[
         'cryptography>=2.7',
         'lxml>=4.4.0',
@@ -89,11 +93,6 @@ setup(
         'opcua==0.98.9.latest.fork',
         # 'opcua==0.98.3' # maybe better alternative: load fork from https://github.com/SebastianDD/python-opcua@n5geh
     ],
-    dependency_links=[
-        # 'git+https://github.com/FreeOpcUa/python-opcua.git@master#egg=opcua-0.98.9.1',
-        'https://github.com/SebastianDD/python-opcua/tarball/master#egg=opcua-0.98.9.latest.fork'
-    ],
-
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
     # for example:
