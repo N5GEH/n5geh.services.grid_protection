@@ -81,7 +81,7 @@ setup(
     python_requires='>=3.7.0',
     dependency_links=[
         # 'git+https://github.com/FreeOpcUa/python-opcua.git@master#egg=opcua-0.98.9.1',
-        'git+https://github.com/SebastianDD/python-opcua.git@master#egg=opcua-0.98.9.latest.fork',
+        'https://github.com/SebastianDD/python-opcua/tarball/master#egg=opcua-0.98.9',
     ],
     install_requires=[
         'cryptography>=2.7',
@@ -90,7 +90,7 @@ setup(
         'pytz>=2019.2',
         'pyyaml>=5.1.2',
         'pandas>=1.0.0',
-        'opcua==0.98.9.latest.fork',
+        'opcua>=0.98.9',
         # 'opcua==0.98.3' # maybe better alternative: load fork from https://github.com/SebastianDD/python-opcua@n5geh
     ],
     # List additional groups of dependencies here (e.g. development
