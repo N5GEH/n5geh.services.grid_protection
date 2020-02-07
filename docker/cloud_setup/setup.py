@@ -81,7 +81,7 @@ setup(
     python_requires='>=3.7.0',
     dependency_links=[
         # 'git+https://github.com/FreeOpcUa/python-opcua.git@master#egg=opcua-0.98.9.1',
-        'git+https://github.com/SebastianDD/python-opcua.git@master#egg=opcua-0.98.9.latest.fork'
+        'git+https://github.com/SebastianDD/python-opcua.git@master#egg=opcua-0.98.9.latest.fork',
     ],
     install_requires=[
         'cryptography>=2.7',
