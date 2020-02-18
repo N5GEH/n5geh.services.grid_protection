@@ -3,8 +3,8 @@ FROM python:3.7-slim-buster
 # install dependencies and libs via setup.py in cloud_setup
 WORKDIR /usr/src/cloud_setup
 ADD docker/cloud_setup .
-RUN pip install -r requirements.txt
 RUN pip install -e .
+RUN pip install -r requirements.txt
 
 # add environment variables
 ENV PYTHONPATH /usr/src
