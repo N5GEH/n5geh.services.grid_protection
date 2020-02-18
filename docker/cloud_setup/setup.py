@@ -87,7 +87,7 @@ setup(
         'pyyaml>=5.1.2',
         'pandas>=1.0.0',
         # 'opcua>=0.98.9',
-        # 'opcua==0.98.3' # maybe better alternative: load fork from https://github.com/SebastianDD/python-opcua@n5geh
+        # 'opcua==0.98.3' # for powerfactory maybe better alternative
     ],
     dependency_links=[
         # 'git+https://github.com/FreeOpcUa/python-opcua.git@master#egg=opcua-0.98.9.1',
