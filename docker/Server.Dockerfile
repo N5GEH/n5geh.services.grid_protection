@@ -1,5 +1,5 @@
 FROM python:3.7-slim-buster
-RUN apt-get install -y git
+RUN apt-get update && apt-get install -y git
 
 # install dependencies and libs via setup.py in cloud_setup
 WORKDIR /usr/src/cloud_setup
