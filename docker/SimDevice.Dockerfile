@@ -9,7 +9,7 @@ RUN pip install -e .
 RUN pip install -e .[sim_device]
 
 # remove git and not used packages
-RUN apt-get purge -y git && apt-get autoremove
+RUN apt-get purge -y git && apt-get autoremove -y
 
 # add environment variables
 ENV PYTHONPATH /usr/src
