@@ -18,7 +18,7 @@ opcua_server:
     refs:
     - develop
     changes:
-    - docker/server.Dockerfile
+    - docker/Server.Dockerfile
     - docker/cloud_setup/opc_ua/server/OPCServer.py
 
 opcua_extern_client:
