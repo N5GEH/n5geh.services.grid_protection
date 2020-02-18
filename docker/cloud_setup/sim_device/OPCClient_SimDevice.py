@@ -88,8 +88,18 @@ class VarUpdater(Thread):
                         print(self.__class__.__name__, dv.Value)
 
             except Exception as ex:
-                print(DateHelper.get_local_datetime(), ex)
-                sys.exit(1)
+                if type(ex).__name__ in TimeoutError.__name__:
+                    print(DateHelper.get_local_datetime(), 'TimeOutError ignored')
+                    pass
+                else:
+                    print(DateHelper.get_local_datetime(), type(ex))
+                    # os.system('python ' + os.path.abspath(sys.argv[0]))
+                    # os.execv(sys.executable, ['python'] + sys.argv[0])
+                    # os.execl(sys.executable, os.path.abspath(sys.argv[0]), *sys.argv)
+                    # os.startfile(sys.argv[0])
+                    # os.execl("restart.sh")
+                    # os.startfile(os.path.abspath(os.path.dirname(sys.argv[0])))
+                    raise
 
             t1 = count / 1000
             # make deviation after 60 time steps
@@ -174,8 +184,8 @@ if __name__ == "__main__":
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
     # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "simulation")
-    # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
-    # os.environ.setdefault("AUTO_VAR_UPDATER_UPDATE_PERIOD", "100")        # in ms
+    # os.environ.setdefault("DEBUG_MODE_PRINT", "False")
+    # os.environ.setdefault("AUTO_VAR_UPDATER_UPDATE_PERIOD", "14")        # in ms
     # os.environ.setdefault("AUTO_VAR_UPDATER_TIMESTAMP_PRECISION", "10")   # in ms
     # os.environ.setdefault("AUTO_VAR_UPDATER_START_THRESHOLD", "5000")     # in ms
     # os.environ.setdefault("AUTO_VAR_UPDATER_TIME_STEPS_NO_ERROR", "60")

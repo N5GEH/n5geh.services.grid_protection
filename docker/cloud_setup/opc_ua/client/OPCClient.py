@@ -161,9 +161,17 @@ class CustomClient(object):
         for ctrl in ctrl_list:
             for var in observed_nodes_list:
                 if var.nodeid == ctrl.nodeid:
-                    variant_type = var.get_data_value().Value.VariantType
-                    var.set_value(value_list[i], variant_type)
-                    break
+                    try:
+                        variant_type = var.get_data_value().Value.VariantType
+                        var.set_value(value_list[i], variant_type)
+                        break
+                    except Exception as ex:
+                        if type(ex).__name__ in TimeoutError.__name__:
+                            print(DateHelper.get_local_datetime(), 'TimeOutError ignored while set var in OPCClient')
+                            pass
+                        else:
+                            print(DateHelper.get_local_datetime(), ex)
+                            raise
             i += 1
 
     # region subscription
