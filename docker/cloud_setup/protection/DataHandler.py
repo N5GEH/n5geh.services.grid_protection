@@ -296,25 +296,25 @@ class DataHandler(object):
 if __name__ == "__main__":
     ##################
     # if using local (means not in Docker)
-    local = False   # if server is local or as Docker
-    if local:
-        os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
-    else:
-        os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/OPCUA/python_server/")
-    os.environ.setdefault("NAMESPACE", "https://n5geh.de")
-    os.environ.setdefault("ENABLE_CERTIFICATE", "False")
-    os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT", "/opc_ua/certificates/n5geh_opcua_server_cert.pem")
-    os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
-    os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
-    os.environ.setdefault("DEBUG_MODE_PRINT", "False")
-    os.environ.setdefault("THREE_PHASE_CALCULATION", "False")
-    os.environ.setdefault("TIMESTAMP_PRECISION", "10")   # in ms
-    os.environ.setdefault("MAX_FAULTY_STATES", "5")
-    os.environ.setdefault("NOMINAL_CURRENT", "2")
-    os.environ.setdefault("CURRENT_EPS", "0.05")
-    os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "simulation")
-    os.environ.setdefault("TOPOLOGY_PATH", "/data/topology/TopologyFile_demonstrator.json")
-    os.environ.setdefault("DEVICE_PATH", "/data/device_config/Setup_demonstrator.txt")
+    # local = False   # if server is local or as Docker
+    # if local:
+    #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
+    # else:
+    #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/OPCUA/python_server/")
+    # os.environ.setdefault("NAMESPACE", "https://n5geh.de")
+    # os.environ.setdefault("ENABLE_CERTIFICATE", "False")
+    # os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT", "/opc_ua/certificates/n5geh_opcua_server_cert.pem")
+    # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
+    # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
+    # os.environ.setdefault("DEBUG_MODE_PRINT", "False")
+    # os.environ.setdefault("THREE_PHASE_CALCULATION", "False")
+    # os.environ.setdefault("TIMESTAMP_PRECISION", "10")   # in ms
+    # os.environ.setdefault("MAX_FAULTY_STATES", "5")
+    # os.environ.setdefault("NOMINAL_CURRENT", "2")
+    # os.environ.setdefault("CURRENT_EPS", "0.05")
+    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "simulation")
+    # os.environ.setdefault("TOPOLOGY_PATH", "/data/topology/TopologyFile_demonstrator.json")
+    # os.environ.setdefault("DEVICE_PATH", "/data/device_config/Setup_demonstrator.txt")
     ##################
 
     topo_path = os.environ.get("TOPOLOGY_PATH")
