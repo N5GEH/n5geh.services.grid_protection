@@ -10,6 +10,8 @@ ADD docker/cloud_setup .
 RUN pip install -r requirements.txt
 RUN pip install -e .
 RUN pip install -e .[protection]
+RUN pip install -e .[database_access]
+
 
 # remove git and not used packages
 RUN apt-get purge -y git && apt-get autoremove -y
@@ -31,6 +33,11 @@ ENV VOLUME_PATH /data
 ENV OPCUA_SERVER_DIR_NAME demo
 ENV TOPOLOGY_PATH /cloud_setup/data/topology/TopologyFile_demonstrator.json
 ENV DEVICE_PATH /cloud_setup/data/device_config/Setup_demonstrator.txt
+
+ENV DATABASE_UPDATE_PERIOD 1000
+ENV INFLUXDB_HOST ubuntu5g
+ENV INFLUXDB_PORT 8086
+ENV INFLUXDB_NAME demonstrator_grid_protection
 
 EXPOSE 4860
 LABEL type="protection_python" \
