@@ -56,6 +56,7 @@ class DataHandler(object):
         self.df_ph1 = pd.DataFrame()          # dataframe for phase 1 to pass to fault_assessment
         self.df_ph2 = pd.DataFrame()
         self.df_ph3 = pd.DataFrame()
+        self.buffer_limit = 100
 
     def _start_client(self):
         self.opc_client.start()
@@ -219,7 +220,6 @@ class DataHandler(object):
 
                 # TODO necessary for real meas devices with fixed timestamp?
                 ts = DateHelper.round_time(datetime_source, self.TIMESTAMP_PRECISION)
-                # ts = self.format_datetime(datetime_source)
 
                 if self.slack_ph1 is not None and var.opctag == self.slack_ph1.opctag or \
                         self.slack_ph2 is not None and var.opctag == self.slack_ph2.opctag or \
@@ -248,6 +248,8 @@ class DataHandler(object):
                           self.df_ph1, self.df_ph2, self.df_ph3)
             dc.start()
             self.clear_meas_data()
+        else:
+            self.clear_unused_meas_data()
 
         end = time.time_ns()                    # in ns
         if self.DEBUG_MODE_PRINT:
@@ -275,6 +277,11 @@ class DataHandler(object):
                 return True
             return False
 
+    def clear_unused_meas_data(self):
+        if len(self.df_ph1.index) > self.buffer_limit or len(self.df_ph2.index) > self.buffer_limit or \
+                len(self.df_ph3.index) > self.buffer_limit:
+            self.clear_meas_data()
+
     def clear_meas_data(self):
         self.df_ph1 = pd.DataFrame()
         self.df_ph2 = pd.DataFrame()
@@ -296,25 +303,25 @@ class DataHandler(object):
 if __name__ == "__main__":
     ##################
     # if using local (means not in Docker)
-    # local = False   # if server is local or as Docker
-    # if local:
-    #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
-    # else:
-    #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/OPCUA/python_server/")
-    # os.environ.setdefault("NAMESPACE", "https://n5geh.de")
-    # os.environ.setdefault("ENABLE_CERTIFICATE", "False")
-    # os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT", "/opc_ua/certificates/n5geh_opcua_server_cert.pem")
-    # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
-    # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
-    # os.environ.setdefault("DEBUG_MODE_PRINT", "False")
-    # os.environ.setdefault("THREE_PHASE_CALCULATION", "False")
-    # os.environ.setdefault("TIMESTAMP_PRECISION", "10")   # in ms
-    # os.environ.setdefault("MAX_FAULTY_STATES", "5")
-    # os.environ.setdefault("NOMINAL_CURRENT", "2")
-    # os.environ.setdefault("CURRENT_EPS", "0.05")
-    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "simulation")
-    # os.environ.setdefault("TOPOLOGY_PATH", "/data/topology/TopologyFile_demonstrator.json")
-    # os.environ.setdefault("DEVICE_PATH", "/data/device_config/Setup_demonstrator.txt")
+    local = False   # if server is local or as Docker
+    if local:
+        os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
+    else:
+        os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/OPCUA/python_server/")
+    os.environ.setdefault("NAMESPACE", "https://n5geh.de")
+    os.environ.setdefault("ENABLE_CERTIFICATE", "False")
+    os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT", "/opc_ua/certificates/n5geh_opcua_server_cert.pem")
+    os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
+    os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
+    os.environ.setdefault("DEBUG_MODE_PRINT", "True")
+    os.environ.setdefault("THREE_PHASE_CALCULATION", "False")
+    os.environ.setdefault("TIMESTAMP_PRECISION", "10")   # in ms
+    os.environ.setdefault("MAX_FAULTY_STATES", "5")
+    os.environ.setdefault("NOMINAL_CURRENT", "2")
+    os.environ.setdefault("CURRENT_EPS", "0.05")
+    os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "demo")
+    os.environ.setdefault("TOPOLOGY_PATH", "/data/topology/TopologyFile_demonstrator_2devices.json")
+    os.environ.setdefault("DEVICE_PATH", "/data/device_config/Setup_demonstrator.txt")
     ##################
 
     topo_path = os.environ.get("TOPOLOGY_PATH")
