@@ -33,11 +33,11 @@ class DataResultWrapper:
                 misc_nodes ([CustomVar]): list of protection relevant status flag OPC vars
                 dataframe_phx (dataframe): dataframe for each phase containing all measured values for (several) timestamps
                 """
-        self.ctrl_nodes_list = ctrl
-        self.misc_nodes_list = misc
-        self.df_ph1 = df_ph1
-        self.df_ph2 = df_ph2
-        self.df_ph3 = df_ph3
+        self.ctrl_nodes_list = ctrl.copy()
+        self.misc_nodes_list = misc.copy()
+        self.df_ph1 = df_ph1.copy()
+        self.df_ph2 = df_ph2.copy()
+        self.df_ph3 = df_ph3.copy()
 
 
 class DataHandler(object):
@@ -123,12 +123,9 @@ class DataHandler(object):
             if self.check_if_all_rows_have_an_entry():
                 df_ph1, df_ph2, df_ph3 = self.remove_nans_from_dataframe()
 
-                ctrl = self.ctrl_nodes_list.copy()
-                misc = self.misc_nodes_list.copy()
-
                 self.clear_meas_data_flag = True
 
-                return DataResultWrapper(ctrl, misc, df_ph1, df_ph2, df_ph3)
+                return DataResultWrapper(self.ctrl_nodes_list, self.misc_nodes_list, df_ph1, df_ph2, df_ph3)
             else:
                 self.check_for_unused_meas_data()
                 return None
