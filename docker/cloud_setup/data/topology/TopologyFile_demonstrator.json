@@ -6,7 +6,7 @@
         "TRAFO_I_PH1_RES": "Feeder2 Slack, Current Phase1",
         "LAST_I_PH1_RES": "Feeder2 Load, Current Phase1",
         "PV_I_PH1_RES": "Feeder2 PV-Infeed, Current Phase1",
-        "PV_LIMIT_CTRL": "Feeder2 PV-Infeed, Active power upper limit[0-0%, 1000-100%]",
+        "PV_LIMIT_CTRL": "Feeder2 PV-Infeed, Active power upper limit[0-->0%, 100-->100%]",
         "NETZ_PH1_FEHLER_COUNTER": "Feeder2 Status PH1, Number of detected faulty states since last disconnect of feeder2",
         "UPDATE_REQUEST_TOPOLOGY": "Feeder2 Request, External Request to Update(read in) Topology File"
       }

@@ -9,7 +9,7 @@
 """
 import logging
 
-from cloud_setup.protection.DataHandler import DataHandler
+from cloud_setup.protection.GridProtectionManager import DataHandler
 from cloud_setup.opc_ua.server.OPCServer import CustomServer
 from sim_device.OPCClient_SimDevice import OPCClientSimDevice
 from multiprocessing import Process

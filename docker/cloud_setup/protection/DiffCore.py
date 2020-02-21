@@ -3,59 +3,68 @@
 
 """This is the Differential protection Algorithm Core module.
 
-This module checks for a dataframe (which contains for all relevant nodes at least one value)
-if sum of currents within the subgrid is zero.
+    This module checks for a dataframe (which contains for all relevant nodes at least one value)
+    if sum of currents within the subgrid is zero.
 
-If there is an deviation greater than an epsilon, that ctrl_nodes gets new values via OPC-client.
+    If there is an deviation greater than an epsilon, that ctrl_nodes gets new values via OPC-client.
 """
 import os
+import time
 from distutils.util import strtobool
 from threading import Thread
 
 from protection import LocalData
 
-__version__ = '0.6'
+__version__ = '0.7'
 __author__ = 'Sebastian Krahmer'
 
 
+def sums(row):
+    return row.sum()
+
+
 class DiffCore(Thread):
-    def __init__(self, opc_client, ctrl_nodes, misc_nodes, dataframe_ph1, dataframe_ph2, dataframe_ph3,
-                 nominal_current=275, eps=0.05, number_of_faulty_dates_to_failure=5):
+    def __init__(self, opc_client, data_handler, nominal_current=275, eps=0.05, number_of_faulty_states_to_failure=5):
         Thread.__init__(self)
         # super().__init__()
         """
             Args:
                 opc_client (CustomClient): instance of CustomClient used to set ctrl_node
-                ctrl_nodes ([CustomVar]): list with all controllable OPC vars
-                dataframe_phx (dataframe): dataframe for each phase containing all measured values for (several) timestamps
+                data_handler (DataHandler): instance of DataHandler (Bufferclass for incoming data of monitored items)
                 nominal_current (int): nominal current of biggest cable close to MV/LV transformer in A
                 eps (float): permissible deviation of current sum to zero in x/100%
                 number_of_faulty_dates_to_failure (int): number of allowed consecutive faulty states within one phase
         """
-        self.DEBUG_MODE_PRINT = os.environ.get("DEBUG_MODE_PRINT")
+        self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT", "False")))
         self.NOMINAL_CURRENT = int(os.environ.get("NOMINAL_CURRENT", nominal_current))
         self.CURRENT_EPS = float(os.environ.get("CURRENT_EPS", eps))
-        self.MAX_FAULTY_STATES = int(os.environ.get("MAX_FAULTY_STATES", number_of_faulty_dates_to_failure))
+        self.MAX_FAULTY_STATES = int(os.environ.get("MAX_FAULTY_STATES", number_of_faulty_states_to_failure))
         # three_phase_mode: True if calculation should be for all three phases, False if only single phase
-        self.THREE_PHASE_CALCULATION = bool(strtobool(os.environ.get("THREE_PHASE_CALCULATION")))
+        self.THREE_PHASE_CALCULATION = bool(strtobool(os.environ.get("THREE_PHASE_CALCULATION", "False")))
 
-        self.work_status = 'init'
         self.opc_client = opc_client
-        self.ctrl_nodes_list = ctrl_nodes
-        self.misc_nodes_list = misc_nodes
-
-        self.df_ph1 = dataframe_ph1
-        self.df_ph2 = dataframe_ph2
-        self.df_ph3 = dataframe_ph3
-
+        self.data_handler = data_handler
         self.eps_abs = self.NOMINAL_CURRENT * self.CURRENT_EPS  # 5 %
 
-        self.print_work_status()
+        self.ctrl_nodes_list = []
+        self.misc_nodes_list = []
+
+        self.df_ph1 = None
+        self.df_ph2 = None
+        self.df_ph3 = None
+
+        self._is_running = False
+        self.print_work_status('init')
 
     def run(self):
-        self.work_status = 'started'
-        self.print_work_status()
-        self.compute_balance_of_current()
+        self._is_running = True
+        self.print_work_status('started')
+        while self.is_running():
+            self.check_for_new_data()
+            time.sleep(0.005)
+
+    def is_running(self):
+        return self._is_running
 
     # def pause(self):
     #     self.work_status = 'paused'
@@ -66,47 +75,77 @@ class DiffCore(Thread):
     #     self.print_work_status()
 
     def stop(self):
-        self.work_status = 'stopped'
-        self.print_work_status()
+        self._is_running = False
+        self.print_work_status('stopped')
 
-    # ## I_sum for each phase of subgrid
+    def check_for_new_data(self):
+        res = self.data_handler.get_newest_data()
+
+        if res is not None:
+            self.ctrl_nodes_list = res.ctrl_nodes_list
+            self.misc_nodes_list = res.misc_nodes_list
+            self.df_ph1 = res.df_ph1
+            self.df_ph2 = res.df_ph2
+            self.df_ph3 = res.df_ph3
+
+            if self.THREE_PHASE_CALCULATION and (self.df_ph1 is None or self.df_ph2 is None or self.df_ph3 is None)\
+                    or not self.THREE_PHASE_CALCULATION and self.df_ph1 is None:
+                pass
+            else:
+                self.compute_balance_of_current()
+
+    # I_sum for each phase of subgrid
     def compute_balance_of_current(self):
-        self.df_ph1.loc[:, 'sum'] = self.df_ph1.sum(axis=1)
+        self.df_ph1['sum'] = self.df_ph1.apply(func=sums, axis=1)
+        # self.df_ph1.loc[:, 'sum'] = self.df_ph1.sum(axis=1)
 
         if self.THREE_PHASE_CALCULATION:
-            self.df_ph2.loc[:, 'sum'] = self.df_ph2.sum(axis=1)
-            self.df_ph3.loc[:, 'sum'] = self.df_ph3.sum(axis=1)
+            self.df_ph2['sum'] = self.df_ph2.apply(func=sums, axis=1)
+            self.df_ph3['sum'] = self.df_ph3.apply(func=sums, axis=1)
+            # self.df_ph2.loc[:, 'sum'] = self.df_ph2.sum(axis=1)
+            # self.df_ph3.loc[:, 'sum'] = self.df_ph3.sum(axis=1)
 
         self.evaluate_balance_of_current()
 
-    # ## evaluate the balance (of current) for the closest timestamp
+    # evaluate the balance (of current) for the closest timestamp
     def evaluate_balance_of_current(self):
         result_code = "VALID"
 
-        if abs(self.df_ph1.iloc[-1]['sum']) >= self.eps_abs:  # ## if sum of closest timestamp is bigger than threshold
-            result_code = "INVALID"
-            self.evaluate_historical_balances_of_current(1)  # ## otherwise check if in past sum=0 was violated as well
-        else:
-            self.decrease_fault_state_counter(1)
+        try:
+            if self.THREE_PHASE_CALCULATION:
+                if abs(self.df_ph1.iloc[-1][
+                           'sum']) >= self.eps_abs:  # if sum of closest timestamp is bigger than threshold
+                    result_code = "INVALID"
+                    self.evaluate_historical_balances_of_current(1)  # otherwise check if in past sum=0 was violated as well
+                else:
+                    self.decrease_fault_state_counter(1)
 
-        if self.THREE_PHASE_CALCULATION:
-            if abs(self.df_ph2.iloc[-1]['sum']) >= self.eps_abs and result_code == "VALID":
-                result_code = "INVALID"
-                self.evaluate_historical_balances_of_current(2)
+                if abs(self.df_ph2.iloc[-1]['sum']) >= self.eps_abs and result_code == "VALID":
+                    result_code = "INVALID"
+                    self.evaluate_historical_balances_of_current(2)
+                else:
+                    self.decrease_fault_state_counter(2)
+
+                if abs(self.df_ph3.iloc[-1]['sum']) >= self.eps_abs and result_code == "VALID":
+                    result_code = "INVALID"
+                    self.evaluate_historical_balances_of_current(3)
+                else:
+                    self.decrease_fault_state_counter(3)
             else:
-                self.decrease_fault_state_counter(2)
+                if abs(self.df_ph1.iloc[-1]['sum']) >= self.eps_abs:
+                    result_code = "INVALID"
+                    self.evaluate_historical_balances_of_current(1)
+                else:
+                    self.decrease_fault_state_counter(1)
 
-            if abs(self.df_ph3.iloc[-1]['sum']) >= self.eps_abs and result_code == "VALID":
-                result_code = "INVALID"
-                self.evaluate_historical_balances_of_current(3)
-            else:
-                self.decrease_fault_state_counter(3)
+            self.send_fault_state_counter_to_server()
 
-        self.send_fault_state_counter_to_server()
+            self.print_current_result(result_code)
+        except IndexError as ex:
+            print('evaluate_balance_of_current()')
+            print(ex)
 
-        self.print_current_result(result_code)
-
-    # ## check the recent balances (of current) of selected phase
+    # check the recent balances (of current) of selected phase
     def evaluate_historical_balances_of_current(self, faulty_phase):
         if faulty_phase == 1:
             self.increase_fault_state_counter(faulty_phase)
@@ -164,8 +203,7 @@ class DiffCore(Thread):
         # execute set_vars()
         self.opc_client.set_vars(nodes, values)
 
-        if self.DEBUG_MODE_PRINT:
-            print(self.__class__.__name__, "All CTRL devices are set to power feedin = 0.")
+        print(self.__class__.__name__, "All CTRL devices are set to power feedin = 0.")
 
     @staticmethod
     def decrease_fault_state_counter(faulty_phase):
@@ -208,5 +246,5 @@ class DiffCore(Thread):
                 print(result_code, ': '
                       , str(format(self.df_ph1.iloc[-1]['sum'], '.2f')) + '(' + str(LocalData.mFaultStateCounter_ph1) + ')' + ";" + '\n')
 
-    def print_work_status(self):
-        print(self.__class__.__name__, self.work_status)
+    def print_work_status(self, work_status):
+        print(self.__class__.__name__, work_status)

@@ -59,7 +59,7 @@ protection:
     - develop
     changes:
     - docker/Protection.Dockerfile
-    - docker/cloud_setup/protection/DataHandler.py
+    - docker/cloud_setup/protection/GridProtectionManager.py
 
 databse_access:
   stage: build

@@ -141,7 +141,7 @@ class CustomServer(object):
         inarg1.DataType = ua.NodeId(ua.ObjectIds.Int32)  # Integer
         inarg1.ValueRank = -1
         inarg1.ArrayDimensions = []
-        inarg1.Description = ua.LocalizedText("Type in relative active power setpoint [0 ... 1000]")
+        inarg1.Description = ua.LocalizedText("Type in active power setpoint in percent [0 ... 100]")
 
         inarg2 = ua.Argument()
         inarg2.Name = "parent_node"
@@ -191,9 +191,9 @@ class CustomServer(object):
         for mvar in obj.get_variables():
             if "PV" and "CTRL" in mvar.get_browse_name().Name:
                 variant_type = mvar.get_data_value().Value.VariantType
-                mvar.set_value(clamp(setpoint, 0, 1000), variant_type)
+                mvar.set_value(clamp(setpoint, 0, 100), variant_type)
                 print(DateHelper.get_local_datetime(),
-                      "Set Value of node " + mvar.get_browse_name().Name + " to " + str(clamp(setpoint, 0, 1000)))
+                      "Set Value of node " + mvar.get_browse_name().Name + " to " + str(clamp(setpoint, 0, 100)))
 
     def start(self):
         self.server.start()
