@@ -161,69 +161,6 @@ class DataHandler(object):
 
         return self.df_ph1, self.df_ph1, self.df_ph1
 
-    # def check_if_all_rows_have_an_entry(self):
-    #     df_ph1 = None
-    #     df_ph2 = None
-    #     df_ph3 = None
-    #     try:
-    #         if self.THREE_PHASE_CALCULATION:
-    #             # drops all rows where not all columns filled with values != NaN and check if length is
-    #             df_ph1 = self.df_ph1.dropna()
-    #             df_ph2 = self.df_ph2.dropna()
-    #             df_ph3 = self.df_ph3.dropna()
-    #             if len(df_ph1.columns) == len(self.Iph1_nodes_list) and len(df_ph1.index) >= 1 \
-    #                     and len(df_ph2.columns) == len(self.Iph2_nodes_list) and len(df_ph2.index) >= 1 \
-    #                     and len(df_ph3.columns) == len(self.Iph3_nodes_list) and len(df_ph3.index) >= 1:
-    #                 return True
-    #             return False
-    #         else:
-    #             # drops all rows where not all columns filled with values != NaN and check if length is
-    #             df_ph1 = self.df_ph1.dropna()
-    #             if len(df_ph1.columns) == len(self.Iph1_nodes_list) and len(df_ph1.index) >= 1:
-    #                 return True
-    #             return False
-    #             #todo class
-    #     except ValueError as ex:
-    #         print('check_data_queue_for_completeness()')
-    #         print(ex)
-    #         self.print_dataframe(self.df_ph1)
-    #     except pd.core.indexing.IndexingError as ex:
-    #         print('check_data_queue_for_completeness()')
-    #         print(ex)
-    #         print(df_ph1)
-    #     except TypeError as ex:
-    #         print('check_data_queue_for_completeness()')
-    #         print(ex)
-    #         print(df_ph1)
-    #     return False
-
-    # def remove_nans_from_dataframe(self):
-    #     # drops all rows where not all columns filled with values != NaN
-    #     df_ph1 = None
-    #     df_ph2 = None
-    #     df_ph3 = None
-    #     try:
-    #         if self.THREE_PHASE_CALCULATION:
-    #             df_ph1 = self.df_ph1
-    #             df_ph1.dropna(inplace=True)
-    #             df_ph2 = self.df_ph2
-    #             df_ph2.dropna(inplace=True)
-    #             df_ph3 = self.df_ph3
-    #             df_ph3.dropna(inplace=True)
-    #         else:
-    #             df_ph1 = self.df_ph1
-    #             df_ph1.dropna(inplace=True)
-    #
-    #     except ValueError as ex:
-    #         print('remove_nans_from_dataframe()')
-    #         print(ex)
-    #         print(df_ph1)
-    #         df_ph1 = None
-    #         df_ph2 = None
-    #         df_ph3 = None
-    #     finally:
-    #         return df_ph1, df_ph2, df_ph3
-
     def check_for_unused_meas_data(self):
         if len(self.df_ph1.index) > self.buffer_limit or len(self.df_ph2.index) > self.buffer_limit or \
                 len(self.df_ph3.index) > self.buffer_limit:

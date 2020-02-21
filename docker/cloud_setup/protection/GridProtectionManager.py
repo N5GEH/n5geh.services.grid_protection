@@ -236,79 +236,6 @@ class GridProtectionManager(object):
                     self.update_topology(self.topo_path, [var], self.server_dir_name)
                     return
 
-        # otherwise update data used for DiffCore
-        # for var in (self.Iph1_nodes_list + self.Iph2_nodes_list + self.Iph3_nodes_list):
-        #     if var.nodeid == node.nodeid:
-        #
-        #         # TODO necessary for real meas devices with fixed timestamp?
-        #         ts = DateHelper.round_time(datetime_source, self.TIMESTAMP_PRECISION)
-        #
-        #         if self.slack_ph1 is not None and var.opctag == self.slack_ph1.opctag or \
-        #                 self.slack_ph2 is not None and var.opctag == self.slack_ph2.opctag or \
-        #                 self.slack_ph3 is not None and var.opctag == self.slack_ph3.opctag:
-        #             val = -val  # IMPORTANT: slack counts in negative manner
-        #
-        #         if var.phase == 1:
-        #             self.df_ph1.loc[ts, var.opctag] = val
-        #             if self.DEBUG_MODE_PRINT:
-        #                 print(self.df_ph1)
-        #         elif var.phase == 2:
-        #             self.df_ph2.loc[ts, var.opctag] = val
-        #             if self.DEBUG_MODE_PRINT:
-        #                 print(self.df_ph2)
-        #         elif var.phase == 3:
-        #             self.df_ph3.loc[ts, var.opctag] = val
-        #             if self.DEBUG_MODE_PRINT:
-        #                 print(self.df_ph3)
-        #
-        #         if self.DEBUG_MODE_PRINT:
-        #             print(self.__class__.__name__, " successful updated data")
-        #         break
-        #
-        # if self.check_data_queue_for_completeness():
-        #     dc = DiffCore(self.opc_client, self.ctrl_nodes_list, self.misc_nodes_list,
-        #                   self.df_ph1, self.df_ph2, self.df_ph3)
-        #     dc.start()
-        #     self.clear_meas_data()
-        # else:
-        #     self.clear_unused_meas_data()
-        #
-        # end = time.time_ns()                    # in ns
-        # if self.DEBUG_MODE_PRINT:
-        #     print(DateHelper.get_local_datetime(), 'Data Update: ' + str((end-start) / (1000 * 1000)) + " ms")  # in ms
-
-    # def check_data_queue_for_completeness(self):
-    #     if self.THREE_PHASE_CALCULATION:
-    #         # drops all rows where not all columns filled with values != NaN and check if length is
-    #         df_ph1 = self.df_ph1.dropna()
-    #         df_ph2 = self.df_ph2.dropna()
-    #         df_ph3 = self.df_ph3.dropna()
-    #         if len(df_ph1.columns) == len(self.Iph1_nodes_list) and len(df_ph1.index) >= 1 \
-    #                 and len(df_ph2.columns) == len(self.Iph2_nodes_list) and len(df_ph2.index) >= 1 \
-    #                 and len(df_ph3.columns) == len(self.Iph3_nodes_list) and len(df_ph3.index) >= 1:
-    #             self.df_ph1.dropna(inplace=True)    # drops all rows where not all columns filled with values != NaN
-    #             self.df_ph2.dropna(inplace=True)
-    #             self.df_ph3.dropna(inplace=True)
-    #             return True
-    #         return False
-    #     else:
-    #         # drops all rows where not all columns filled with values != NaN and check if length is
-    #         df_ph1 = self.df_ph1.dropna()
-    #         if len(df_ph1.columns) == len(self.Iph1_nodes_list) and len(df_ph1.index) >= 1:
-    #             self.df_ph1.dropna(inplace=True)  # drops all rows where not all columns filled with values != NaN
-    #             return True
-    #         return False
-    #
-    # def clear_unused_meas_data(self):
-    #     if len(self.df_ph1.index) > self.buffer_limit or len(self.df_ph2.index) > self.buffer_limit or \
-    #             len(self.df_ph3.index) > self.buffer_limit:
-    #         self.clear_meas_data()
-    #
-    # def clear_meas_data(self):
-    #     self.df_ph1 = pd.DataFrame()
-    #     self.df_ph2 = pd.DataFrame()
-    #     self.df_ph3 = pd.DataFrame()
-
     def set_start_values_for_ctrls(self):
         # set start value of PRED_CTRL to 100%
         ctrls = []
@@ -325,25 +252,25 @@ class GridProtectionManager(object):
 if __name__ == "__main__":
     ##################
     # if using local (means not in Docker)
-    local = False   # if server is local or as Docker
-    if local:
-        os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
-    else:
-        os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/OPCUA/python_server/")
-    os.environ.setdefault("NAMESPACE", "https://n5geh.de")
-    os.environ.setdefault("ENABLE_CERTIFICATE", "False")
-    os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT", "/opc_ua/certificates/n5geh_opcua_server_cert.pem")
-    os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
-    os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
-    os.environ.setdefault("DEBUG_MODE_PRINT", "True")
-    os.environ.setdefault("THREE_PHASE_CALCULATION", "False")
-    os.environ.setdefault("TIMESTAMP_PRECISION", "10")   # in ms
-    os.environ.setdefault("MAX_FAULTY_STATES", "5")
-    os.environ.setdefault("NOMINAL_CURRENT", "2")
-    os.environ.setdefault("CURRENT_EPS", "0.05")
-    os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "simulation")
-    os.environ.setdefault("TOPOLOGY_PATH", "/data/topology/TopologyFile_demonstrator.json")
-    os.environ.setdefault("DEVICE_PATH", "/data/device_config/Setup_demonstrator.txt")
+    # local = False   # if server is local or as Docker
+    # if local:
+    #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
+    # else:
+    #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://ubuntu5g:4840") # 0.0.0.0:4840/OPCUA/python_server/")
+    # os.environ.setdefault("NAMESPACE", "https://n5geh.de")
+    # os.environ.setdefault("ENABLE_CERTIFICATE", "False")
+    # os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT", "/opc_ua/certificates/n5geh_opcua_server_cert.pem")
+    # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
+    # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
+    # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
+    # os.environ.setdefault("THREE_PHASE_CALCULATION", "False")
+    # os.environ.setdefault("TIMESTAMP_PRECISION", "10")   # in ms
+    # os.environ.setdefault("MAX_FAULTY_STATES", "5")
+    # os.environ.setdefault("NOMINAL_CURRENT", "2")
+    # os.environ.setdefault("CURRENT_EPS", "0.05")
+    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "simulation")
+    # os.environ.setdefault("TOPOLOGY_PATH", "/data/topology/TopologyFile_demonstrator.json")
+    # os.environ.setdefault("DEVICE_PATH", "/data/device_config/Setup_demonstrator.txt")
     ##################
 
     topo_path = os.environ.get("TOPOLOGY_PATH")

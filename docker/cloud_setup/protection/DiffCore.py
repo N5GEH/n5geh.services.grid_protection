@@ -97,13 +97,10 @@ class DiffCore(Thread):
     # I_sum for each phase of subgrid
     def compute_balance_of_current(self):
         self.df_ph1['sum'] = self.df_ph1.apply(func=sums, axis=1)
-        # self.df_ph1.loc[:, 'sum'] = self.df_ph1.sum(axis=1)
 
         if self.THREE_PHASE_CALCULATION:
             self.df_ph2['sum'] = self.df_ph2.apply(func=sums, axis=1)
             self.df_ph3['sum'] = self.df_ph3.apply(func=sums, axis=1)
-            # self.df_ph2.loc[:, 'sum'] = self.df_ph2.sum(axis=1)
-            # self.df_ph3.loc[:, 'sum'] = self.df_ph3.sum(axis=1)
 
         self.evaluate_balance_of_current()
 

@@ -34,5 +34,5 @@ ENV DEVICE_PATH /cloud_setup/data/device_config/Setup_demonstrator.txt
 
 EXPOSE 4860
 LABEL type="protection_python" \
-      version="0.6"
+      version="0.7"
 CMD [ "python", "/usr/src/cloud_setup/protection/GridProtectionManager.py"]
