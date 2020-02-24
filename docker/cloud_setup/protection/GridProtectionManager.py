@@ -10,6 +10,7 @@ Init DataHandler class with relevant nodes (coming from topology mapping).
             update_topology(topo_path)
 """
 import os
+import sys
 import time
 
 from distutils.util import strtobool
@@ -98,7 +99,7 @@ class GridProtectionManager(object):
             except Exception as ex:
                 print(DateHelper.get_local_datetime(), self.__class__.__name__, 'lost connection to server:')
                 print(ex)
-                exit(1)
+                sys.exit(1)
 
     def stop(self):
         self.__is_running = False
