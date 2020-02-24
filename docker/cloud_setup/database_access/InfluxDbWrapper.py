@@ -52,12 +52,16 @@ class InfluxDbWrapper(object):
         self.opc_client.start()
 
         while not self.ticker.wait(self.UPDATE_PERIOD/1000):
-            if self.opc_client.client.uaclient._uasocket._thread.isAlive():
+            try:
+                # check is server node browsename still exists/is valid
+                browse_name = self.opc_client.client.get_server_node().get_browse_name()
+
                 df = self.opc_client.get_last_dataframe()
                 self.update_database(df)
-            else:
+            except Exception as ex:
                 print(DateHelper.get_local_datetime(), self.__class__.__name__, " lost client connection")
-                raise ConnectionAbortedError
+                print(ex)
+                sys.exit(1)
 
     # region Database Update
     def stop_database_update(self):
