@@ -11,7 +11,6 @@ Init DataHandler class with relevant nodes (coming from topology mapping).
 """
 import os
 
-import time
 from distutils.util import strtobool
 from cloud_setup.protection.DataSource import TopologyData
 from cloud_setup.protection.DataSource import CustomVar
@@ -86,6 +85,14 @@ class GridProtectionManager(object):
             self.mDiffCore.start()
 
         print(DateHelper.get_local_datetime(), self.__class__.__name__, " finished Start-Routine")
+
+        while True:
+            try:
+                browse_name = self.opc_client.client.get_server_node().get_browse_name()
+            except Exception as ex:
+                print(DateHelper.get_local_datetime(), self.__class__.__name__, 'lost connection to server:')
+                print(ex)
+                raise
 
     def register_devices(self, dir_name, device_config_path):
         self.opc_client.create_dir_on_server(dir_name)
@@ -225,7 +232,6 @@ class GridProtectionManager(object):
         self.misc_nodes_list = []
 
     def update_data(self, node, datetime_source, val):
-        start = time.time_ns()
         # check for Update Request topology
         for var in self.misc_nodes_list:
             if var.nodeid == node.nodeid and "UPDATE_REQUEST_TOPOLOGY" in var.opctag:
