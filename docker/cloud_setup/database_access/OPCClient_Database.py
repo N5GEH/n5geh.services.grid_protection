@@ -19,7 +19,7 @@ from opc_ua.client.subscription import SubHandler
 
 sys.path.insert(0, "..")
 
-__version__ = '0.6'
+__version__ = '0.7'
 __author__ = 'Sebastian Krahmer'
 
 

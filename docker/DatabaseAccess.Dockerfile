@@ -27,5 +27,5 @@ ENV INFLUXDB_NAME demonstrator_grid_protection
 
 
 LABEL type="database_access_python" \
-      version="0.6"
+      version="0.7"
 CMD [ "python", "/usr/src/cloud_setup/database_access/InfluxDbWrapper.py"]
