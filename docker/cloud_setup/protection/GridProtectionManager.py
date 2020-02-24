@@ -10,6 +10,7 @@ Init DataHandler class with relevant nodes (coming from topology mapping).
             update_topology(topo_path)
 """
 import os
+import time
 
 from distutils.util import strtobool
 from cloud_setup.protection.DataSource import TopologyData
@@ -52,6 +53,8 @@ class GridProtectionManager(object):
         self.DataHandler = None
         self.mDiffCore = None
 
+        self.__is_running = False
+
     def _start_client(self):
         self.opc_client.start()
 
@@ -86,13 +89,18 @@ class GridProtectionManager(object):
 
         print(DateHelper.get_local_datetime(), self.__class__.__name__, " finished Start-Routine")
 
-        while True:
+        self.__is_running = True
+        while self.__is_running:
             try:
                 browse_name = self.opc_client.client.get_server_node().get_browse_name()
+                time.sleep(1)
             except Exception as ex:
                 print(DateHelper.get_local_datetime(), self.__class__.__name__, 'lost connection to server:')
                 print(ex)
                 raise
+
+    def stop(self):
+        self.__is_running = False
 
     def register_devices(self, dir_name, device_config_path):
         self.opc_client.create_dir_on_server(dir_name)
