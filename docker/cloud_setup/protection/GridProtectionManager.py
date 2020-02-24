@@ -10,7 +10,6 @@ Init DataHandler class with relevant nodes (coming from topology mapping).
             update_topology(topo_path)
 """
 import os
-import sys
 import time
 
 from distutils.util import strtobool
@@ -35,7 +34,7 @@ class GridProtectionManager(object):
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT", "False")))
         self.DEVICE_PATH = os.environ.get("DEVICE_PATH")
 
-        self.opc_client = OPCClientDataHandler("n5geh_opcua_client1", "n5geh2019", self.SERVER_ENDPOINT)
+        self.opc_client = None
 
         self.topo_path = os.path.dirname(os.getcwd()) + topology_path
         self.topo_data = None
@@ -54,55 +53,71 @@ class GridProtectionManager(object):
         self.DataHandler = None
         self.mDiffCore = None
 
-        self.__is_running = False
+        self._terminated = False
 
-    def _start_client(self):
+    def _init_OPCUA(self):
+        if self.opc_client:
+            self._del_OPCUA()
+
+        self.opc_client = OPCClientDataHandler("n5geh_opcua_client1", "n5geh2019", self.SERVER_ENDPOINT)
         self.opc_client.start()
 
-    def _stop_client(self):
+    def _del_OPCUA(self):
         self.opc_client.stop()
 
+    def _finalize(self):
+        self._del_OPCUA()
+
+    def terminate(self):
+        self._terminated = True
+
     def start(self):
-        # start opc client
-        self._start_client()
-
-        # Init DataHandler
-        self.DataHandler = DataHandler(self.opc_client)
-
-        # Init DiffCore
-        self.mDiffCore = DiffCore(self.opc_client, self.DataHandler)
-
-        # Registration of vars at server
-        self.register_devices(self.server_dir_name, os.path.dirname(os.getcwd()) + self.DEVICE_PATH)
-
-        # Set topology used for grid protection
-        self.set_meas_topology(self.topo_path, [], self.server_dir_name)
-
-        # Set start values for controllable nodes
-        self.set_start_values_for_ctrls()
-
-        # Set status nodes used monitoring and topology/device updates
-        self.set_status_flags(self.topo_path, [], self.server_dir_name)
-
-        # start DiffCore
-        if not self.mDiffCore.is_running():
-            self.mDiffCore.start()
-
-        print(DateHelper.get_local_datetime(), self.__class__.__name__, " finished Start-Routine")
-
-        # start server status request loop
-        self.__is_running = True
-        while self.__is_running:
+        while not self._terminated:
             try:
-                browse_name = self.opc_client.client.get_server_node().get_browse_name()
-                time.sleep(1)
-            except Exception as ex:
-                print(DateHelper.get_local_datetime(), self.__class__.__name__, 'lost connection to server:')
-                print(ex)
-                sys.exit(1)
+                # start opc client
+                self._init_OPCUA()
 
-    def stop(self):
-        self.__is_running = False
+                # Init DataHandler
+                self.DataHandler = DataHandler(self.opc_client)
+
+                # Init DiffCore
+                self.mDiffCore = DiffCore(self.opc_client, self.DataHandler)
+
+                # Registration of vars at server
+                self.register_devices(self.server_dir_name, os.path.dirname(os.getcwd()) + self.DEVICE_PATH)
+
+                # Set topology used for grid protection
+                self.set_meas_topology(self.topo_path, [], self.server_dir_name)
+
+                # Set start values for controllable nodes
+                self.set_start_values_for_ctrls()
+
+                # Set status nodes used monitoring and topology/device updates
+                self.set_status_flags(self.topo_path, [], self.server_dir_name)
+
+                # start DiffCore
+                if not self.mDiffCore.is_running():
+                    self.mDiffCore.start()
+
+                print(DateHelper.get_local_datetime(), self.__class__.__name__, " finished Start-Routine")
+
+                # start server status request loop
+                while not self._terminated:
+                    try:
+                        browse_name = self.opc_client.client.get_server_node().get_browse_name()
+                        time.sleep(1)
+                    except Exception as ex:
+                        print(DateHelper.get_local_datetime(), self.__class__.__name__, 'lost connection to server:')
+                        print(ex)
+                        break
+
+            except Exception as ex:
+                print(ex)
+            finally:
+                if not self._terminated:
+                    print(DateHelper.get_local_datetime(), 'Restart ', self.__class__.__name__)
+                    time.sleep(1)
+        self._finalize()
 
     def register_devices(self, dir_name, device_config_path):
         self.opc_client.create_dir_on_server(dir_name)
@@ -284,7 +299,7 @@ if __name__ == "__main__":
     # os.environ.setdefault("MAX_FAULTY_STATES", "5")
     # os.environ.setdefault("NOMINAL_CURRENT", "2")
     # os.environ.setdefault("CURRENT_EPS", "0.05")
-    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "simulation")
+    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "demo")
     # os.environ.setdefault("TOPOLOGY_PATH", "/data/topology/TopologyFile_demonstrator.json")
     # os.environ.setdefault("DEVICE_PATH", "/data/device_config/Setup_demonstrator.txt")
     ##################

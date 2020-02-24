@@ -79,10 +79,12 @@ class CustomClient(object):
             self.client.connect()
         except ConnectionError as er:
             print(DateHelper.get_local_datetime(), er)
-            sys.exit(1)
+            raise
+            # sys.exit(1)
         except Exception as ex:
             print(DateHelper.get_local_datetime(), ex)
-            sys.exit(1)
+            raise
+            # sys.exit(1)
 
         # Now getting root variable node using its browse path
         self.root = self.client.get_root_node()
