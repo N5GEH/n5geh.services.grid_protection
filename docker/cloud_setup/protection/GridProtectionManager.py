@@ -89,6 +89,7 @@ class GridProtectionManager(object):
 
         print(DateHelper.get_local_datetime(), self.__class__.__name__, " finished Start-Routine")
 
+        # start server status request loop
         self.__is_running = True
         while self.__is_running:
             try:
@@ -97,7 +98,7 @@ class GridProtectionManager(object):
             except Exception as ex:
                 print(DateHelper.get_local_datetime(), self.__class__.__name__, 'lost connection to server:')
                 print(ex)
-                raise
+                exit(1)
 
     def stop(self):
         self.__is_running = False
