@@ -33,7 +33,7 @@ class InfluxDbWrapper(object):
         # TimeLoop
         # https://medium.com/greedygame-engineering/an-elegant-way-to-run-periodic-tasks-in-python-61b7c477b679
         self.ticker = threading.Event()
-        self.stop_request = False
+        self.__is_running = True
 
         # DB related stuff
         user = 'root'
@@ -51,7 +51,8 @@ class InfluxDbWrapper(object):
     def start(self):
         self.opc_client.start()
 
-        while not self.ticker.wait(self.UPDATE_PERIOD/1000):
+        self.__is_running = True
+        while self.__is_running and not self.ticker.wait(self.UPDATE_PERIOD/1000):
             try:
                 # check is server node browsename still exists/is valid
                 browse_name = self.opc_client.client.get_server_node().get_browse_name()
@@ -65,7 +66,7 @@ class InfluxDbWrapper(object):
 
     # region Database Update
     def stop_database_update(self):
-        self.stop_request = True
+        self.__is_running = False
 
     def update_database(self, dataframe):
         self.db_client.write_points(dataframe, self.INFLUXDB_NAME, protocol=self.protocol)
