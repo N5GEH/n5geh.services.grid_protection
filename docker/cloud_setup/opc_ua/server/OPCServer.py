@@ -206,9 +206,9 @@ class CustomServer(object):
 
 if __name__ == "__main__":
     # optional: setup logging
-    logging.basicConfig(level=logging.WARN)
-    logger = logging.getLogger("opcua.uaprocessor")
-    logger.setLevel(logging.DEBUG)
+    # logging.basicConfig(level=logging.WARN)
+    # logger = logging.getLogger("opcua.uaprocessor")
+    # logger.setLevel(logging.DEBUG)
 
     #################################
     # if using local (means not in Docker)
