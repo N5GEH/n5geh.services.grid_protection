@@ -10,6 +10,7 @@ This class is used as Measurement device equivalent and updates value of vars vi
 import os
 import sys
 from distutils.util import strtobool
+
 import pandas as pd
 from helper.DateHelper import DateHelper
 
@@ -94,7 +95,7 @@ class OPCClientDatabase(CustomClient):
     # endregion
 
     def get_last_dataframe(self):
-        df = self.df
+        df = self.df.copy()
         self.reset_dataframe()
         return df
 
