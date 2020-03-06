@@ -18,6 +18,7 @@ opcua_server:
     refs:
     - develop
     changes:
+    - docker/cloud_setup/requirements.txt
     - docker/Server.Dockerfile
     - docker/cloud_setup/opc_ua/server/OPCServer.py
 
@@ -38,6 +39,7 @@ opcua_extern_client:
     refs:
     - develop
     changes:
+    - docker/cloud_setup/requirements.txt
     - docker/SimDevice.Dockerfile
     - docker/cloud_setup/sim_device/OPCClient_SimDevice.py
 
@@ -58,6 +60,7 @@ protection:
     refs:
     - develop
     changes:
+    - docker/cloud_setup/requirements.txt
     - docker/Protection.Dockerfile
     - docker/cloud_setup/protection/GridProtectionManager.py
 
@@ -78,5 +81,6 @@ databse_access:
     refs:
     - develop
     changes:
+    - docker/cloud_setup/requirements.txt
     - docker/DatabaseAccess.Dockerfile
     - docker/cloud_setup/database_access/InfluxDbWrapper.py
