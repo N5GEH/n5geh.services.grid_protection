@@ -22,6 +22,27 @@ opcua_server:
     - docker/Server.Dockerfile
     - docker/cloud_setup/opc_ua/server/OPCServer.py
 
+opcua_server_demonstrator:
+  stage: build
+  cache:
+    key: kaniko
+    paths:
+    - /kanikocache
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  before_script:
+  - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+  script:
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/Server.Dockerfile --destination $CI_REGISTRY_IMAGE/server:demonstrator --cache=true --cache-dir=/kanikocache
+  only:
+    refs:
+    - demonstrator
+    changes:
+    - docker/cloud_setup/requirements.txt
+    - docker/Server.Dockerfile
+    - docker/cloud_setup/opc_ua/server/OPCServer.py
+
 opcua_extern_client:
   stage: build
   cache:
@@ -64,6 +85,27 @@ protection:
     - docker/Protection.Dockerfile
     - docker/cloud_setup/protection/GridProtectionManager.py
 
+protection_demonstrator:
+  stage: build
+  cache:
+    key: kaniko
+    paths:
+    - /kanikocache
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  before_script:
+  - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+  script:
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/Protection.Dockerfile --destination $CI_REGISTRY_IMAGE/protection:demonstrator --cache=true --cache-dir=/kanikocache
+  only:
+    refs:
+    - demonstrator
+    changes:
+    - docker/cloud_setup/requirements.txt
+    - docker/Protection.Dockerfile
+    - docker/cloud_setup/protection/GridProtectionManager.py
+
 databse_access:
   stage: build
   cache:
@@ -80,6 +122,27 @@ databse_access:
   only:
     refs:
     - develop
+    changes:
+    - docker/cloud_setup/requirements.txt
+    - docker/DatabaseAccess.Dockerfile
+    - docker/cloud_setup/database_access/InfluxDbWrapper.py
+
+databse_access_demonstrator:
+  stage: build
+  cache:
+    key: kaniko
+    paths:
+    - /kanikocache
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  before_script:
+  - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+  script:
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/DatabaseAccess.Dockerfile --destination $CI_REGISTRY_IMAGE/database_access:demonstrator --cache=true --cache-dir=/kanikocache
+  only:
+    refs:
+    - demonstrator
     changes:
     - docker/cloud_setup/requirements.txt
     - docker/DatabaseAccess.Dockerfile
