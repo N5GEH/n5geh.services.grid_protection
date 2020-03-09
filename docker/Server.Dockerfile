@@ -22,9 +22,13 @@ ENV CERTIFICATE_PATH_SERVER_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_o
 EXPOSE 4840
 LABEL type="opcua_python_server" \
 <<<<<<< HEAD
+<<<<<<< HEAD
       version="0.7"
 =======
       version="0.6"
 
 >>>>>>> develop
+=======
+      version="0.7"
+>>>>>>> 10b06bd... adapt ENV vars for deployment with kubernetes on demonstrator pc
 CMD [ "python", "/usr/src/cloud_setup/opc_ua/server/OPCServer.py"]
