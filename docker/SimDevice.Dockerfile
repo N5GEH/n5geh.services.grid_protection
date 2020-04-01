@@ -28,6 +28,6 @@ ENV AUTO_VAR_UPDATER_TIMESTAMP_PRECISION 10
 ENV AUTO_VAR_UPDATER_START_THRESHOLD 5000
 
 EXPOSE 4850
-LABEL type="opcua_externClient_python" \
-      version="0.6"
-CMD [ "python", "/usr/src/cloud_setup/sim_device/OPCClient_SimDevice.py"]
+LABEL type="opcua_simulatedDevices_python" \
+      version="0.7"
+CMD [ "python", "/usr/src/cloud_setup/sim_device/SimulatedDeviceManager.py"]
