@@ -11,7 +11,7 @@ import logging
 
 from cloud_setup.protection.GridProtectionManager import DataHandler
 from cloud_setup.opc_ua.server.OPCServer import CustomServer
-from sim_device.OPCClient_SimDevice import OPCClientSimDevice
+from sim_device.SimulatedDeviceManager import DeviceManager
 from multiprocessing import Process
 import os
 
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     # setup meas devices as OPC client
     meas_device_tags = ["RES"]
     for tag in meas_device_tags:
-        mClient_MeasSim = OPCClientSimDevice(tag, "n5geh_opcua_client2", "n5geh2020")
+        mClient_MeasSim = DeviceManager(tag, "n5geh_opcua_client2", "n5geh2020")
         mClient_MeasSim.start()
 
     # # setup influxDb wrapper

@@ -9,4 +9,3 @@ misc*/
 #Cache
 *.pyc
 local_simulation_setup/Diff_Protection/RecordedData/
-docker/cloud_setup/protection/DataHandler2.py
