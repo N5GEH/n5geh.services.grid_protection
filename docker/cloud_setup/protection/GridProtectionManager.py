@@ -1,9 +1,10 @@
+#  encoding: utf-8
 #  Copyright (c) 2019.
 #  Author: Sebastian Krahmer
 
 """This is the Grid Protection Manager.
 
-This module init all opc clients, register variables, evaluate topology file and listen for topology updates (monitored item).
+This module init all opc clients, register variables, evaluate topology file and listen for topology updates.
 Init DataHandler class with relevant nodes (coming from topology mapping).
     Methods:
             register_devices(device_config_path)
@@ -25,7 +26,7 @@ __author__ = 'Sebastian Krahmer'
 
 
 class GridProtectionManager(object):
-    def __init__(self, topology_path, dir_name):
+    def __init__(self, topology_path, dir_name, client_username, client_pw):
         """
         :param topology_path (String): path of TopologyFile.json
         :param dir_name (String): name of subfolder to create; parent of all created nodes
@@ -33,6 +34,9 @@ class GridProtectionManager(object):
         self.SERVER_ENDPOINT = os.environ.get("SERVER_ENDPOINT")
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT", "False")))
         self.DEVICE_PATH = os.environ.get("DEVICE_PATH")
+
+        self.client_username = client_username
+        self.client_pw = client_pw
 
         self.opc_client = None
 
@@ -59,7 +63,7 @@ class GridProtectionManager(object):
         if self.opc_client:
             self._del_OPCUA()
 
-        self.opc_client = OPCClientDataHandler("n5geh_opcua_client1", "n5geh2019", self.SERVER_ENDPOINT)
+        self.opc_client = OPCClientDataHandler(self.client_username, self.client_pw, self.SERVER_ENDPOINT)
         self.opc_client.start()
 
     def _del_OPCUA(self):
@@ -72,6 +76,8 @@ class GridProtectionManager(object):
         self._terminated = True
 
     def start(self):
+        """Start routine to setup GridProtectionManager
+        """
         while not self._terminated:
             try:
                 # start opc client
@@ -90,7 +96,7 @@ class GridProtectionManager(object):
                 self.set_meas_topology(self.topo_path, [], self.server_dir_name)
 
                 # Set start values for controllable nodes
-                self.set_start_values_for_ctrls()
+                self.set_start_values_for_ctrls(100, "LIMIT_CTRL")
 
                 # Set status nodes used monitoring and topology/device updates
                 self.set_status_flags(self.topo_path, [], self.server_dir_name)
@@ -120,6 +126,9 @@ class GridProtectionManager(object):
         self._finalize()
 
     def register_devices(self, dir_name, device_config_path):
+        """Register device representation specified in *device_config_path* as node on *dir_name* at opc server
+        """
+
         self.opc_client.create_dir_on_server(dir_name)
         self.opc_client.register_variables_to_server(dir_name, device_config_path)
 
@@ -127,11 +136,18 @@ class GridProtectionManager(object):
               " successful register devices from file:" + device_config_path)
 
     def set_meas_topology(self, path, list_of_nodes_to_reset, dir_name):
+        """Match topology specified in *path* used for grid protection with all available nodes on *dir_name* at opc
+        server
+
+        This results in defining slack nodes for subgrids as well as mapping each node to information about the
+        representing phase. After all node are sorted in local lists the opc client is requested to make a subscription
+        for each node of interest at the opc server.
+        """
         # get at server registered vars allocated as CustomVar
         server_vars = self.get_customized_server_vars(dir_name)
 
         # get new topology
-        self.clear_topo_meas()
+        self._clear_topo_meas()
         self.topo_data = TopologyData(path)
 
         # cluster topology nodes into lists (current, ctrl and misc) and assign the appropriate CustomVar
@@ -167,13 +183,15 @@ class GridProtectionManager(object):
                                       self.misc_nodes_list)
 
         # update OPC-client: delete old subscription and start new subscription
-        self.update_subscription_opc_client(self.DataHandler, self.Iph1_nodes_list + self.Iph2_nodes_list +
-                                            self.Iph3_nodes_list + self.other_meas_nodes_list + self.ctrl_nodes_list,
-                                            False)
-
+        self._update_subscription_opc_client(self.DataHandler, self.Iph1_nodes_list + self.Iph2_nodes_list +
+                                             self.Iph3_nodes_list + self.other_meas_nodes_list + self.ctrl_nodes_list,
+                                             False)
+        # reset f
         self.reset_flags(list_of_nodes_to_reset, dir_name)
 
     def update_topology(self, path, list_of_nodes_to_reset, dir_name):
+        """Update used grid topology by stopping DiffCore and calling set_meas_topology() and starting DiffCore again
+        """
         # stop DiffCore if running
         if self.mDiffCore.is_running():
             self.mDiffCore.stop()
@@ -185,14 +203,17 @@ class GridProtectionManager(object):
         self.mDiffCore.start()
 
     def set_status_flags(self, path, list_of_nodes_to_reset, dir_name):
+        """Ge status_nodes from topology file specified by *path* and map they with nodes on *dir_name* at opc server.
+        In a next step make subscription for status nodes.
+        """
         # get at server registered vars allocated as CustomVar
         server_vars = self.get_customized_server_vars(dir_name)
 
         # get new topology
-        self.clear_topo_status_flags()
+        self._clear_topo_status_flags()
         self.topo_data = TopologyData(path)
 
-        # cluster topology nodes into lists (current, ctrl and misc) and assign the appropriate CustomVar
+        # cluster topology nodes into lists (here searching only for misc) and assign the appropriate CustomVar
         for topo_opctag, topo_browsename in self.topo_data.get_itempairs():
             for var in server_vars:
                 if var.opctag == topo_opctag:
@@ -204,15 +225,12 @@ class GridProtectionManager(object):
               " successful updated status flags from file:" + path)
 
         # update OPC-client: delete old subscription and start new subscription
-        self.update_subscription_opc_client(self, self.misc_nodes_list, True, 500)
+        self._update_subscription_opc_client(self, self.misc_nodes_list, True, 500)
 
         self.reset_flags(list_of_nodes_to_reset, dir_name)
 
     def reset_flags(self, list_of_flags_to_reset, dir_name):
-        """
-        Reset the value of each node in the provided list to 0.
-        :param list_of_flags_to_reset: list of nodes
-        :param dir_name: <String> name of subfolder(node)
+        """Reset the value of each node in the provided *list_of_flags_to_reset* on *dir_name* at opc sever to 0.
         """
         nodes = []
         values = []
@@ -226,6 +244,8 @@ class GridProtectionManager(object):
         self.opc_client.set_vars(nodes, values)
 
     def get_customized_server_vars(self, dir_name):
+        """Get server nodes and convert them into CustomVar to store opctag, nodeid and phase information together.
+        """
         all_observed_nodes = self.opc_client.get_server_vars(dir_name)
         mvars = []
         for var in all_observed_nodes:
@@ -240,10 +260,10 @@ class GridProtectionManager(object):
                 mvars.append(CustomVar(opctag, var.nodeid))
         return mvars
 
-    def update_subscription_opc_client(self, notification_target_class, list_of_nodes, are_status_nodes=False, sub_interval=1):
+    def _update_subscription_opc_client(self, notification_target_class, list_of_nodes, are_status_nodes=False, sub_interval=1):
         self.opc_client.make_subscription(notification_target_class, self.server_dir_name, list_of_nodes, are_status_nodes, sub_interval)
 
-    def clear_topo_meas(self):
+    def _clear_topo_meas(self):
         self.slack_ph1 = None
         self.slack_ph2 = None
         self.slack_ph3 = None
@@ -253,28 +273,29 @@ class GridProtectionManager(object):
         self.ctrl_nodes_list = []
         self.other_meas_nodes_list = []
 
-    def clear_topo_status_flags(self):
+    def _clear_topo_status_flags(self):
         self.misc_nodes_list = []
 
     def update_data(self, node, datetime_source, val):
+        """Function called from outside (by subscription class) when the state of an so-called update_node has changed.
+        """
         # check for Update Request topology
         for var in self.misc_nodes_list:
             if var.nodeid == node.nodeid and "UPDATE_REQUEST_TOPOLOGY" in var.opctag:
                 if val == 1:
-                    #TODO could not stop client -->Error
-                    # self._stop_client()
-                    # self._start_client()
                     self.update_topology(self.topo_path, [var], self.server_dir_name)
                     return
 
-    def set_start_values_for_ctrls(self):
+    def set_start_values_for_ctrls(self, start_value, key_phrase):
+        """Set a unique *start_value* for all nodes specified as controllable by *key_phrase*
+        """
         # set start value of PRED_CTRL to 100%
         ctrls = []
         values = []
         for ctrl in self.ctrl_nodes_list:
-            if "LIMIT_CTRL" in ctrl.opctag:
+            if key_phrase in ctrl.opctag:
                 ctrls.append(ctrl)
-                values.append(100)
+                values.append(start_value)
         self.opc_client.set_vars(ctrls, values)
 
         print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful set startValues for ctrl devices")
@@ -307,5 +328,5 @@ if __name__ == "__main__":
     topo_path = os.environ.get("TOPOLOGY_PATH")
     opcua_dir_name = os.environ.get("OPCUA_SERVER_DIR_NAME")
 
-    mGridProtectionManager = GridProtectionManager(topo_path, opcua_dir_name)
+    mGridProtectionManager = GridProtectionManager(topo_path, opcua_dir_name, "n5geh_opcua_client1", "n5geh2019")
     mGridProtectionManager.start()
