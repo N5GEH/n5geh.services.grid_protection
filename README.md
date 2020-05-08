@@ -1,7 +1,9 @@
 Grid Protection
 =========================
 
-These modules can be used to run a docker based grid protection service.
+These modules can be used to run a docker based grid protection service. For more information see [wiki.n5geh.de][link_to_n5geh_wiki].
+[link_to_n5geh_wiki]: https://wiki.n5geh.de/display/EN/Grid+Protection
+
 In order to enable a minimum functionality three services have to be deployed:
 
 * protocol master (1): OPC-UA server
