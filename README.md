@@ -1,8 +1,7 @@
 Grid Protection
 =========================
 
-These modules can be used to run a docker based grid protection service. For more information see [wiki.n5geh.de][link_to_n5geh_wiki].
-[link_to_n5geh_wiki]: https://wiki.n5geh.de/display/EN/Grid+Protection
+These modules can be used to run a docker based grid protection service. For more information see [wiki.n5geh.de][https://wiki.n5geh.de/display/EN/Grid+Protection]
 
 In order to enable a minimum functionality three services have to be deployed:
 
@@ -43,3 +42,6 @@ Ones could generate docker images following one of this two ways.
 4. load image into your server, e.g. via portainer
 
 
+
+
+[https://wiki.n5geh.de/display/EN/Grid+Protection]: https://wiki.n5geh.de/display/EN/Grid+Protection
