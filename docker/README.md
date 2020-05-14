@@ -57,7 +57,6 @@ only to be perfomed by an exchange of the topology file within container directo
 | DEBUG_MODE_PRINT                    | "False"                         | flag indicating whether massive status outputs should be activated for debugging |
 
 ### Appendum to container SimDevice (external measurement simulator)
-- optionally publish network ports manually (cf. EXPOSE in xx.Dockerfile): 4850
 
 Environment variables of the container:
 
@@ -78,7 +77,7 @@ Environment variables of the container:
 
 ### Appendum to container DatabaseAccess (InfluxDB wrapper)
 - before creating this container, setup an influxdb(dockerhub/influxdb) and grafana(dockerhub/grafana/grafana)
-- publish network ports manually (cf. EXPOSE in xx.Dockerfile): 8086
+- the exposed port of influxdb container should match with the port number of the env variables INFLUXDB_PORT.
 
 Environment variables of the container:
 

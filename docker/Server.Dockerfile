@@ -22,4 +22,5 @@ ENV CERTIFICATE_PATH_SERVER_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_o
 EXPOSE 4840
 LABEL type="opcua_python_server" \
       version="0.6"
+
 CMD [ "python", "/usr/src/cloud_setup/opc_ua/server/OPCServer.py"]
