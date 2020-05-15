@@ -92,14 +92,14 @@ class GridProtectionManager(object):
                 # Registration of vars at server
                 self.register_devices(self.server_dir_name, os.path.dirname(os.getcwd()) + self.DEVICE_PATH)
 
+                # Set status nodes used monitoring and topology/device updates
+                self.set_status_flags(self.topo_path, [], self.server_dir_name)
+
                 # Set topology used for grid protection
                 self.set_meas_topology(self.topo_path, [], self.server_dir_name)
 
                 # Set start values for controllable nodes
                 self.set_start_values_for_ctrls(100, "LIMIT_CTRL")
-
-                # Set status nodes used monitoring and topology/device updates
-                self.set_status_flags(self.topo_path, [], self.server_dir_name)
 
                 # start DiffCore
                 if not self.mDiffCore.is_running():
@@ -186,7 +186,7 @@ class GridProtectionManager(object):
         self._update_subscription_opc_client(self.DataHandler, self.Iph1_nodes_list + self.Iph2_nodes_list +
                                              self.Iph3_nodes_list + self.other_meas_nodes_list + self.ctrl_nodes_list,
                                              False)
-        # reset f
+        # reset flags
         self.reset_flags(list_of_nodes_to_reset, dir_name)
 
     def update_topology(self, path, list_of_nodes_to_reset, dir_name):
@@ -196,6 +196,9 @@ class GridProtectionManager(object):
         if self.mDiffCore.is_running():
             self.mDiffCore.stop()
 
+        # Set status nodes used monitoring and topology/device updates
+        self.set_status_flags(self.topo_path, [], self.server_dir_name)
+
         # set new topology
         self.set_meas_topology(path, list_of_nodes_to_reset, dir_name)
 
@@ -203,7 +206,7 @@ class GridProtectionManager(object):
         self.mDiffCore.start()
 
     def set_status_flags(self, path, list_of_nodes_to_reset, dir_name):
-        """Ge status_nodes from topology file specified by *path* and map they with nodes on *dir_name* at opc server.
+        """Get status_nodes from topology file specified by *path* and map they with nodes on *dir_name* at opc server.
         In a next step make subscription for status nodes.
         """
         # get at server registered vars allocated as CustomVar
