@@ -1,3 +1,4 @@
+#  encoding: utf-8
 #  Copyright (c) 2019.
 #  Author: Sebastian Krahmer
 
@@ -19,7 +20,7 @@ from opc_ua.client.OPCClient import CustomClient
 
 sys.path.insert(0, "..")
 
-__version__ = '0.6'
+__version__ = '0.7'
 __author__ = 'Sebastian Krahmer'
 
 
@@ -53,7 +54,8 @@ def numbers_to_typestrings(arg):
 
 
 class OPCClientDataHandler(CustomClient):
-    def __init__(self, auth_name=None, auth_password=None, server_endpoint="opc.tcp://0.0.0.0:4840/OPCUA/python_server/", client_request_timeout=4):
+    def __init__(self, auth_name=None, auth_password=None, server_endpoint="opc.tcp://0.0.0.0:4840/OPCUA/python_server/",
+                 client_request_timeout=4):
         # super
 
         self.NAMESPACE = os.environ.get("NAMESPACE")

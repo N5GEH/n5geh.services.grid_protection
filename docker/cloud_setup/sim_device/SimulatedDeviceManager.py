@@ -205,7 +205,7 @@ if __name__ == "__main__":
     # os.environ.setdefault("ENABLE_CERTIFICATE", "False")
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
-    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "simulation")
+    # os.environ.setdefault("OPCUA_SERVER_DIR_NAME", "demo")
     # os.environ.setdefault("DEBUG_MODE_PRINT", "False")
     # os.environ.setdefault("AUTO_VAR_UPDATER_UPDATE_PERIOD", "14")        # in ms
     # os.environ.setdefault("AUTO_VAR_UPDATER_TIMESTAMP_PRECISION", "10")   # in ms

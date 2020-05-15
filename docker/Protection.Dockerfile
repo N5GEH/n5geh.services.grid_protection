@@ -1,5 +1,6 @@
 FROM python:3.7-slim-buster
 RUN apt-get update && apt-get install -y git
+
 #RUN mkdir /data
 #ADD docker/cloud_setup/topology          /data/topology
 #ADD docker/cloud_setup/device_config  /data/device_config

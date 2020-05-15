@@ -1,3 +1,4 @@
+#  encoding: utf-8
 #  Copyright (c) 2019.
 #  Author: Sebastian Krahmer
 
@@ -92,20 +93,16 @@ class DiffCore(Thread):
                     or not self.THREE_PHASE_CALCULATION and self.df_ph1 is None:
                 pass
             else:
-                self.compute_balance_of_current()
+                self.evaluate_balance_of_current()
 
-    # I_sum for each phase of subgrid
-    def compute_balance_of_current(self):
+    # evaluate the balance (of current) for the closest timestamp
+    def evaluate_balance_of_current(self):
         self.df_ph1['sum'] = self.df_ph1.apply(func=sums, axis=1)
 
         if self.THREE_PHASE_CALCULATION:
             self.df_ph2['sum'] = self.df_ph2.apply(func=sums, axis=1)
             self.df_ph3['sum'] = self.df_ph3.apply(func=sums, axis=1)
 
-        self.evaluate_balance_of_current()
-
-    # evaluate the balance (of current) for the closest timestamp
-    def evaluate_balance_of_current(self):
         result_code = "VALID"
 
         try:
