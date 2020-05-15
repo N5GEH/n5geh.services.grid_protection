@@ -93,13 +93,8 @@ if __name__ == "__main__":
     # setup meas devices as OPC client
     meas_device_tags = ["RES"]
     for tag in meas_device_tags:
-<<<<<<< HEAD
-        mClient_MeasSim = DeviceManager(tag, "n5geh_opcua_client2", "n5geh2020")
-        mClient_MeasSim.start()
-=======
         mDeviceManager = DeviceManager(tag)
         mDeviceManager.start()
->>>>>>> develop
 
     # # setup influxDb wrapper
     #     mInfluxDbWrapper = InfluxDbWrapper()
