@@ -3,11 +3,9 @@
 ## Generating docker images
 
 Images can be created either by the gitlab runner or via docker commands in a console of the target host OS.
+Please have a look at the [tutorial][link_to_tutorial].
 
-## Create Container with portainer
-1. choose "registry.git.rwth-aachen.de/" as registry root and insert the particular image tag (cf. Container Registry @ Gitlab)
-2. always pull the image: true
-3. restart policy: allways
+Importing: The IP address 0.0.0.0 only refers to inside a container and not to the host OS in which the container is running.
 
 ### Appendum to container Server (OPC-UA server)
 - have to publish network ports manually (cf. EXPOSE in xx.Dockerfile): 4840
@@ -96,3 +94,4 @@ Environment variables of the container:
 | DEBUG_MODE_PRINT                    | "False"                        | flag indicating whether status outputs should be activated for debugging                                             |
 
 
+[link_to_tutorial]: ../tutorials/
