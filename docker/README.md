@@ -94,4 +94,4 @@ Environment variables of the container:
 | DEBUG_MODE_PRINT                    | "False"                        | flag indicating whether status outputs should be activated for debugging                                             |
 
 
-[link_to_tutorial]: ../tutorials/
+[link_to_tutorial]: ../tutorial/

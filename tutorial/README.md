@@ -20,7 +20,7 @@ deployed first before the core services will be started. The picture below shows
 ### Recommended associated services
 For visualization and easy configuration additional services are recommended.
 
-#### Graphical user interface for docker administration
+#### 1. Graphical user interface for docker administration
 For the local graphical administration of docker related services [portainer][portainer] can be used.
 
 Pull the container image via
@@ -37,7 +37,7 @@ From now you can **use this GUI within the tutorial for creating or pulling cont
 
 For a scaled up deployment docker-compose files in combination with Kubernetes is recommended instead. 
 
-#### Graphical user interface for database visualization
+#### 2. Graphical user interface for database visualization
 [Grafana][grafana] is an open source analytics & monitoring solution for every database. Within this tutorial it will be used to show
 the time series data from the OPC-UA server stored in the influxdb Database.
 
@@ -50,7 +50,7 @@ and deploy via
     $ docker run -d -p 3000:3000 --name grafana --restart always grafana/grafana
 A new dashboard will be set up [later](#monitoring-via-grafana) in this tutorial.    
 
-#### Time series database for archiving OPC-UA variables
+#### 3. Time series database for archiving OPC-UA variables
 [InfluxDB][influxdb] is a high-speed read and write database. The data is being written in real-time and one can read in real-time.
 It will be used to store time series data from the OPC-UA server.
 
@@ -62,7 +62,7 @@ and deploy via
 
     $ docker run -d -p 8086:8086 --name influxdb --restart always -v influxdb:/var/lib/influxdb influxdb
 InfluxDB is now ready for use and will be initialized later.
-#### Network Time Protocol server
+#### 4. Network Time Protocol server
 The [NTP server][ntp] will be used for synchronization of the field measurement devices, the so-called Wireless Transducer Interfaces (WTI).
 Have a look at hte NTP server configuration if you want to change the time server.
 
@@ -96,7 +96,7 @@ We want to mention two ways to get docker images of these services. The first wa
 from the registry at [dockerhub][n5geh_docker_registry], the second is to build each service based on the cloned repository using the `Dockerfiles`.
 Both can be done using [portainer][portainer_images]. This tutorial focuses on the second way.
 
-#### Clone repository to local host system using Git
+#### 5. Clone repository to local host system using Git
     $ sudo apt install git
 For the following it is assumed that the repo was cloned to the local directory `/home/n5geh/grid_protection_repo/`.
 
@@ -108,7 +108,7 @@ Now one can build images using
  
 This tutorial focuses on the second way. 
 
-#### OPC-UA server
+#### 6. OPC-UA server
 To build the OPC-UA server image with the tag `n5geh/opcua_server:latest` run in the console
 
     $ docker build -t n5geh/opcua_server:latest -f /home/n5geh/grid_protection_repo/docker/Server.Dockerfile /home/n5geh/grid_protection_repo/
@@ -122,7 +122,7 @@ To create and run a container based on this image the exposed port (4840) has to
 
 Now one can again observe or change the status of the existing container using [portainer][portainer_container].
 
-#### Grid Protection service
+#### 7. Grid Protection service
 ##### Adaption of device and topology list
 This tutorial runs out of the box with a list of six variables as a representation of a simple single phase grid:
 * 3 measurement variables
@@ -161,7 +161,7 @@ Add the OPC-UA server and connect.
 ![UaExpoert: add new opcua server for monitoring and connect](images/uaexpert_add_new_server_anonymous.png)
 ![UaExpoert: show_connected_nodes](images/uaexpert_show_connected_nodes.png)
 
-#### Device Simulator service
+#### 8. Device Simulator service
 To proof the functionality without real WTIs, measurements can be simply simulated by this service. A loop of sinus waves 
 will be calculated and after the half of time one simulated measurement is assigned with an offset to trigger fault detection.
 For detail information go for the related `README`.
@@ -179,8 +179,8 @@ To create and run a container based on this image:
 
 Check via UaExpert, that all measurement variables start to change their values.
 
-#### Database access for archiving and superior monitoring
-#### Deployment
+#### 9. Database access for archiving and superior monitoring
+##### Deployment
 If one want to archive the values arriving on the OPC-UA server or have a superior insight of data history, this service
 provide access to the influxDB set up beforehand.
 
@@ -219,7 +219,7 @@ Next create a appropriate dashboard by yourself to visualize the history of data
 
 ![Grafana: dashboard](images/grafana_meas_values.png)
 
-#### Conclusion
+#### 10. Conclusion
 If all was set up right, then one have eight container running (cf. following picture).
 
 ![Portainer: list of running container after finishing this tutorial](images/portainer_finish.png)
@@ -234,8 +234,6 @@ It is possible to use certificates as well as username/password for the connecti
 of this option change `ENABLE_CERTIFICATE` to `"True"` in all `.Dockerfiles`. While within the services this will work out 
 of the box, a username/password must be entered for UaExpert when connecting to server. One will find the predefined combinations in [OPCServer.py][OPCServer].
 
-##### Network Time Protocol
-To get more in touch with the functionality of the NTP, one can use the simple ntp_client.py provided in the repository directory _/ntp_.
 
 
 [n5geh_wiki]: https://wiki.n5geh.de/display/EN/Grid+Protection
