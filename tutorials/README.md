@@ -220,7 +220,7 @@ Next create a appropriate dashboard by yourself to visualize the history of data
 ![Grafana: dashboard](images/grafana_meas_values.png)
 
 #### Conclusion
-If all was set up right, then one have eight container running. (cf. following picture).
+If all was set up right, then one have eight container running (cf. following picture).
 
 ![Portainer: list of running container after finishing this tutorial](images/portainer_finish.png)
 
