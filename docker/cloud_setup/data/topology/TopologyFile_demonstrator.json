@@ -8,7 +8,8 @@
         "PV_I_PH1_RES": "Feeder2 PV-Infeed, Current Phase1",
         "PV_LIMIT_CTRL": "Feeder2 PV-Infeed, Active power upper limit[0-->0%, 100-->100%]",
         "NETZ_PH1_FEHLER_COUNTER": "Feeder2 Status PH1, Number of detected faulty states since last disconnect of feeder2",
-        "UPDATE_REQUEST_TOPOLOGY": "Feeder2 Request, External Request to Update(read in) Topology File"
+        "UPDATE_REQUEST_TOPOLOGY": "Feeder2 Request, External Request to Update(read in) Topology File",
+        "RUN_ONLINE_GRID_PROTECTION": "Feeder2 Request, External Request to Run or Run not the Online Grid Protection"
       }
     ]
 }

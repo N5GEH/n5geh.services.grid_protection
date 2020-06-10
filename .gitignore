@@ -9,4 +9,3 @@ misc*/
 #Cache
 *.pyc
 local_simulation_setup/Diff_Protection/RecordedData/
-docker/cloud_setup/data/topology/TopologyFile_demonstrator_2devices.json

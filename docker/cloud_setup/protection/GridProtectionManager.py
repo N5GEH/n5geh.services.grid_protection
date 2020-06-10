@@ -52,7 +52,7 @@ class GridProtectionManager(object):
         self.Iph3_nodes_list = []
         self.ctrl_nodes_list = []   # CustomVars related to actuators (will used only for feedback-control); (PF: CTRL-Variable, control only)
         self.other_meas_nodes_list = []     # CustomVars that are sensors and NOT related to I-measurement; (PF: RES-Variable which contain not to I-measurement)
-        self.misc_nodes_list = []   # CustomVars not directly related to grid protection (mostly status vars and vars providing additional infos); (PF: PF intern simulation vars)
+        self.misc_nodes_list = []   # CustomVars related to status information of grid protection; (PF: PF intern simulation vars)
 
         self.DataHandler = None
         self.mDiffCore = None
@@ -88,22 +88,26 @@ class GridProtectionManager(object):
 
                 # Init DiffCore
                 self.mDiffCore = DiffCore(self.opc_client, self.DataHandler)
+                time.sleep(1)
 
                 # Registration of vars at server
                 self.register_devices(self.server_dir_name, os.path.dirname(os.getcwd()) + self.DEVICE_PATH)
 
-                # Set status nodes used monitoring and topology/device updates
+                # Set status nodes used for monitoring and topology/device updates
                 self.set_status_flags(self.topo_path, [], self.server_dir_name)
 
-                # Set topology used for grid protection
+                # Set topology used for grid protection functionality itself
                 self.set_meas_topology(self.topo_path, [], self.server_dir_name)
 
-                # Set start values for controllable nodes
-                self.set_start_values_for_ctrls(100, "LIMIT_CTRL")
+                # Set start value for controllable node
+                self.set_start_value_for_ctrl_node(100, "LIMIT_CTRL")  # set start value of PV_LIMIT_CTRL to 100%
+
+                # Set start value for misc node
+                self.set_start_value_for_misc_node(1, "RUN_ONLINE_GRID_PROTECTION")  # set start value to ON
 
                 # start DiffCore
-                if not self.mDiffCore.is_running():
-                    self.mDiffCore.start()
+                time.sleep(1)
+                self.mDiffCore.start()
 
                 print(DateHelper.get_local_datetime(), self.__class__.__name__, " finished Start-Routine")
 
@@ -194,7 +198,7 @@ class GridProtectionManager(object):
         """
         # stop DiffCore if running
         if self.mDiffCore.is_running():
-            self.mDiffCore.stop()
+            self.mDiffCore.pause()
 
         # Set status nodes used monitoring and topology/device updates
         self.set_status_flags(self.topo_path, [], self.server_dir_name)
@@ -203,7 +207,8 @@ class GridProtectionManager(object):
         self.set_meas_topology(path, list_of_nodes_to_reset, dir_name)
 
         # start DiffCore
-        self.mDiffCore.start()
+        if not self.mDiffCore.is_running():
+            self.mDiffCore.resume()
 
     def set_status_flags(self, path, list_of_nodes_to_reset, dir_name):
         """Get status_nodes from topology file specified by *path* and map they with nodes on *dir_name* at opc server.
@@ -288,26 +293,49 @@ class GridProtectionManager(object):
                 if val == 1:
                     self.update_topology(self.topo_path, [var], self.server_dir_name)
                     return
+            elif var.nodeid == node.nodeid and "RUN_ONLINE_GRID_PROTECTION" in var.opctag:
+                if val == 1:
+                    # run DiffCore if is not running
+                    if not self.mDiffCore.is_running():
+                        self.mDiffCore.resume()
+                    return
+                else:
+                    # stop DiffCore if is running
+                    if self.mDiffCore.is_running():
+                        self.mDiffCore.pause()
+                    return
 
-    def set_start_values_for_ctrls(self, start_value, key_phrase):
-        """Set a unique *start_value* for all nodes specified as controllable by *key_phrase*
+    def set_start_value_for_ctrl_node(self, start_value, key_phrase):
+        """Set a *start_value* for a node specified as controllable by *key_phrase*
         """
-        # set start value of PRED_CTRL to 100%
-        ctrls = []
+        nodes = []
         values = []
-        for ctrl in self.ctrl_nodes_list:
-            if key_phrase in ctrl.opctag:
-                ctrls.append(ctrl)
+        for node in self.ctrl_nodes_list:
+            if key_phrase in node.opctag:
+                nodes.append(node)
                 values.append(start_value)
-        self.opc_client.set_vars(ctrls, values)
+        self.opc_client.set_vars(nodes, values)
 
-        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful set startValues for ctrl devices")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful set startValues for ctrl node")
+
+    def set_start_value_for_misc_node(self, start_value, key_phrase):
+        """Set a *start_value* for a node specified as misc by *key_phrase*
+        """
+        nodes = []
+        values = []
+        for node in self.misc_nodes_list:
+            if key_phrase in node.opctag:
+                nodes.append(node)
+                values.append(start_value)
+        self.opc_client.set_vars(nodes, values)
+
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, " successful set startValues for misc node")
 
 
 if __name__ == "__main__":
     ##################
     # if using local (means not in Docker)
-    # local = False   # if server is local or as Docker
+    # local = True   # if server is local or as Docker
     # if local:
     #     os.environ.setdefault("SERVER_ENDPOINT", "opc.tcp://localhost:4840/OPCUA/python_server/")
     # else:
@@ -317,7 +345,7 @@ if __name__ == "__main__":
     # os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT", "/opc_ua/certificates/n5geh_opcua_server_cert.pem")
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
     # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
-    # os.environ.setdefault("DEBUG_MODE_PRINT", "True")
+    # os.environ.setdefault("DEBUG_MODE_PRINT", "False")
     # os.environ.setdefault("THREE_PHASE_CALCULATION", "False")
     # os.environ.setdefault("TIMESTAMP_PRECISION", "10")   # in ms
     # os.environ.setdefault("MAX_FAULTY_STATES", "5")
