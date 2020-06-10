@@ -20,7 +20,7 @@ from opcua.ua.uaerrors import BadNoMatch
 
 sys.path.insert(0, "..")
 
-__version__ = '0.6'
+__version__ = '0.7'
 __author__ = 'Sebastian Krahmer'
 
 # users database
@@ -152,6 +152,23 @@ class CustomServer(object):
 
         method_node = self.obj.add_method(self.idx, "SET_PV_LIMIT", self.set_pv_active_power_setpoint, [inarg1, inarg2])
 
+        # method: RUN_ONLINE_GRID_PROTECTION
+        inarg1 = ua.Argument()
+        inarg1.Name = "On/Off"
+        inarg1.DataType = ua.NodeId(ua.ObjectIds.Int32)  # Integer
+        inarg1.ValueRank = -1
+        inarg1.ArrayDimensions = []
+        inarg1.Description = ua.LocalizedText("Type in 1 to RUN or 0 to STOP ONLINE_GRID_PROTECTION")
+
+        inarg2 = ua.Argument()
+        inarg2.Name = "parent_node"
+        inarg2.DataType = ua.NodeId(ua.ObjectIds.String)  # String
+        inarg2.ValueRank = -1
+        inarg2.ArrayDimensions = []
+        inarg2.Description = ua.LocalizedText("Type in the name of the parent node")
+
+        method_node = self.obj.add_method(self.idx, "RUN_ONLINE_GRID_PROTECTION", self.run_online_grid_protection, [inarg1, inarg2])
+
     @uamethod
     def add_objects_subfolder(self, parent, dir_name):
         # check if old dir with dir_name exists. if so then delete this dir first
@@ -194,6 +211,21 @@ class CustomServer(object):
                 mvar.set_value(clamp(setpoint, 0, 100), variant_type)
                 print(DateHelper.get_local_datetime(),
                       "Set Value of node " + mvar.get_browse_name().Name + " to " + str(clamp(setpoint, 0, 100)))
+
+    @uamethod
+    def run_online_grid_protection(self, parent, setpoint, parent_node=""):
+        try:
+            obj = self.root.get_child(["0:Objects", ("{}:" + parent_node).format(self.idx)])
+        except BadNoMatch:
+            print(DateHelper.get_local_datetime(), "run_online_grid_protection(): Change in On/Off failed.")
+            raise
+
+        for mvar in obj.get_variables():
+            if "RUN_ONLINE_GRID_PROTECTION" in mvar.get_browse_name().Name:
+                variant_type = mvar.get_data_value().Value.VariantType
+                mvar.set_value(clamp(setpoint, 0, 1), variant_type)
+                print(DateHelper.get_local_datetime(),
+                      "Change status of online grid protection to " + str(clamp(setpoint, 0, 1)))
 
     def start(self):
         self.server.start()

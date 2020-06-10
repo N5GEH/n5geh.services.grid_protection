@@ -14,6 +14,7 @@ import time
 from distutils.util import strtobool
 from threading import Thread
 
+from helper.DateHelper import DateHelper
 from protection import LocalData
 
 __version__ = '0.7'
@@ -27,6 +28,7 @@ def sums(row):
 class DiffCore(Thread):
     def __init__(self, opc_client, data_handler, nominal_current=275, eps=0.05, number_of_faulty_states_to_failure=5):
         Thread.__init__(self)
+
         # super().__init__()
         """
             Args:
@@ -59,25 +61,26 @@ class DiffCore(Thread):
 
     def run(self):
         self._is_running = True
+        self.set_status_online_grid_protection(1)
         self.print_work_status('started')
-        while self.is_running():
-            self.check_for_new_data()
-            time.sleep(0.005)
+        while True:
+            while self.is_running():
+                self.check_for_new_data()
+                time.sleep(0.005)
+            time.sleep(1)
+
+    def pause(self):
+        self._is_running = False
+        self.set_status_online_grid_protection(0)
+        self.print_work_status('paused')
+
+    def resume(self):
+        self._is_running = True
+        self.set_status_online_grid_protection(1)
+        self.print_work_status('resumed')
 
     def is_running(self):
         return self._is_running
-
-    # def pause(self):
-    #     self.work_status = 'paused'
-    #     self.print_work_status()
-    #
-    # def resume(self):
-    #     self.work_status = 'resumed'
-    #     self.print_work_status()
-
-    def stop(self):
-        self._is_running = False
-        self.print_work_status('stopped')
 
     def check_for_new_data(self):
         res = self.data_handler.get_newest_data()
@@ -197,7 +200,21 @@ class DiffCore(Thread):
         # execute set_vars()
         self.opc_client.set_vars(nodes, values)
 
-        print(self.__class__.__name__, "All CTRL devices are set to power feedin = 0.")
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, "All CTRL devices are set to power feedin = 0.")
+
+    def set_status_online_grid_protection(self, status_value):
+        """Set a value for node RUN_ONLINE_GRID_PROTECTION
+        """
+        nodes = []
+        values = []
+        for node in self.misc_nodes_list:
+            if "RUN_ONLINE_GRID_PROTECTION" in node.opctag:
+                nodes.append(node)
+                values.append(status_value)
+        self.opc_client.set_vars(nodes, values)
+
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, "updated status of Online Grid Protection.")
+
 
     @staticmethod
     def decrease_fault_state_counter(faulty_phase):
@@ -241,4 +258,4 @@ class DiffCore(Thread):
                       , str(format(self.df_ph1.iloc[-1]['sum'], '.2f')) + '(' + str(LocalData.mFaultStateCounter_ph1) + ')' + ";" + '\n')
 
     def print_work_status(self, work_status):
-        print(self.__class__.__name__, work_status)
+        print(DateHelper.get_local_datetime(), self.__class__.__name__, work_status)

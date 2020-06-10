@@ -83,6 +83,7 @@ class DataHandler(object):
     def update_data(self, node, datetime_source, val):
         # pause DiffCore Thread to not rw DataFrame which is in Update process
         with self.__lock:
+            self.check_for_unused_meas_data()
             if self.clear_meas_data_flag:
                 self.clear_meas_data()
             start = time.time_ns()
