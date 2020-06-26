@@ -37,6 +37,8 @@ class VarUpdater(Thread):
         self.PERIOD = int(os.environ.get("AUTO_VAR_UPDATER_UPDATE_PERIOD", period))
         self.TIME_STEPS_NO_ERROR = int(os.environ.get("AUTO_VAR_UPDATER_TIME_STEPS_NO_ERROR", "60"))
         self.TIME_STEPS_ERROR = int(os.environ.get("AUTO_VAR_UPDATER_TIME_STEPS_ERROR", "60"))
+        self.ANORMAL_NODE_NAME = os.environ.get("NAME_OF_ANORMAL_MEASUREMENT")
+        self.SLACK_NODE_NAME = os.environ.get("NAME_OF_SLACK_MEASUREMENT")
 
         self.ticker = threading.Event()
         self._terminated = False
@@ -75,10 +77,10 @@ class VarUpdater(Thread):
                 dv.SourceTimestamp = now
                 # dv.SourceTimestamp = now_noised
 
-                if "LAST_I_PH1_RES" in var.get_browse_name().Name:
+                if self.ANORMAL_NODE_NAME in var.get_browse_name().Name:
                     dv.Value = ua.Variant(2 * sin(100 * pi * (t1 + t2)))
                 else:
-                    if "TRAFO_I_PH1_RES" in var.get_browse_name().Name:
+                    if self.SLACK_NODE_NAME in var.get_browse_name().Name:
                         dv.Value = ua.Variant((len(self.vars)-1) * 2 * sin(100 * pi * t1))
                     else:
                         dv.Value = ua.Variant(2 * sin(100 * pi * t1))
@@ -212,6 +214,8 @@ if __name__ == "__main__":
     # os.environ.setdefault("AUTO_VAR_UPDATER_START_THRESHOLD", "5000")     # in ms
     # os.environ.setdefault("AUTO_VAR_UPDATER_TIME_STEPS_NO_ERROR", "60")
     # os.environ.setdefault("AUTO_VAR_UPDATER_TIME_STEPS_ERROR", "60")
+    # os.environ.setdefault("NAME_OF_ANORMAL_MEASUREMENT", "LAST_I_PH1_RES")
+    # os.environ.setdefault("NAME_OF_SLACK_MEASUREMENT", "TRAFO_I_PH1_RES")
     ##################
 
     meas_device_tags = ["RES"]

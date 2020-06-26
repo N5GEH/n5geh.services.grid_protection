@@ -228,7 +228,7 @@ For a use of real WTIs please stop the container `sim_device` and configure the 
 
 ### Individual testing
 ##### Using authentication 
-It has to mention that to this date (15.05.2020) the used OPC-UA library will **not** work properly using a secured connection over a period longer than one hour (cf. renew opened secure connection).
+It has to mention that to this date (15.05.2020) the used OPC-UA library will **not** work properly using a secured connection over a period longer than one hour (cf. Issue: renew opened secure connection).
 
 It is possible to use certificates as well as username/password for the connection between clients and server. To make use 
 of this option change `ENABLE_CERTIFICATE` to `"True"` in all `.Dockerfiles`. While within the services this will work out 

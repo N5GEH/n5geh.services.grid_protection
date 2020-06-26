@@ -55,6 +55,7 @@ only to be perfomed by an exchange of the topology file within container directo
 | DEBUG_MODE_PRINT                    | "False"                         | flag indicating whether massive status outputs should be activated for debugging |
 
 ### Appendum to container SimDevice (external measurement simulator)
+- so far the setup is only for a single phase simulation
 
 Environment variables of the container:
 
@@ -72,6 +73,8 @@ Environment variables of the container:
 | AUTO_VAR_UPDATER_TIMESTAMP_PRECISION | "10"                          | based on this timestamp precision (in ms) a randomized timestamp noize can be added                                  |
 | AUTO_VAR_UPDATER_START_THRESHOLD    | "5000"                         | time threshold after the simulator will start to send periodically value update for each node                        |
 | DEBUG_MODE_PRINT                    | "False"                        | flag indicating whether status outputs should be activated for debugging                                             |
+| NAME_OF_ANORMAL_MEASUREMENT         | "LAST_I_PH1_RES"               | name of measurement node, which will be partly occupied with a phase shift to simulate a failure |
+| NAME_OF_SLACK_MEASUREMENT           | "TRAFO_I_PH1_RES"              | name of measurement node, which can be seen as slack and therefore is calculated in a negative way for evaluation of the current sum |
 
 ### Appendum to container DatabaseAccess (InfluxDB wrapper)
 - before creating this container, setup an influxdb(dockerhub/influxdb) and grafana(dockerhub/grafana/grafana)
