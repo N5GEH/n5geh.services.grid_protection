@@ -1,5 +1,8 @@
 Grid Protection
 =========================
+## Disclosure
+This repository was developed within the scope of the research project N5GEH and serves the exemplary implementation of a cloud-based grid protection. 
+There is therefore no claim to absence of errors, especially for a possible commercial adaptation. The use is without guarantee. 
 
 These modules can be used to run a docker based grid protection service. For more information see [wiki.n5geh.de][https://wiki.n5geh.de/display/EN/Grid+Protection]
 
