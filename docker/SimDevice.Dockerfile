@@ -16,8 +16,8 @@ ENV PYTHONPATH /usr/src
 ENV SERVER_ENDPOINT opc.tcp://ubuntu5g:4840
 ENV NAMESPACE https://n5geh.de
 ENV ENABLE_CERTIFICATE False
-ENV CERTIFICATE_PATH_CLIENT_CERT /cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem
-ENV CERTIFICATE_PATH_CLIENT_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem
+# ENV CERTIFICATE_PATH_CLIENT_CERT /cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem
+# ENV CERTIFICATE_PATH_CLIENT_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem
 ENV OPCUA_SERVER_DIR_NAME demo
 ENV DEBUG_MODE_PRINT False
 
@@ -28,5 +28,5 @@ ENV AUTO_VAR_UPDATER_TIMESTAMP_PRECISION 10
 ENV AUTO_VAR_UPDATER_START_THRESHOLD 5000
 
 LABEL type="opcua_simulatedDevices_python" \
-      version="0.7"
+      version="0.7.1"
 CMD [ "python", "/usr/src/cloud_setup/sim_device/SimulatedDeviceManager.py"]

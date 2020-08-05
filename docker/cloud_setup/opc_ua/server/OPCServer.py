@@ -252,9 +252,9 @@ if __name__ == "__main__":
     # os.environ.setdefault("NAMESPACE", "https://n5geh.de")
     # os.environ.setdefault("SERVER_NAME", "N5GEH_FreeOpcUa_Python_Server")
     # os.environ.setdefault("ENABLE_CERTIFICATE", "False")
-    # os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT",
+    #  # os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT",
     #                       "/cloud_setup/opc_ua/certificates/n5geh_opcua_server_cert.pem")
-    # os.environ.setdefault("CERTIFICATE_PATH_SERVER_PRIVATE_KEY",
+    #  # os.environ.setdefault("CERTIFICATE_PATH_SERVER_PRIVATE_KEY",
     #                       "/cloud_setup/opc_ua/certificates/n5geh_opcua_server_private_key.pem")
     #################################
     server = CustomServer()

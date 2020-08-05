@@ -26,7 +26,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.7.0',
+    version='0.7.1',
 
     description='Python GridProtection via OPC-UA, optionally using PowerFactory as Measurement-OPC-client',
     long_description=long_description,
@@ -86,12 +86,12 @@ setup(
         'pytz>=2019.3',
         'pyyaml>=5.3',
         'pandas>=1.0.1',
-        # 'opcua>=0.98.9',
+        # 'opcua>=0.98.13',
         # 'opcua==0.98.3' # for powerfactory maybe better alternative
     ],
     dependency_links=[
         # see instead requirements.txt
-        # 'git+https://github.com/FreeOpcUa/python-opcua.git@master#egg=opcua-0.98.9.1',
+        # 'git+https://github.com/FreeOpcUa/python-opcua.git@master#egg=opcua-0.98.13.1',
     ],
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,

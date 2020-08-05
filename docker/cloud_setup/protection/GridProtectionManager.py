@@ -343,8 +343,8 @@ if __name__ == "__main__":
     # os.environ.setdefault("NAMESPACE", "https://n5geh.de")
     # os.environ.setdefault("ENABLE_CERTIFICATE", "False")
     # os.environ.setdefault("CERTIFICATE_PATH_SERVER_CERT", "/opc_ua/certificates/n5geh_opcua_server_cert.pem")
-    # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
-    # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
+    # # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_CERT", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem")
+    # # os.environ.setdefault("CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "/cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem")
     # os.environ.setdefault("DEBUG_MODE_PRINT", "False")
     # os.environ.setdefault("THREE_PHASE_CALCULATION", "False")
     # os.environ.setdefault("TIMESTAMP_PRECISION", "10")   # in ms
