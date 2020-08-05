@@ -16,8 +16,8 @@ ENV PYTHONPATH /usr/src
 ENV SERVER_ENDPOINT opc.tcp://ubuntu5g:4840
 ENV NAMESPACE https://n5geh.de
 ENV ENABLE_CERTIFICATE False
-ENV CERTIFICATE_PATH_CLIENT_CERT /cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem
-ENV CERTIFICATE_PATH_CLIENT_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem
+# ENV CERTIFICATE_PATH_CLIENT_CERT /cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem
+# ENV CERTIFICATE_PATH_CLIENT_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem
 ENV OPCUA_SERVER_DIR_NAME demo
 ENV DATABASE_UPDATE_PERIOD 1000
 ENV INFLUXDB_HOST ubuntu5g
@@ -27,5 +27,5 @@ ENV INFLUXDB_NAME demonstrator_grid_protection
 
 
 LABEL type="database_access_python" \
-      version="0.7"
+      version="0.7.1"
 CMD [ "python", "/usr/src/cloud_setup/database_access/InfluxDbWrapper.py"]

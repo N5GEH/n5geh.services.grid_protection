@@ -20,8 +20,8 @@ ENV PYTHONPATH /usr/src
 ENV SERVER_ENDPOINT opc.tcp://ubuntu5g:4840
 ENV NAMESPACE https://n5geh.de
 ENV ENABLE_CERTIFICATE False
-ENV CERTIFICATE_PATH_CLIENT_CERT /cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem
-ENV CERTIFICATE_PATH_CLIENT_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem
+# ENV CERTIFICATE_PATH_CLIENT_CERT /cloud_setup/opc_ua/certificates/n5geh_opcua_client_cert.pem
+# ENV CERTIFICATE_PATH_CLIENT_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_opcua_client_private_key.pem
 ENV DEBUG_MODE_PRINT False
 ENV THREE_PHASE_CALCULATION False
 ENV TIMESTAMP_PRECISION 10
@@ -35,5 +35,5 @@ ENV DEVICE_PATH /cloud_setup/data/device_config/Setup_demonstrator.txt
 
 EXPOSE 4860
 LABEL type="protection_python" \
-      version="0.7"
+      version="0.7.1"
 CMD [ "python", "/usr/src/cloud_setup/protection/GridProtectionManager.py"]
