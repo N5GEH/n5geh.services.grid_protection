@@ -29,7 +29,7 @@ class DataResultWrapper:
     def __init__(self, ctrl, misc, df_ph1, df_ph2, df_ph3):
         """
         :param:
-                trl_nodes ([CustomVar]): list of all controllable OPC vars
+                ctrl_nodes ([CustomVar]): list of all controllable OPC vars
                 misc_nodes ([CustomVar]): list of protection relevant status flag OPC vars
                 dataframe_phx (dataframe): dataframe for each phase containing all measured values for (several) timestamps
                 """
