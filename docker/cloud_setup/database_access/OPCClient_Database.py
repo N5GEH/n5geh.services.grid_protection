@@ -31,9 +31,9 @@ class OPCClientDatabase(CustomClient):
         self.NAMESPACE = os.environ.get("NAMESPACE")
         self.ENABLE_CERTIFICATE = bool(strtobool(os.environ.get("ENABLE_CERTIFICATE")))
         self.CERTIFICATE_PATH_CLIENT_CERT = os.path.dirname(os.getcwd()) + os.environ.get(
-            "CERTIFICATE_PATH_CLIENT_CERT")
+            "CERTIFICATE_PATH_CLIENT_CERT", "not_specified")
         self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY = os.path.dirname(os.getcwd()) + os.environ.get(
-            "CERTIFICATE_PATH_CLIENT_PRIVATE_KEY")
+            "CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "not_specified")
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT", "False")))
 
         super().__init__(self.SERVER_ENDPOINT, self.NAMESPACE, self.ENABLE_CERTIFICATE, self.CERTIFICATE_PATH_CLIENT_CERT,
