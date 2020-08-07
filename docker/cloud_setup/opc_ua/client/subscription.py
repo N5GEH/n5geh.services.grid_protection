@@ -28,6 +28,12 @@ class SubHandler(object):
 
     def event_notification(self, event):
         if self.DEBUG_MODE_PRINT:
-            print("Python: New event", event)
+            print("New Event: ", event)
+        else:
+            pass
+
+    def status_change_notification(self, status):
+        if self.DEBUG_MODE_PRINT:
+            print("New Status: ", status)
         else:
             pass
