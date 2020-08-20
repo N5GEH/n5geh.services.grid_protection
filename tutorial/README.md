@@ -1,13 +1,13 @@
 # Tutorial Grid Protection
 This is a tutorial of how to run the services for N5GEH use case Grid Protection. For a better understanding of the 
-use case and the derived services one should take a look at [wiki.n5geh.de][n5geh_wiki]. The OPC-UA protocol will be used for the communication between field devices and the cloud instance.
+use case and the derived services one should take a look at [wiki.n5geh.de [1]][n5geh_wiki]. The OPC-UA protocol will be used for the communication between field devices and the cloud instance.
 
 To start using the tutorial it is necessary to install Pre-requisites.
 
 ## Pre-requisites
 - server or virtual machine with linux
-- Docker engine (cf. [docs.docker.com][docker_install])
-- OPC-UA client ( e.g. [UaExpert][uaexpert_install]) for individual monitoring of OPC-UA variables
+- Docker engine (cf. [docs.docker.com [2]][docker_install])
+- OPC-UA client ( e.g. [UaExpert [3]][uaexpert_install]) for individual monitoring of OPC-UA variables
 
 
 ## Manual
@@ -21,7 +21,7 @@ deployed first before the core services will be started. The picture below shows
 For visualization and easy configuration additional services are recommended.
 
 #### 1. Graphical user interface for docker administration
-For the local graphical administration of docker related services [portainer][portainer] can be used.
+For the local graphical administration of docker related services [portainer [4]][portainer] can be used.
 
 Pull the container image via
 
@@ -38,7 +38,7 @@ From now you can **use this GUI within the tutorial for creating or pulling cont
 For a scaled up deployment docker-compose files in combination with Kubernetes is recommended instead. 
 
 #### 2. Graphical user interface for database visualization
-[Grafana][grafana] is an open source analytics & monitoring solution for every database. Within this tutorial it will be used to show
+[Grafana [5]][grafana] is an open source analytics & monitoring solution for every database. Within this tutorial it will be used to show
 the time series data from the OPC-UA server stored in the influxdb Database.
 
 Pull the container image via
@@ -51,7 +51,7 @@ and deploy via
 A new dashboard will be set up [later](#monitoring-via-grafana) in this tutorial.    
 
 #### 3. Time series database for archiving OPC-UA variables
-[InfluxDB][influxdb] is a high-speed read and write database. The data is being written in real-time and one can read in real-time.
+[InfluxDB [6]][influxdb] is a high-speed read and write database. The data is being written in real-time and one can read in real-time.
 It will be used to store time series data from the OPC-UA server.
 
 Pull the container image via
@@ -62,8 +62,9 @@ and deploy via
 
     $ docker run -d -p 8086:8086 --name influxdb --restart always -v influxdb:/var/lib/influxdb influxdb
 InfluxDB is now ready for use and will be initialized later.
+
 #### 4. Network Time Protocol server
-The [NTP server][ntp] will be used for synchronization of the field measurement devices, the so-called Wireless Transducer Interfaces (WTI).
+The [NTP server [7]][ntp] will be used for synchronization of the field measurement devices, the so-called Wireless Transducer Interfaces (WTI).
 Have a look at hte NTP server configuration if you want to change the time server.
 
 Pull the container image via
@@ -93,7 +94,7 @@ There are four services available for set up via `Dockerfile`. After make the re
 first the OPC-UA server will be set up, then the protection service itself. Supplementary a database access and a device simulator are provided.
 
 We want to mention two ways to get docker images of these services. The first way is to load ready built docker images 
-from the registry at [dockerhub][n5geh_docker_registry], the second is to build each service based on the cloned repository using the `Dockerfiles`.
+from the registry at [dockerhub [8]][n5geh_docker_registry], the second is to build each service based on the cloned repository using the `Dockerfiles`.
 Both can be done using [portainer][portainer_images]. This tutorial focuses on the second way.
 
 #### 5. Clone repository to local host system using Git
@@ -154,7 +155,7 @@ To create and run a container based on this image with the optionally exposed po
     $ docker run -d -p 4860:4860 --name=grid_protection --restart=always n5geh/grid_protection:latest
 
 ##### Monitoring via external OPC-UA client
-[UaExpert][uaexpert_install] is used to get a better insight into the OPC-UA structure. This program can be used to monitor 
+[UaExpert [3]][uaexpert_install] is used to get a better insight into the OPC-UA structure. This program can be used to monitor 
 live data and even call manually server methods.  
 
 Add the OPC-UA server and connect.
@@ -234,6 +235,16 @@ It is possible to use certificates as well as username/password for the connecti
 of this option change `ENABLE_CERTIFICATE` to `"True"` in all `.Dockerfiles`. While within the services this will work out 
 of the box, a username/password must be entered for UaExpert when connecting to server. One will find the predefined combinations in [OPCServer.py][OPCServer].
 
+
+### Links
+[[1] https://wiki.n5geh.de/display/EN/Grid+Protection][n5geh_wiki] \
+[[2] https://docs.docker.com/engine/install/ubuntu/][docker_install] \
+[[3] https://www.unified-automation.com/de/downloads/opc-ua-clients.html][uaexpert_install] \
+[[4] https://hub.docker.com/r/portainer/portainer/][portainer] \
+[[5] https://hub.docker.com/r/grafana/grafana/][grafana] \
+[[6] https://hub.docker.com/_/influxdb][influxdb] \
+[[7] https://hub.docker.com/r/cturra/ntp/][ntp] \
+[[8] https://hub.docker.com/u/n5geh][n5geh_docker_registry]
 
 
 [n5geh_wiki]: https://wiki.n5geh.de/display/EN/Grid+Protection
