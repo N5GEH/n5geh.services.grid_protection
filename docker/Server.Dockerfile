@@ -22,6 +22,6 @@ ENV ENABLE_CERTIFICATE False
 
 EXPOSE 4840
 LABEL type="opcua_python_server" \
-      version="0.7.1"
+      version="0.7.2"
 
 CMD [ "python", "/usr/src/cloud_setup/opc_ua/server/OPCServer.py"]

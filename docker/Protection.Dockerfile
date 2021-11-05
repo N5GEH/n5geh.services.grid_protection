@@ -17,7 +17,7 @@ RUN apt-get purge -y git && apt-get autoremove -y
 
 # add environment variables
 ENV PYTHONPATH /usr/src
-#ENV SERVER_ENDPOINT opc.tcp://ubuntu5g:4840
+ENV SERVER_ENDPOINT opc.tcp://ubuntu5g:4840
 ENV NAMESPACE https://n5geh.de
 
 ENV ENABLE_CERTIFICATE False
@@ -37,5 +37,5 @@ ENV DEVICE_PATH /cloud_setup/data/device_config/Setup_demonstrator.txt
 
 EXPOSE 4860
 LABEL type="protection_python" \
-      version="0.7.1"
+      version="0.7.2"
 CMD [ "python", "/usr/src/cloud_setup/protection/GridProtectionManager.py"]

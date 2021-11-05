@@ -31,5 +31,5 @@ ENV NAME_OF_ANORMAL_MEASUREMENT LAST_I_PH1_RES
 ENV NAME_OF_SLACK_MEASUREMENT TRAFO_I_PH1_RES
 
 LABEL type="opcua_simulatedDevices_python" \
-      version="0.7.1"
+      version="0.7.2"
 CMD [ "python", "/usr/src/cloud_setup/sim_device/SimulatedDeviceManager.py"]

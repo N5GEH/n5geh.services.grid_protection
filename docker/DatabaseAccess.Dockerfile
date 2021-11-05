@@ -13,7 +13,7 @@ RUN apt-get purge -y git && apt-get autoremove -y
 
 # add environment variables
 ENV PYTHONPATH /usr/src
-#ENV SERVER_ENDPOINT opc.tcp://ubuntu5g:4840
+ENV SERVER_ENDPOINT opc.tcp://ubuntu5g:4840
 ENV NAMESPACE https://n5geh.de
 
 ENV ENABLE_CERTIFICATE False
@@ -27,5 +27,5 @@ ENV DEBUG_MODE_PRINT False
 ENV INFLUXDB_NAME demonstrator_grid_protection
 
 LABEL type="database_access_python" \
-      version="0.7.1"
+      version="0.7.2"
 CMD [ "python", "/usr/src/cloud_setup/database_access/InfluxDbWrapper.py"]
