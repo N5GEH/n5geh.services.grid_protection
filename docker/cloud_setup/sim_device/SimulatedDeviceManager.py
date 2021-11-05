@@ -114,9 +114,9 @@ class DeviceManager(object):
         self.NAMESPACE = os.environ.get("NAMESPACE")
         self.ENABLE_CERTIFICATE = bool(strtobool(os.environ.get("ENABLE_CERTIFICATE")))
         self.CERTIFICATE_PATH_CLIENT_CERT = os.path.dirname(os.getcwd()) + os.environ.get(
-            "CERTIFICATE_PATH_CLIENT_CERT")
+            "CERTIFICATE_PATH_CLIENT_CERT", "not_specified")
         self.CERTIFICATE_PATH_CLIENT_PRIVATE_KEY = os.path.dirname(os.getcwd()) + os.environ.get(
-            "CERTIFICATE_PATH_CLIENT_PRIVATE_KEY")
+            "CERTIFICATE_PATH_CLIENT_PRIVATE_KEY", "not_specified")
         self.DEBUG_MODE_PRINT = bool(strtobool(os.environ.get("DEBUG_MODE_PRINT", "False")))
 
         self.START_THRESHOLD = int(os.environ.get("AUTO_VAR_UPDATER_START_THRESHOLD", start_threshold)) * 1000 * 1000   # conversion into ns
