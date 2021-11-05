@@ -193,16 +193,16 @@ Check via UaExpert, that all measurement variables start to change their values.
 If one want to archive the values arriving on the OPC-UA server or have a superior insight of data history, this service
 provide access to the influxDB set up beforehand.
 
-_Important:_ In `SimDevice.Dockerfile` adapt the env `SERVER_ENDPOINT` (`"opc.tcp://x.x.x.x:4840"`)
+_Important:_ In `DatabaseAccess.Dockerfile` adapt the env `SERVER_ENDPOINT` (`"opc.tcp://x.x.x.x:4840"`)
 as well as `INFLUXDB_HOST` (`"x.x.x.x"`) to corresponding host ip addresses (see [portainer container overview][portainer_container]).
 
-To build the Device Simulator image with the tag `n5geh/influxdb_wrapper:latest` run in the console
+To build a DataBaseAccess image with the tag `n5geh/influxdb_client:latest` run in the console
 
-    $ docker build -t n5geh/influxdb_wrapper:latest -f /home/n5geh/grid_protection_repo/docker/DatabaseAccess.Dockerfile /home/n5geh/grid_protection_repo/
+    $ docker build -t n5geh/influxdb_client:latest -f /home/n5geh/grid_protection_repo/docker/DatabaseAccess.Dockerfile /home/n5geh/grid_protection_repo/
 
 To create and run a container based on this image:
 
-    $ docker run -d --name=influxdb_wrapper  n5geh/influxdb_wrapper:latest
+    $ docker run -d --name=influxdb_client  n5geh/influxdb_client:latest
 
 ##### Monitoring via Grafana
 Grafana can be used to visualize influxDB data.
