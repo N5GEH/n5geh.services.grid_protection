@@ -20,56 +20,60 @@ deployed first before the core services will be started. The picture below shows
 ### Recommended associated services
 For visualization and easy configuration additional services are recommended.
 
-<<<<<<< HEAD:tutorial/README.md
-
-=======
->>>>>>> master:tutorials/tutorial_grid_protection.md
 #### 1. Graphical user interface for docker administration
 For the local graphical administration of docker related services [portainer [4]][portainer] can be used.
 
 Pull the container image via
 
-    $ docker pull portainer/portainer
+    docker pull portainer/portainer
 
 and deploy via
 
-    $ docker volume create portainer_data
-    $ docker run -d -p 9000:9000 -p 8000:8000 --name portainer --restart always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer
+    docker volume create portainer_data
+    docker run -d -p 9000:9000 -p 8000:8000 --name portainer --restart always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer
 
 Then browse to your local [portainer instance][portainer_port] and create a user-password combination and select _Local Docker_ to manage your locally deployed docker containers. 
-From now you can **use this GUI within the tutorial for creating or pulling container images and manage their deployment.**
+From now, you can **use this GUI within the tutorial for creating or pulling container images and manage their deployment.**
 
 For a scaled up deployment docker-compose files in combination with Kubernetes is recommended instead. 
 
-<<<<<<< HEAD:tutorial/README.md
-
-=======
->>>>>>> master:tutorials/tutorial_grid_protection.md
 #### 2. Graphical user interface for database visualization
 [Grafana [5]][grafana] is an open source analytics & monitoring solution for every database. Within this tutorial it will be used to show
 the time series data from the OPC-UA server stored in the influxdb Database.
 
 Pull the container image via
 
-    $ docker pull grafana/grafana
+    docker pull grafana/grafana
 
 and deploy via
 
-    $ docker run -d -p 3000:3000 --name grafana --restart always grafana/grafana
+    docker run -d -p 3000:3000 --name grafana --restart always grafana/grafana
 A new dashboard will be set up [later](#monitoring-via-grafana) in this tutorial.    
 
 #### 3. Time series database for archiving OPC-UA variables
 [InfluxDB [6]][influxdb] is a high-speed read and write database. The data is being written in real-time and one can read in real-time.
-It will be used to store time series data from the OPC-UA server.
+It will be used to store time series data from the OPC-UA server. It is suggested to use influxdb:1.x.
 
 Pull the container image via
 
-    $ docker pull influxdb
+    docker pull influxdb:1.8.10
 
 and deploy via
 
-    $ docker run -d -p 8086:8086 --name influxdb --restart always -v influxdb:/var/lib/influxdb influxdb
+    docker run -d -p 8086:8086 --name influxdb --restart always -v influxdb:/var/lib/influxdb influxdb
+    docker run -d -p 8086:8086 --name influxdb_1.8.10 --restart always -v influxdb_1.8.10:/var/lib/influxdb_1.8.10 influxdb:1.8.10
 InfluxDB is now ready for use and will be initialized later.
+
+If using influxDB>2.0, browse to [influxdb][influxdb_port] and create access credentials:
+Suggestion:
+* user: root
+* password: n5geh2019
+* organization: IEEH
+* bucket: Demonstrator
+
+If using other credentials, you have to create an user account used by the DatabaseAccess service later.
+    
+    sudo apt install influxdb-client
 
 #### 4. Network Time Protocol server
 The [NTP server [7]][ntp] will be used for synchronization of the field measurement devices, the so-called Wireless Transducer Interfaces (WTI).
@@ -77,21 +81,23 @@ Have a look at hte NTP server configuration if you want to change the time serve
 
 Pull the container image via
 
-    $ docker pull cturra/ntp
+    docker pull cturra/ntp
 
 and deploy via
 
-    $ docker run -d -p 123:123/udp --name=ntp --restart=always --cap-add=SYS_TIME cturra/ntp
+    docker run -d -p 123:123/udp --name=ntp --restart=always --cap-add=SYS_TIME cturra/ntp
 One can test the NTP container with the follow command:
     
-    $ ntpdate -q localhost
+    ntpdate -q localhost
   
 #### List of services
 Here is the list of the services:
 
 * [portainer][portainer_port]: username:admin; password: chosen by user
 * [grafana][grafana_port]: username:admin; password:admin (user can change the password immediately)
-* [influxdb][influxdb_port]: will show `404 page not found` when set up 
+* [influxdb][influxdb_port]: 
+  * Using InfluxDB<2.0: will show `404 page not found`, when set up 
+  * Using InfluxDB>2.0: will show welcome screen, when set up
 * [ntp][ntp_port]
 
 One can observe the status of the set up container using [portainer][portainer_container].
@@ -106,10 +112,10 @@ from the registry at [dockerhub [8]][n5geh_docker_registry], the second is to bu
 Both can be done using [portainer][portainer_images]. This tutorial focuses on the second way.
 
 #### 5. Clone repository to local host system using Git
-    $ sudo apt install git
+    sudo apt install git
 For the following it is assumed that the repo was cloned to the local directory `/home/n5geh/grid_protection_repo/`.
 
-    $ git clone https://github.com/N5GEH/<name of repository> <path to local directory you want to clone the repo into>
+    git clone https://github.com/N5GEH/<name of repository> <path to local directory you want to clone the repo into>
 
 Now one can build images using
  * the [portainer interface][portainer_images] or 
@@ -120,14 +126,14 @@ This tutorial focuses on the second way.
 #### 6. OPC-UA server
 To build the OPC-UA server image with the tag `n5geh/opcua_server:latest` run in the console
 
-    $ docker build -t n5geh/opcua_server:latest -f /home/n5geh/grid_protection_repo/docker/Server.Dockerfile /home/n5geh/grid_protection_repo/
+    docker build -t n5geh/opcua_server:latest -f /home/n5geh/grid_protection_repo/docker/Server.Dockerfile /home/n5geh/grid_protection_repo/
 
 After a refresh of the image list it should looks like:
 ![opcua server image was build](images/portainer_build_opcua_server_image.png)
 
 To create and run a container based on this image the exposed port (4840) has to map so that other container can reach this container via calling this port:
 
-    $ docker run -d -p 4840:4840 --name=opcua_server --restart=always n5geh/opcua_server:latest
+    docker run -d -p 4840:4840 --name=opcua_server --restart=always n5geh/opcua_server:latest
 
 Now one can again observe or change the status of the existing container using [portainer][portainer_container].
 
@@ -156,11 +162,11 @@ _Important:_ In `Protection.Dockerfile` adapt the env `SERVER_ENDPOINT` (`"opc.t
 
 To build the Grid Protection image with the tag `n5geh/grid_protection:latest` run in the console
 
-    $ docker build -t n5geh/grid_protection:latest -f /home/n5geh/grid_protection_repo/docker/Protection.Dockerfile /home/n5geh/grid_protection_repo/
+    docker build -t n5geh/grid_protection:latest -f /home/n5geh/grid_protection_repo/docker/Protection.Dockerfile /home/n5geh/grid_protection_repo/
 
 To create and run a container based on this image with the optionally exposed port (4860):
 
-    $ docker run -d -p 4860:4860 --name=grid_protection --restart=always n5geh/grid_protection:latest
+    docker run -d -p 4860:4860 --name=grid_protection --restart=always n5geh/grid_protection:latest
 
 ##### Monitoring via external OPC-UA client
 [UaExpert [3]][uaexpert_install] is used to get a better insight into the OPC-UA structure. This program can be used to monitor 
@@ -180,17 +186,17 @@ _Important:_ In `SimDevice.Dockerfile` adapt the env `SERVER_ENDPOINT` (`"opc.tc
 
 To build the Device Simulator image with the tag `n5geh/sim_device:latest` run in the console
 
-    $ docker build -t n5geh/sim_device:latest -f /home/n5geh/grid_protection_repo/docker/SimDevice.Dockerfile /home/n5geh/grid_protection_repo/
+    docker build -t n5geh/sim_device:latest -f /home/n5geh/grid_protection_repo/docker/SimDevice.Dockerfile /home/n5geh/grid_protection_repo/
 
 To create and run a container based on this image:
 
-    $ docker run -d --name=sim_device  n5geh/sim_device:latest
+    docker run -d --name=sim_device  n5geh/sim_device:latest
 
 Check via UaExpert, that all measurement variables start to change their values.
 
 #### 9. Database access for archiving and superior monitoring
 ##### Deployment
-If one want to archive the values arriving on the OPC-UA server or have a superior insight of data history, this service
+If one want to archive the values arriving at the OPC-UA server or have a superior insight of data history, this service
 provide access to the influxDB set up beforehand.
 
 _Important:_ In `DatabaseAccess.Dockerfile` adapt the env `SERVER_ENDPOINT` (`"opc.tcp://x.x.x.x:4840"`)
@@ -198,17 +204,18 @@ as well as `INFLUXDB_HOST` (`"x.x.x.x"`) to corresponding host ip addresses (see
 
 To build a DataBaseAccess image with the tag `n5geh/influxdb_client:latest` run in the console
 
-    $ docker build -t n5geh/influxdb_client:latest -f /home/n5geh/grid_protection_repo/docker/DatabaseAccess.Dockerfile /home/n5geh/grid_protection_repo/
+    docker build -t n5geh/influxdb_client:latest -f /home/n5geh/grid_protection_repo/docker/DatabaseAccess.Dockerfile /home/n5geh/grid_protection_repo/
 
 To create and run a container based on this image:
 
-    $ docker run -d --name=influxdb_client  n5geh/influxdb_client:latest
+    docker run -d --name=influxdb_client  n5geh/influxdb_client:latest
 
 ##### Monitoring via Grafana
 Grafana can be used to visualize influxDB data.
 
 The setup is done by:
 * open [Grafana][grafana_port]
+* optional: install [Telegraf][influxdata_telegraf_weblink] for InfluxDB metrics
 * select `InfluxDB` as type for Data Sources
 * adapt the settings
     * name: `InfluxDB_demo`
@@ -223,16 +230,13 @@ is hardcoded for now in the `InfluxDbWrapper.py`, but can also be specified in t
 
 ![Grafana: set up data source](images/grafana_datasource.png)
 
-Next create a appropriate dashboard by yourself to visualize the history of data. For simplicity one can [import][grafana_import_dashboard] this 
+Next create an appropriate dashboard by yourself to visualize the history of data. For simplicity one can [import][grafana_import_dashboard] this 
 [preconfigured dashboard template][grafana_dashboard_template]. This leads to the following dashboard.
 
 ![Grafana: dashboard](images/grafana_meas_values.png)
 
-<<<<<<< HEAD:tutorial/README.md
-#### Conclusion
-=======
+
 #### 10. Conclusion
->>>>>>> master:tutorials/tutorial_grid_protection.md
 If all was set up right, then one have eight container running (cf. following picture).
 
 ![Portainer: list of running container after finishing this tutorial](images/portainer_finish.png)
@@ -258,17 +262,6 @@ of the box, a username/password must be entered for UaExpert when connecting to 
 [[7] https://hub.docker.com/r/cturra/ntp/][ntp] \
 [[8] https://hub.docker.com/u/n5geh][n5geh_docker_registry]
 
-### Links
-[[1] https://wiki.n5geh.de/display/EN/Grid+Protection][n5geh_wiki] \
-[[2] https://docs.docker.com/engine/install/ubuntu/][docker_install] \
-[[3] https://www.unified-automation.com/de/downloads/opc-ua-clients.html][uaexpert_install] \
-[[4] https://hub.docker.com/r/portainer/portainer/][portainer] \
-[[5] https://hub.docker.com/r/grafana/grafana/][grafana] \
-[[6] https://hub.docker.com/_/influxdb][influxdb] \
-[[7] https://hub.docker.com/r/cturra/ntp/][ntp] \
-[[8] https://hub.docker.com/u/n5geh][n5geh_docker_registry]
-
-
 [n5geh_wiki]: https://wiki.n5geh.de/display/EN/Grid+Protection
 [n5geh_docker_registry]: https://hub.docker.com/u/n5geh
 
@@ -287,6 +280,7 @@ of the box, a username/password must be entered for UaExpert when connecting to 
 
 [influxdb]: https://hub.docker.com/_/influxdb
 [influxdb_port]: localhost:8086
+[influxdata_telegraf_weblink]: https://docs.influxdata.com/telegraf
 
 [ntp]: https://hub.docker.com/r/cturra/ntp/
 [ntp_port]: localhost:123
