@@ -14,12 +14,14 @@ RUN apt-get purge -y git && apt-get autoremove -y
 ENV PYTHONPATH /usr/src
 ENV SERVER_ENDPOINT opc.tcp://0.0.0.0:4840/OPCUA/python_server/
 ENV NAMESPACE https://n5geh.de
-#ENV SERVER_NAME N5GEH_FreeOpcUa_Server
-#ENV ENABLE_CERTIFICATE False
-#ENV CERTIFICATE_PATH_SERVER_CERT /cloud_setup/opc_ua/certificates/n5geh_opcua_server_cert.pem
-#ENV CERTIFICATE_PATH_SERVER_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_opcua_server_private_key.pem
+
+ENV SERVER_NAME N5GEH_FreeOpcUa_Python_Server
+ENV ENABLE_CERTIFICATE False
+# ENV CERTIFICATE_PATH_SERVER_CERT /cloud_setup/opc_ua/certificates/n5geh_opcua_server_cert.pem
+# ENV CERTIFICATE_PATH_SERVER_PRIVATE_KEY /cloud_setup/opc_ua/certificates/n5geh_opcua_server_private_key.pem
 
 EXPOSE 4840
 LABEL type="opcua_python_server" \
       version="0.7.1"
+
 CMD [ "python", "/usr/src/cloud_setup/opc_ua/server/OPCServer.py"]

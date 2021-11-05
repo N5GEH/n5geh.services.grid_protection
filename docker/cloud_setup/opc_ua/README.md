@@ -26,4 +26,4 @@ If this is wanted, set ENABLE_CERTICITATE to TRUE in each Dockerfile. Also the c
 
 It has to mention that for now it is not recommended to open a secured connection because of open issues when refreshing the connection after the maximum session time. If this is requested attention should be given to the latest version of the opcua lib.
 
-[link_to_certificate_generation]: /certificates/generate_certificate_x509v3.sh
+[link_to_certificate_generation]: certificates/generate_certificate_x509v3.sh

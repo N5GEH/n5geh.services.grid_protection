@@ -21,8 +21,8 @@ Additional services can be used to improve the usability and maintainability:
 (2) are available on [dockerhub [2]][dockerhub], while an example for testing can be found in [ntp directory][dir_ntp] \
 (3) are available on [dockerhub [2]][dockerhub]
 
-# Gitlab runner CI
-For this project a gitlab runner is established. For now, there are 4 separate images specified:
+### Gitlab runner CI
+If a gitlab runner is established, there are 4 separate images specified:
 - an OPCUA server
 - a device group (external client) simulation as instance of an OPCUA client
 - a grid protection service
